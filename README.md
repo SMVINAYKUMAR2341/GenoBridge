@@ -138,7 +138,6 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 
 ## 🏛️ Technical Architecture & System Engineering
 
-```mermaid
 flowchart TD
     subgraph ClientLayer ["Client & Edge Layer"]
         User["Clinicians & Nurses (10M Concurrency)"] --> CF["Cloudflare Global Edge\n(DDoS Protection, WAF, SSL, Anycast CDN)"]
@@ -158,7 +157,7 @@ flowchart TD
         NextApp --> PgPool["PostgreSQL 16 Connection Pool\n(PgBouncer / Tuned 50 Max Pool)"]
         PgPool --> PgBase["Persistent Collections\n(Users, Patients, ANC, Audits)"]
     end
-```
+
 
 ### 1. 4-Tier Defense-in-Depth Security Architecture
 * **Tier 1 — Perimeter Edge Firewall ([`middleware.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/middleware.ts)):** Executes before any page rendering or database query. Validates cryptographic session cookies (`app-session` and `payload-token`). Unauthenticated force-browsing attempts to `/doctor/*`, `/nurse/*`, `/anc/*`, or `/assessment/*` are intercepted with HTTP 307 redirects to `/login`.
