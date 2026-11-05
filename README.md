@@ -1,4 +1,4 @@
-# HelixHealth — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
+﻿# HelixHealth — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.4.2-black?logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.3.1-61dafb?logo=react)](https://react.dev/)
@@ -284,14 +284,32 @@ python -m unittest discover backend/tests -v
 
 ---
 
-## 🌐 Production Deployment Guide
+## 🚀 Production Deployment Guide
 
-1. **Database:** Deploy a free PostgreSQL database on [Neon](https://neon.tech) and copy the pooled connection string.
-2. **Compute:** Deploy the repository to [Railway](https://railway.app) or [Render](https://render.com) using the root [`Dockerfile`](Dockerfile).
-3. **Edge / CDN:** Route your domain through [Cloudflare](https://dash.cloudflare.com) with the Orange Cloud Proxy enabled for free global DDoS mitigation, SSL, and sub-10ms edge caching.
+Deploy HelixHealth to production for free in 3 steps:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/SMVINAYKUMAR2341/GenoBridge)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/SMVINAYKUMAR2341/GenoBridge)
+
+1. **Free Database (Neon PostgreSQL):**
+   * Create a free account at [Neon.tech](https://neon.tech) and create a project named helix-db.
+   * Under **Dashboard → Connection Details**, copy the **Pooled connection string**:
+     `	ext
+     postgresql://helix_owner:password@ep-xyz-pooler.ap-south-1.aws.neon.tech/helix-db?sslmode=require
+     `
+2. **Compute Service (Render / Railway):**
+   * Click either the **Deploy to Render** or **Deploy on Railway** button above, or connect your repository (SMVINAYKUMAR2341/GenoBridge).
+   * Set the 4 environment variables:
+     * DATABASE_URI: *(Your Neon PostgreSQL connection string)*
+     * PAYLOAD_SECRET: helix-production-secret-key-32-chars-long-2026
+     * NODE_ENV: production
+     * PORT: 3000
+3. **Global Edge & DDoS Proxy (Cloudflare):**
+   * Point your custom domain's CNAME record to your Railway/Render service URL with **Orange Cloud (Proxied)** enabled.
+   * Under SSL/TLS, enable **Full (strict)**.
+   * Add a Cache Rule for static assets (/_next/static/*, /images/*) to cache everything with a 1-month TTL for sub-10ms global edge delivery.
 
 ---
-
 ## 📄 License & Clinical Disclaimer
 
 This software is developed for clinical decision support and educational demonstration. Automated recommendations are calibrated against published guidelines (ACOG, ACMG, MoHFW) and are designed to assist healthcare professionals. Final diagnostic determination and patient management remain the exclusive responsibility of credentialed attending clinicians.

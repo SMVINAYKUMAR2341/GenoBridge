@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: helixhealth
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URI
+        sync: false
+      - key: PAYLOAD_SECRET
+        generateValue: true
