@@ -2,7 +2,12 @@
 FROM node:22-bookworm-slim AS base
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl openssl ca-certificates python3 make g++ && rm -rf /var/lib/apt/lists/*
-RUN corepack enable && corepack prepare pnpm@10.6.1 --activate
+
+# Install pnpm directly via npm (avoids corepack /nonexistent home permission errors)
+RUN npm install -g pnpm@10.6.1
+
+ENV COREPACK_ENABLE_STRICT=0
+ENV COREPACK_HOME=/tmp/corepack
 
 # Step 1: Dependencies
 FROM base AS deps
@@ -36,17 +41,18 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOME=/app
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 -g nodejs -d /app nextjs
 
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/next.config.ts* ./
-COPY --from=builder /app/figma-image-loader.ts* ./
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts* ./
+COPY --from=builder --chown=nextjs:nodejs /app/figma-image-loader.ts* ./
 
 USER nextjs
 
