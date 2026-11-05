@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package.json* pnpm-lock.yaml* ./
 COPY ClinicalGeneticsReferralDecisionSupport-main/package.json* ClinicalGeneticsReferralDecisionSupport-main/pnpm-lock.yaml* ./
 
-RUN pnpm install --no-frozen-lockfile --ignore-engines
+RUN pnpm install --no-frozen-lockfile
 
 # Step 2: Build Next.js application
 FROM base AS builder
