@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { redirect } from 'next/navigation'
 import { appAuth } from '@/lib/app-auth'
 import WorkspaceHistory from '@/components/clinical/WorkspaceHistory'

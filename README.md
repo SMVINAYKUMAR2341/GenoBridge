@@ -1,4 +1,4 @@
-﻿# HelixHealth — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
+# HelixHealth — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.4.2-black?logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.3.1-61dafb?logo=react)](https://react.dev/)

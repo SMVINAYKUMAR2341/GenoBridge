@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { appAuth } from '@/lib/app-auth'
 import LandingPage from '@/components/landing/LandingPage'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'HelixHealth | Clinical Genetics & Antenatal Decision Support',
   description: 'Evidence-based clinical decision support for Gynecologists, OB-GYNs, and Maternal Health Nurses.',

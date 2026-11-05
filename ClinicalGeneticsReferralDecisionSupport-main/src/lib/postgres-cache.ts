@@ -88,11 +88,13 @@ function getPgCachePool(): pg.Pool {
     const connStr =
       process.env.DATABASE_URI ||
       'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging'
+    const isSsl = connStr.includes('sslmode=require') || connStr.includes('neon.tech')
     pgPoolInstance = new Pool({
       connectionString: connStr,
       max: 30, // Optimized for high concurrent worker pools
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
+      ssl: isSsl ? { rejectUnauthorized: false } : undefined,
     })
   }
   return pgPoolInstance

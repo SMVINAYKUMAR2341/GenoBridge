@@ -1,4 +1,3 @@
-import 'server-only'
 import { isDeepStrictEqual } from 'node:util'
 import type { PathwaySlug } from './decision-engine'
 import { FORM_FIELDS, type InputField } from './form-fields'

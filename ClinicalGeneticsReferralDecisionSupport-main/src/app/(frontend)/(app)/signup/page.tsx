@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import React from 'react'
 import type { Metadata } from 'next'
 import { SignUp } from '@/components/ui/sign-up'

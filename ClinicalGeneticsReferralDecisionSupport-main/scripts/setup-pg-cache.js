@@ -1,9 +1,11 @@
 import pg from 'pg'
 const { Pool } = pg
 
+const connStr = process.env.DATABASE_URI || 'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging'
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URI || 'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging',
+  connectionString: connStr,
   max: 20,
+  ssl: connStr.includes('sslmode=require') || connStr.includes('neon.tech') ? { rejectUnauthorized: false } : undefined,
 })
 
 async function run() {

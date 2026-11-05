@@ -44,6 +44,7 @@ export default buildConfig({
       max: 50,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
+      ssl: process.env.DATABASE_URI?.includes('sslmode=require') || process.env.DATABASE_URI?.includes('neon.tech') ? { rejectUnauthorized: false } : undefined,
     },
     idType: 'uuid',
   }),

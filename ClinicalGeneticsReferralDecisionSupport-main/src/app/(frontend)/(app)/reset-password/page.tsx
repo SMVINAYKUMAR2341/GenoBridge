@@ -4,6 +4,8 @@ import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
 import { AuthCardShell } from '@/components/auth/AuthCardShell'
 import { ShieldCheck } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Set New Password | Helix Clinical Genetics',
   description: 'Create a new secure password for your clinical workspace',

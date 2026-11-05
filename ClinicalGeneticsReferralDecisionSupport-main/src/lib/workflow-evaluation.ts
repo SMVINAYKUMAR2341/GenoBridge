@@ -1,4 +1,3 @@
-import 'server-only'
 import type { PayloadRequest } from 'payload'
 import type { PathwaySlug } from './decision-engine'
 import {

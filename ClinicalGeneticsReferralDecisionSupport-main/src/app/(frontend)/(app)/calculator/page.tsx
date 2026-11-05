@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { Calculator, ShieldAlert } from 'lucide-react'
 import { btnGhost, card, PageHeader } from '@/components/ui/Primitives'
