@@ -13,6 +13,23 @@
 
 ---
 
+## 🔑 Demo Access & Test Credentials
+
+The system enforces strict role-based access control (RBAC). Use the pre-configured clinical credentials below to explore each portal:
+
+| Portal | Professional Role | Registered Work Email | Password | Assigned Permissions & Clinical Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Doctor / Clinician Portal** | **Gynecologist / OB-GYN** | `doctor@hospital.org` | `password123` | Full clinical review authority, clinician confirmation/sign-off on high-risk assessments, genetic referral attestation, pathway triage. |
+| **Nurse Intake Portal** | **Staff Nurse / Medical Assistant** | `nurse@hospital.org` | `password123` | Maternal health registration, ANC visit logging, baseline vitals intake, multiple gestation documentation, progressive draft saving. |
+| **Alternative Provider** | **Consultant OB-GYN** | `jane.smith@helix-test.local` | `password123` | Secondary clinician account for multi-specialist sign-off and retrospective audit review. |
+| **Alternative Nurse** | **ANC Coordinator** | `mary.johnson@helix-test.local` | `password123` | Secondary triage nurse account for high-volume intake testing. |
+| **System Administrator** | **Platform Admin** | `admin@helix-test.local` | `password123` | Master governance dashboard, institutional user verification approval, ruleset versioning lifecycle. |
+
+> [!NOTE]
+> Public self-registration is also available via `/signup` with role-specific credentialing (NMC registration for doctors, INC registration for nurses). Newly registered accounts enter an approval queue and are granted access upon credential validation.
+
+---
+
 ## 📸 System Walkthrough & Screenshot Gallery
 
 ### 1. Authentication & Institutional Onboarding
@@ -87,6 +104,14 @@
 
 ---
 
+### 4. Comprehensive Clinical Record Report (PDF Export)
+
+#### Automated Antenatal Care (ANC) Record Report
+*Standardized clinical documentation export unifying patient identification, obstetric timeline, clinical risk stratification, baseline examination, maternal medical conditions, visit logs, and laboratory investigations for tertiary referral and EMR integration.*
+![Comprehensive ANC Record Report](Readme/12-anc-comprehensive-report.jpg)
+
+---
+
 ## 🔬 Core Capabilities
 
 ### 1. Six Governed Clinical Genetics Pathways
@@ -136,13 +161,13 @@ flowchart TD
 ```
 
 ### 1. 4-Tier Defense-in-Depth Security Architecture
-* **Tier 1 — Perimeter Edge Firewall ([`middleware.ts`](file:///c:/Users/AsusUser/New%20folder/Downloads/ClinicalGeneticsReferralDecisionSupport-main/ClinicalGeneticsReferralDecisionSupport-main/src/middleware.ts)):** Executes before any page rendering or database query. Validates cryptographic session cookies (`app-session` and `payload-token`). Unauthenticated force-browsing attempts to `/doctor/*`, `/nurse/*`, `/anc/*`, or `/assessment/*` are intercepted with HTTP 307 redirects to `/login`.
-* **Tier 2 — Server-Side Cryptographic Session & Account Gate ([`app-auth.ts`](file:///c:/Users/AsusUser/New%20folder/Downloads/ClinicalGeneticsReferralDecisionSupport-main/ClinicalGeneticsReferralDecisionSupport-main/src/lib/app-auth.ts)):** Verifies JWT signatures with `PAYLOAD_SECRET`. Validates `verificationStatus === 'APPROVED'`. Pending or rejected staff are locked out of clinical workflows.
+* **Tier 1 — Perimeter Edge Firewall ([`middleware.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/middleware.ts)):** Executes before any page rendering or database query. Validates cryptographic session cookies (`app-session` and `payload-token`). Unauthenticated force-browsing attempts to `/doctor/*`, `/nurse/*`, `/anc/*`, or `/assessment/*` are intercepted with HTTP 307 redirects to `/login`.
+* **Tier 2 — Server-Side Cryptographic Session & Account Gate ([`app-auth.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/lib/app-auth.ts)):** Verifies JWT signatures with `PAYLOAD_SECRET`. Validates `verificationStatus === 'APPROVED'`. Pending or rejected staff are locked out of clinical workflows.
 * **Tier 3 — Role Privilege Boundary Enforcement:** Prevents horizontal privilege escalation. Nurses attempting to access `/doctor/*` routes are automatically redirected back to `/nurse/dashboard`.
 * **Tier 4 — Direct API & Database Authorization:** API endpoints (`/api/anc`, `/api/patients`) reject unauthenticated requests with HTTP 401/403. Database queries enforce role-scoped data partitions.
 
 ### 2. Dual-Tier High-Performance PostgreSQL Cache (< 1 ms Latency)
-To support **10 million users** without crashing the database and with **$0 cloud cost**, Helix implements an open-source, dual-tier caching engine ([`postgres-cache.ts`](file:///c:/Users/AsusUser/New%20folder/Downloads/ClinicalGeneticsReferralDecisionSupport-main/ClinicalGeneticsReferralDecisionSupport-main/src/lib/postgres-cache.ts)):
+To support **10 million users** without crashing the database and with **$0 cloud cost**, Helix implements an open-source, dual-tier caching engine ([`postgres-cache.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/lib/postgres-cache.ts)):
 * **Tier 1 (L1 RAM LRU Cache):** In-memory process cache serving hot authentication tokens, guideline catalogs, and user sessions at **`0.0009 ms` (0.9 µs)** average latency.
 * **Tier 2 (L2 PostgreSQL UNLOGGED Cache):** A dedicated `UNLOGGED` PostgreSQL table (`helix_cache`) that bypasses write-ahead logging (WAL) and reads directly from PostgreSQL shared memory buffers at **`0.726 ms`** latency (14x faster than the 10 ms target).
 * **Tag-Based Invalidation:** When a record or profile is updated, cache tags (e.g. `user-session-{id}`, `clinical-pathways`) are purged in real-time across both memory and database tiers.
@@ -220,7 +245,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser and sign in with the [Demo Credentials](#-demo-access--test-credentials).
 
 ---
 
