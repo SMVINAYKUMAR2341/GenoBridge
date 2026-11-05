@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>HELIX | Clinical Genetics Referral Decision Support</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-background":"#d4e4fa","surface-container-lowest":"#010f1f","surface-container-high":"#1c2b3c","inverse-primary":"#006b5f","on-tertiary-fixed-variant":"#653e00","on-surface":"#d4e4fa","surface-container-low":"#0d1c2d","primary":"#4fdbc8","outline":"#859490","on-error":"#690005","surface":"#051424","primary-container":"#14b8a6","on-secondary-container":"#00374d","surface-variant":"#273647","secondary":"#7bd0ff","surface-tint":"#4fdbc8","on-surface-variant":"#bbcac6","secondary-fixed-dim":"#7bd0ff","on-primary-fixed-variant":"#005048","background":"#051424","primary-fixed":"#71f8e4","on-secondary-fixed-variant":"#004c69","surface-bright":"#2c3a4c","tertiary":"#ffb95f","error":"#ffb4ab","on-tertiary":"#472a00","surface-container-highest":"#273647","on-tertiary-container":"#543300","tertiary-fixed-dim":"#ffb95f","inverse-surface":"#d4e4fa","inverse-on-surface":"#233143","on-secondary-fixed":"#001e2c","on-primary":"#003731","tertiary-fixed":"#ffddb8","primary-fixed-dim":"#4fdbc8","surface-container":"#122131","outline-variant":"#3c4947","on-error-container":"#ffdad6","error-container":"#93000a","on-tertiary-fixed":"#2a1700","surface-dim":"#051424","on-primary-fixed":"#00201c","secondary-fixed":"#c4e7ff","on-secondary":"#00354a","secondary-container":"#00a6e0","on-primary-container":"#00423b","tertiary-container":"#e49200"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"margin":"1rem","space-md":"1rem","space-xs":"0.25rem","margin-desktop":"3rem","space-xl":"2.5rem","margin-tablet":"2rem","space-sm":"0.5rem","gutter-desktop":"1.5rem","gutter":"1.25rem","space-lg":"1.5rem"},"fontFamily":{"mono-clinical-sm":["JetBrains Mono"],"headline-lg":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"mono-clinical-lg":["JetBrains Mono"],"headline-md":["Plus Jakarta Sans"],"display-hero":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-sm":["Inter"],"body-sm":["Inter"],"label-md":["Inter"],"body-md":["Inter"],"body-lg":["Inter"]},"fontSize":{"mono-clinical-sm":["11px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-lg-mobile":["26px",{"lineHeight":"34px","letterSpacing":"-0.01em","fontWeight":"600"}],"mono-clinical-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"500"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-sm":["18px",{"lineHeight":"26px","letterSpacing":"0em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"400"}],"label-md":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"22px","letterSpacing":"0em","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_4px_24px_rgba(1,15,31,0.6)]"><div class="h-16 w-full px-margin md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group focus:outline-none" data-path="platform" href="#"><div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:text-primary-fixed transition-colors shadow-[0_0_12px_rgba(20,184,166,0.2)]"><span class="material-symbols-outlined text-[20px]">biotech</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface group-hover:text-primary transition-colors font-bold">HELIX</span><span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary uppercase tracking-widest">Genomics OB/GYN</span></div></a><nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary font-label-md"><a aria-current="page" class="transition-colors text-primary font-label-md" data-path="platform" href="#">Platform</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="clinical-pathways" href="#">Clinical Pathways</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="how-it-works" href="#">How It Works</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="governance" href="#">Governance</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a></nav></div><div class="flex items-center gap-space-md"><a class="hidden sm:inline-flex items-center justify-center px-space-md py-space-xs rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="login" href="#">Sign In</a><a class="inline-flex items-center justify-center px-space-md py-space-xs rounded bg-primary-container text-on-primary-container font-label-md text-label-md hover:bg-primary transition-all shadow-[0_0_14px_rgba(20,184,166,0.35)]" data-path="request-demo" href="#">Request a Demo</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-4rem)]"><div class="flex flex-col w-full text-on-surface">
+<!-- HERO SECTION -->
+<section class="relative w-full overflow-hidden px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl lg:py-24">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+<div class="lg:col-span-7 flex flex-col gap-space-md z-10">
+<div class="inline-flex items-center gap-space-xs px-3 py-1.5 rounded-full bg-surface-container-low shadow-sm w-fit">
+<span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+<span class="font-mono-clinical-sm text-mono-clinical-sm uppercase text-primary tracking-wider">Clinical Genetics Referral Platform</span>
+</div>
+<h1 class="font-display-hero text-display-hero text-on-surface tracking-tight">
+          Bringing Clarity to <br class="hidden sm:inline"/>
+<span class="text-primary">Every Genetic Referral Decision</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+          Organize clinical history, family pedigree information, and antenatal care data into structured, evidence-based genetic referral recommendations.
+        </p>
+<div class="flex flex-wrap items-center gap-space-md pt-space-sm">
+<a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-3 rounded bg-primary-container text-on-primary-container font-label-md text-label-md hover:bg-primary transition-all shadow-[0_0_16px_rgba(20,184,166,0.35)]" href="#platform-capabilities">
+<span>Explore Platform</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-3 rounded bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-variant transition-all shadow-sm" href="#how-it-works">
+<span class="material-symbols-outlined text-[18px] text-secondary">account_tree</span>
+<span>View How It Works</span>
+</a>
+</div>
+<div class="flex flex-wrap items-center gap-space-lg pt-space-md text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">terminal</span>
+<span>Deterministic Rule Execution</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">hub</span>
+<span>Standardized Pedigree Engine</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">clinical_notes</span>
+<span>Calibrated to ACOG &amp; ACMG</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 relative flex items-center justify-center">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-surface-container-lowest">
+<img alt="DNA double helix molecular visualization" class="w-full h-full object-cover opacity-95" src="./images/dna-helix-card.jpg" onerror="this.onerror=null; this.src='./images/dna-hero.png';"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/30 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 p-space-sm rounded bg-surface-container/90 backdrop-blur-md shadow-lg flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">science</span>
+<div class="flex flex-col">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface">GENOMIC ENGINE ARCHITECTURE</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Real-time variant &amp; pedigree triage</span>
+</div>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-secondary">v2.4 Core</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CONTROLLED DEMONSTRATION NOTICE BANNER -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-sm">
+<div class="max-w-7xl mx-auto rounded-lg bg-surface-container-low p-space-md md:p-space-lg shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="p-2 rounded bg-surface-container-high text-secondary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[24px]">terminal</span>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex flex-wrap items-center gap-space-xs">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Explore HELIX in a Controlled Demonstration Environment</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary font-mono-clinical-sm text-mono-clinical-sm">Synthetic Data Only</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-4xl">
+            HELIX currently uses synthetic patient data to demonstrate clinical assessment, referral evaluation, workflow management, governance, and structured reporting. This environment is provisioned exclusively for operational evaluation and does not process live production Protected Health Information (PHI).
+          </p>
+</div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded bg-surface-container-high text-on-surface font-mono-clinical-sm text-mono-clinical-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          Evaluation Build Active
+        </span>
+</div>
+</div>
+</section>
+<!-- PLATFORM CAPABILITIES (4 CARDS) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl" id="platform-capabilities">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Functional Modules</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Integrated Clinical Workflows</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Engineered to bridge clinical obstetric records with specialized genetic evaluation through modular data captures.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between shadow-sm group">
+<div class="flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">history_edu</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Clinical History</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Structured clinical information for pathway-specific assessments, standardizing phenotypic data capture across clinical staff.
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span>Phenotype capture</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between shadow-sm group">
+<div class="flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">account_tree</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Family Pedigree</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Three-generation pedigree construction using standardized clinical symbols, documenting inheritance patterns and maternal lineages.
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span>Pedigree engine</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between shadow-sm group">
+<div class="flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">pregnant_woman</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Routine Antenatal Care</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Structured obstetric history, demographics, ultrasound markers, and maternal serum screenings unified in one view.
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span>Obstetric profile</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between shadow-sm group">
+<div class="flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">fact_check</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Referral Evaluation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Server-side evaluation against configured clinical criteria and guideline algorithms to identify candidates for specialty genetics.
+            </p>
+</div>
+<div class="pt-space-md flex items-center gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span>Deterministic review</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SIX CLINICAL PATHWAYS -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl bg-surface-container-lowest" id="pathways">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Pathway Catalog</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Six Clinical Pathways</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Support structured genetic assessment across key clinical referral scenarios encountered in modern obstetric and gynecologic practice.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<!-- Pathway 1 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[22px]">coronavirus</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ACOG No. 793</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">Hereditary Cancer Risk</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Assess clinical and family history relevant to hereditary breast, ovarian, uterine, and colorectal cancer referral criteria.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">BRCA1/2</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Lynch Panel</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">NCCN Guidelines</span>
+</div>
+</div>
+<!-- Pathway 2 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-secondary">
+<span class="material-symbols-outlined text-[22px]">strikethrough_s</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ACOG No. 691</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">Preconception Carrier Screening</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Support structured carrier screening assessment workflows for cystic fibrosis, spinal muscular atrophy, hemoglobinopathies, and expanded pan-ethnic panels.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">CFTR</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">SMN1</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">HBB</span>
+</div>
+</div>
+<!-- Pathway 3 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[22px]">monitoring</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ACOG / SMFM 2026</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">NIPT Results</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Organize and evaluate non-invasive prenatal test assessment metrics including fetal fraction, aneuploidy high-risk calls, and low fetal fraction retest criteria.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">T21/18/13</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Sex Chromosome</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">cfDNA</span>
+</div>
+</div>
+<!-- Pathway 4 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-secondary">
+<span class="material-symbols-outlined text-[22px]">vital_signs</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ACOG No. 175</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">Abnormal Ultrasound Findings</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Capture relevant structural malformations and soft markers including nuchal translucency elevation, cardiac defects, and skeletal anomalies for rapid triage.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Increased NT</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Organ Anomalies</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">CMA Triage</span>
+</div>
+</div>
+<!-- Pathway 5 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-[22px]">replay</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ASRM / ACOG</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">Infertility &amp; Recurrent Pregnancy Loss</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Support structured assessment of relevant reproductive history, prior spontaneous losses, parental karyotype indications, and microdeletions.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Karyotype</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Translocation</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Y-Deletions</span>
+</div>
+</div>
+<!-- Pathway 6 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low hover:bg-surface-container transition-all flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="p-2 rounded bg-surface-container-high text-secondary">
+<span class="material-symbols-outlined text-[22px]">family_restroom</span>
+</div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant">ACMG Standards</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface pt-1">Positive Family History</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Document and cross-reference family history of known monogenic diseases, early onset cardiac arrest, developmental delay, or consanguineous partnerships.
+          </p>
+<div class="pt-2 flex flex-wrap gap-1 font-mono-clinical-sm text-mono-clinical-sm text-secondary">
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Monogenic</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Consanguinity</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest">Pedigree Map</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- HOW IT WORKS (4-STEP PROCESS) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl" id="how-it-works">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Clinical Workflow</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">A Clear Process from Assessment to Clinical Review</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Deterministic execution ensures patient data progresses through standardized checkpoints before specialist referral packaging.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md relative">
+<!-- Step 1 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-mono-clinical-lg text-mono-clinical-lg font-bold text-primary">01</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">dataset</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Collect Clinical History</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Capture patient clinical and family history through structured questionnaires tailored to obstetric indications.
+            </p>
+</div>
+<div class="pt-space-md">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">Intake standardization</span>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-mono-clinical-lg text-mono-clinical-lg font-bold text-secondary">02</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">schema</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Build Family Pedigree</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Create a structured three-generation family pedigree using standardized symbols and documented degrees of kinship.
+            </p>
+</div>
+<div class="pt-space-md">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">Pedigree generation</span>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-mono-clinical-lg text-mono-clinical-lg font-bold text-primary">03</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">rule</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Evaluate Clinical Criteria</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Evaluate information using the server-side deterministic engine against active ACOG and ACMG guideline logic.
+            </p>
+</div>
+<div class="pt-space-md">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">Server-side verification</span>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-mono-clinical-lg text-mono-clinical-lg font-bold text-secondary">04</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">assignment_turned_in</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Generate Referral Recommendations</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Generate structured outcomes and supporting evidence summaries for attending provider attestation.
+            </p>
+</div>
+<div class="pt-space-md">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">Attested documentation</span>
+</div>
+</div>
+</div>
+<!-- Evaluation outcomes status tags -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Standardized Engine Outcomes</span>
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">Strict taxonomy output without ambiguous scoring</span>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm">
+<span class="px-3 py-1 rounded bg-error-container text-on-error-container font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Urgent Referral
+          </span>
+<span class="px-3 py-1 rounded bg-surface-container-high text-primary font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> Routine Referral
+          </span>
+<span class="px-3 py-1 rounded bg-surface-container-high text-secondary font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> No Referral Needed
+          </span>
+<span class="px-3 py-1 rounded bg-surface-container-high text-tertiary font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Borderline Consideration
+          </span>
+<span class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Insufficient Information
+          </span>
+<span class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span> Criteria Pending Approval
+          </span>
+</div>
+<div class="pt-2 text-on-surface-variant font-body-sm text-body-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary">info</span>
+<span>Clinical Reminder: HELIX does not independently diagnose patients or replace credentialed clinical judgment.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- THREE-GENERATION PEDIGREE BUILDER SECTION -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl bg-surface-container-lowest" id="pedigree-engine">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Clinical Genetics Graphics</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Three-Generation Family History Visualization</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          Structure family relationships and clinically relevant genetic history through an interactive pedigree editor compliant with standard clinical genetic nomenclature.
+        </p>
+</div>
+<!-- Pedigree Canvas Mockup -->
+<div class="w-full rounded-xl bg-surface-container-low p-space-md md:p-space-lg shadow-xl flex flex-col gap-space-lg">
+<!-- Header controls -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface font-semibold">SYNTHETIC PEDIGREE: CASE #SYN-8492</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-mono-clinical-sm text-mono-clinical-sm">Maternal Lineage Review</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-3 py-1 rounded bg-surface-container-high text-on-surface hover:bg-surface-variant text-label-md font-label-md flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">zoom_in</span> Zoom
+            </button>
+<button class="px-3 py-1 rounded bg-surface-container-high text-on-surface hover:bg-surface-variant text-label-md font-label-md flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">file_download</span> SVG Export
+            </button>
+</div>
+</div>
+<!-- Interactive SVG Pedigree Tree -->
+<div class="w-full overflow-x-auto py-6 bg-surface-container-lowest rounded-lg flex justify-center">
+<svg class="w-[860px] h-[360px] text-on-surface select-none" viewbox="0 0 860 360">
+<!-- Generation Labels -->
+<text fill="#859490" font-family="JetBrains Mono" font-size="12" font-weight="600" x="24" y="55">GEN I</text>
+<text fill="#859490" font-family="JetBrains Mono" font-size="12" font-weight="600" x="24" y="175">GEN II</text>
+<text fill="#859490" font-family="JetBrains Mono" font-size="12" font-weight="600" x="24" y="295">GEN III</text>
+<!-- Guide Lines -->
+<line stroke="#1c2b3c" stroke-dasharray="4 4" stroke-width="1" x1="80" x2="820" y1="50" y2="50"></line>
+<line stroke="#1c2b3c" stroke-dasharray="4 4" stroke-width="1" x1="80" x2="820" y1="170" y2="170"></line>
+<line stroke="#1c2b3c" stroke-dasharray="4 4" stroke-width="1" x1="80" x2="820" y1="290" y2="290"></line>
+<!-- GENERATION I: Maternal & Paternal Grandparents -->
+<!-- Maternal Grandfather (I:1) Deceased Male -->
+<rect fill="none" height="36" stroke="#d4e4fa" stroke-width="2" width="36" x="230" y="32"></rect>
+<line stroke="#d4e4fa" stroke-width="2" x1="228" x2="268" y1="70" y2="30"></line>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="248" y="85">I:1 (d. 68)</text>
+<!-- Partnership line I:1 & I:2 -->
+<line stroke="#d4e4fa" stroke-width="2" x1="266" x2="330" y1="50" y2="50"></line>
+<!-- Maternal Grandmother (I:2) Affected Female (Ovarian Ca) -->
+<circle cx="348" cy="50" fill="#ffb4ab" r="18" stroke="#ffb4ab" stroke-width="2"></circle>
+<text fill="#ffb4ab" font-family="Inter" font-size="10" text-anchor="middle" x="348" y="85">I:2 (Ov Ca 52)</text>
+<!-- Relationship branch to Gen II -->
+<line stroke="#d4e4fa" stroke-width="2" x1="298" x2="298" y1="50" y2="110"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="200" x2="390" y1="110" y2="110"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="200" x2="200" y1="110" y2="152"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="390" x2="390" y1="110" y2="152"></line>
+<!-- Paternal Grandparents -->
+<rect fill="none" height="36" stroke="#d4e4fa" stroke-width="2" width="36" x="540" y="32"></rect>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="558" y="85">I:3 (74)</text>
+<line stroke="#d4e4fa" stroke-width="2" x1="576" x2="640" y1="50" y2="50"></line>
+<circle cx="658" cy="50" fill="none" r="18" stroke="#d4e4fa" stroke-width="2"></circle>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="658" y="85">I:4 (72)</text>
+<line stroke="#d4e4fa" stroke-width="2" x1="608" x2="608" y1="50" y2="110"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="608" x2="608" y1="110" y2="152"></line>
+<!-- GENERATION II: Maternal Aunt, Mother, Father -->
+<!-- Maternal Aunt (II:1) Carrier -->
+<circle cx="200" cy="170" fill="none" r="18" stroke="#d4e4fa" stroke-width="2"></circle>
+<circle cx="200" cy="170" fill="#4fdbc8" r="5"></circle>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="200" y="205">II:1 (BRCA1+)</text>
+<!-- Mother (II:2) Affected Breast Ca -->
+<circle cx="390" cy="170" fill="#ffb4ab" r="18" stroke="#ffb4ab" stroke-width="2"></circle>
+<text fill="#ffb4ab" font-family="Inter" font-size="10" text-anchor="middle" x="390" y="205">II:2 (Br Ca 41)</text>
+<!-- Father (II:3) -->
+<rect fill="none" height="36" stroke="#d4e4fa" stroke-width="2" width="36" x="590" y="152"></rect>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="608" y="205">II:3 (46)</text>
+<!-- Mother & Father Partnership -->
+<line stroke="#d4e4fa" stroke-width="2" x1="408" x2="590" y1="170" y2="170"></line>
+<!-- Offspring connector to Gen III -->
+<line stroke="#d4e4fa" stroke-width="2" x1="499" x2="499" y1="170" y2="230"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="390" x2="610" y1="230" y2="230"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="390" x2="390" y1="230" y2="272"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="500" x2="500" y1="230" y2="272"></line>
+<line stroke="#d4e4fa" stroke-width="2" x1="610" x2="610" y1="230" y2="272"></line>
+<!-- GENERATION III: Brother, Proband, Unborn Fetus -->
+<!-- Brother (III:1) -->
+<rect fill="none" height="36" stroke="#d4e4fa" stroke-width="2" width="36" x="372" y="272"></rect>
+<text fill="#bbcac6" font-family="Inter" font-size="10" text-anchor="middle" x="390" y="325">III:1 (22)</text>
+<!-- PROBAND (III:2) Consultand Female with Arrow -->
+<circle cx="500" cy="290" fill="none" r="18" stroke="#4fdbc8" stroke-width="3"></circle>
+<polygon fill="#4fdbc8" points="460,312 476,302 468,300 475,286 470,283 463,297 458,290"></polygon>
+<text fill="#4fdbc8" font-family="JetBrains Mono" font-size="12" font-weight="700" x="445" y="325">P</text>
+<text fill="#4fdbc8" font-family="Inter" font-size="11" font-weight="600" text-anchor="middle" x="500" y="325">III:2 Proband (29)</text>
+<!-- Fetus / Gestational age 14w (III:3) Diamond -->
+<polygon fill="none" points="610,270 628,290 610,310 592,290" stroke="#7bd0ff" stroke-width="2"></polygon>
+<text fill="#7bd0ff" font-family="Inter" font-size="10" text-anchor="middle" x="610" y="294">14w</text>
+<text fill="#7bd0ff" font-family="Inter" font-size="10" text-anchor="middle" x="610" y="325">III:3 (Pregnancy)</text>
+</svg>
+</div>
+<!-- Pedigree Standardized Clinical Legend -->
+<div class="pt-space-sm flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant uppercase">Standardized Clinical Nomenclature Legend</span>
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-space-sm font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<div class="w-3.5 h-3.5 bg-transparent border border-on-surface flex-shrink-0"></div>
+<span>Male</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3.5 h-3.5 rounded-full bg-transparent border border-on-surface flex-shrink-0"></div>
+<span>Female</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3.5 h-3.5 rotate-45 bg-transparent border border-on-surface flex-shrink-0"></div>
+<span>Unknown/Fetus</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3.5 h-3.5 rounded-full bg-error flex-shrink-0"></div>
+<span class="text-error">Affected</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3.5 h-3.5 rounded-full bg-transparent border border-on-surface flex items-center justify-center flex-shrink-0">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+<span class="text-primary">Carrier</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative w-3.5 h-3.5 bg-transparent border border-on-surface flex-shrink-0">
+<div class="absolute inset-0 border-t border-on-surface rotate-45 origin-center"></div>
+</div>
+<span>Deceased</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-primary font-bold">P ↗</span>
+<span class="text-primary">Proband</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-2 border-t-2 border-b-2 border-on-surface flex-shrink-0"></div>
+<span>Consanguinity</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- GUIDELINE-INFORMED CLINICAL DECISION SUPPORT (ACOG GUIDELINES) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl" id="guidelines">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Referenced Literature</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Guideline-Informed Clinical Decision Support</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          HELIX organizes clinical information and supports structured referral assessment using configurable clinical criteria calibrated against recognized professional society statements. Clinical governance rule configurations are strictly maintained separately from operational codebases.
+        </p>
+</div>
+<!-- Guideline Reference Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">ACOG Committee Opinion No. 793</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Hereditary Cancer Risk</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Hereditary Cancer Syndromes and Risk Assessment. Establishes thresholds for pedigree evaluation, early onset criteria, and multi-gene panel referrals.
+            </p>
+</div>
+<div class="pt-space-md font-mono-clinical-sm text-mono-clinical-sm text-primary">
+            NCCN Criteria Alignment
+          </div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">ACOG Committee Opinion No. 691</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Carrier Screening</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Carrier Screening for Genetic Conditions. Details pan-ethnic cystic fibrosis, SMA, hemoglobinopathy triage, and expanded carrier screening partner testing.
+            </p>
+</div>
+<div class="pt-space-md font-mono-clinical-sm text-mono-clinical-sm text-primary">
+            ACMG Technical Standards
+          </div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">ACOG Practice Advisory (Jan 2026)</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">NIPT and Prenatal Screening</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Screening for Fetal Chromosomal Abnormalities, endorsing updated SMFM guidance on cell-free DNA, discordant findings, and ultrasound correlation.
+            </p>
+</div>
+<div class="pt-space-md font-mono-clinical-sm text-mono-clinical-sm text-primary">
+            SMFM Consensus Endorsed
+          </div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">ACOG Practice Bulletin No. 175</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ultrasound Findings</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Ultrasound in Pregnancy. Informs indications for diagnostic testing (chorionic villus sampling and amniocentesis with chromosomal microarray) upon anomalous findings.
+            </p>
+</div>
+<div class="pt-space-md font-mono-clinical-sm text-mono-clinical-sm text-primary">
+            Microarray Indication Rules
+          </div>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col justify-between lg:col-span-2">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">ACOG Committee Statement (Feb 2026)</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ethical Considerations</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Ethical Considerations for Genetic Testing and Counseling in Obstetrics and Gynecology. Emphasizes patient autonomy, structured pre-test education, non-directive counseling, and management of variants of uncertain significance (VUS).
+            </p>
+</div>
+<div class="pt-space-md font-mono-clinical-sm text-mono-clinical-sm text-primary">
+            Informed Consent &amp; Autonomy Principles
+          </div>
+</div>
+</div>
+<!-- Core Principles Box -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Core Clinical Principles Embedded in HELIX</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Evidence-based clinical guidance</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Appropriate genetic counseling pathways</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Patient-centered shared decision-making</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Referral to genetics specialists when indicated</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Proper consideration of screening limitations</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Regular review of changing clinical recommendations</span>
+</div>
+</div>
+<div class="pt-space-sm p-space-sm rounded bg-surface-container-high flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">verified</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            HELIX supports structured clinical assessment and does not replace professional medical judgment, genetic counseling, or independent clinical decision-making.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- CLINICAL GOVERNANCE SECTION (2 COLUMNS) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl bg-surface-container-lowest" id="governance">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Auditability &amp; Review</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Dual-Track Clinical Governance</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Segregated lifecycle state machines maintain total transparency across clinical referral submissions and underlying algorithmic rule configurations.
+        </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
+<!-- Column 1: Clinical Workflow -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Clinical Referral Workflow</h3>
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary">Patient Assessment Track</span>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded bg-surface-container-lowest overflow-x-auto text-center font-mono-clinical-sm text-mono-clinical-sm gap-2">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant">DRAFT</span>
+<span class="text-outline">→</span>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant">SUBMITTED</span>
+<span class="text-outline">→</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-secondary">IN_REVIEW</span>
+<span class="text-outline">→</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-primary font-bold">FINALIZED</span>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">drafts</span>
+<div>
+<strong class="text-on-surface">Draft Saving:</strong> Clinic staff can incrementally input intake surveys, pedigree records, and antenatal labs over multiple appointments without premature engine locking.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">send</span>
+<div>
+<strong class="text-on-surface">Submission Protocol:</strong> Immutable snapshot creation freezing pedigree graph data, current gestational age, and uploaded clinical laboratory values.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">rate_review</span>
+<div>
+<strong class="text-on-surface">Provider Review:</strong> Attending physician or genetic counselor inspects flagged risk determinants and verified guideline citations.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] mt-0.5">history</span>
+<div>
+<strong class="text-on-surface">Revision History &amp; Attestation:</strong> Re-evaluations generate append-only logs with timestamped electronic signatures before transmission to specialty centers.
+              </div>
+</div>
+</div>
+</div>
+<!-- Column 2: Clinical Criteria Governance -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Clinical Criteria Governance</h3>
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary">Ruleset Lifecycle Track</span>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded bg-surface-container-lowest overflow-x-auto text-center font-mono-clinical-sm text-mono-clinical-sm gap-1">
+<span class="px-1.5 py-1 rounded bg-surface-container text-on-surface-variant">DRAFT</span>
+<span class="text-outline">→</span>
+<span class="px-1.5 py-1 rounded bg-surface-container text-on-surface-variant">UNDER_REVIEW</span>
+<span class="text-outline">→</span>
+<span class="px-1.5 py-1 rounded bg-surface-container-high text-secondary">APPROVED</span>
+<span class="text-outline">→</span>
+<span class="px-1.5 py-1 rounded bg-surface-container-high text-primary font-bold">ACTIVE</span>
+<span class="text-outline">→</span>
+<span class="px-1.5 py-1 rounded bg-surface-container text-outline">RETIRED</span>
+</div>
+<div class="flex flex-col gap-space-sm pt-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">tune</span>
+<div>
+<strong class="text-on-surface">Criteria Versioning:</strong> Guidelines and threshold definitions (e.g., family history cutoffs) are version-controlled with deterministic hash signatures.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">menu_book</span>
+<div>
+<strong class="text-on-surface">Guideline Cross-Referencing:</strong> Every logic branch requires direct linkage to an active professional society bulletin, statement, or published standard.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">how_to_reg</span>
+<div>
+<strong class="text-on-surface">Multi-Specialist Approval:</strong> Updates require multi-clinician sign-off before promotion to production evaluation pipelines.
+              </div>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">archive</span>
+<div>
+<strong class="text-on-surface">Audit History &amp; Superseding:</strong> Historical referrals continuously link to the exact ruleset version active on their evaluation date for permanent retrospective defense.
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- PRIVACY, SECURITY & HIPAA READINESS PANEL -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl" id="security">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Data Protection</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Privacy and Security at the Core of Clinical Genetics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          HELIX is designed with privacy, controlled access, data integrity, and clinical accountability as foundational architectural priorities.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">manage_accounts</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Role-Based Access</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Strict separation between attending gynecologists, clinical genetic counselors, nurses, and practice system administrators.
+          </p>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">key</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Secure Authentication</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Multi-factor authentication protocols, session expirations, and hospital enterprise identity integration capabilities.
+          </p>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Audit Accountability</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Full audit trails capturing every record view, pedigree mutation, assessment recalculation, and report transmission.
+          </p>
+</div>
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">lock</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Data Integrity</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            SHA-256 cryptographic digest verification verifying that referral data remains unmodified during downstream transit.
+          </p>
+</div>
+</div>
+<!-- HIPAA Readiness Panel -->
+<div class="p-space-lg rounded-lg bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-xs">
+<div>
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary uppercase">Compliance Engineering</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Built with HIPAA Security Principles in Mind</h3>
+</div>
+<span class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm w-fit">
+            Architectural Framework
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          The HELIX infrastructure aligns with federal requirements under the Health Insurance Portability and Accountability Act (HIPAA) Security and Privacy Rules. Security controls are engineered across three regulatory tiers:
+        </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-2">
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col gap-1">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary font-semibold">Administrative Safeguards</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Role assignment protocols, workforce authorization workflows, regular automated vulnerability triage, and business associate governance readiness.
+            </p>
+</div>
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col gap-1">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary font-semibold">Technical Safeguards</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              AES-256 resting data encryption, TLS 1.3 in-transit protections, unique user identification tokens, and automated emergency session termination.
+            </p>
+</div>
+<div class="p-space-sm rounded bg-surface-container-lowest flex flex-col gap-1">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary font-semibold">Physical &amp; Infrastructure Safeguards</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Isolated cloud data centers, zero local caching on unmanaged browser endpoints, and hardware token access limits.
+            </p>
+</div>
+</div>
+<div class="pt-space-xs p-space-sm rounded bg-surface-container-high flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified_user</span>
+<p class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">
+<strong>Security Architecture Disclosure:</strong> Described safeguards reflect platform engineering design specifications. HELIX does not process live production Protected Health Information within this evaluation environment.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- SECURE AND ACCOUNTABLE ARCHITECTURE (BACKEND SPECS) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">System Architecture</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Secure and Accountable Architecture</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Designed for clinical repeatability with zero client-side diagnostic logic execution.
+        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="p-space-md rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">dns</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Server-Side Evaluation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            FastAPI backend executing isolated evaluation pipelines ensures that clinical criteria logic cannot be altered on the client workstation.
+          </p>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-2">
+<span class="material-symbols-outlined text-secondary text-[24px]">badge</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Role Enforcement</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Fine-grained permissions restrict pedigree modification, referral submission, and criteria sign-off to authorized personnel.
+          </p>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">tag</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">SHA-256 Digests</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Cryptographic hashes computed over clinical intake inputs allow instantaneous detection of post-submission tampering.
+          </p>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-2">
+<span class="material-symbols-outlined text-secondary text-[24px]">history</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Append-Only Audit</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Immutable database records preserve complete decision history and time-stamped clinician sign-offs for legal and clinical review.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- STRUCTURED REPORTS FOR CLINICAL REVIEW (PDF PREVIEW MODAL/CARD) -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl" id="reports">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary uppercase tracking-wider">Clinical Documentation</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Structured Reports for Clinical Review</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Automated generation of standardized referral packages designed for seamless transmission into electronic health records and geneticist consult queues.
+        </p>
+</div>
+<!-- Report Card Preview -->
+<div class="w-full max-w-5xl mx-auto rounded-xl bg-surface-container-low p-space-md md:p-space-xl shadow-2xl relative overflow-hidden">
+<!-- Synthetic Demo Watermark -->
+<div class="absolute top-4 right-4 z-20">
+<span class="px-3 py-1 rounded bg-surface-container-highest text-secondary font-mono-clinical-sm text-mono-clinical-sm">
+            SYNTHETIC DATA ONLY - CLINICAL REVIEW DEMO
+          </span>
+</div>
+<!-- Simulated Document Canvas -->
+<div class="p-space-md md:p-space-lg rounded-lg bg-surface-container-lowest text-on-surface shadow-inner flex flex-col gap-space-md">
+<!-- Document Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md border-b border-surface-container-high gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">biotech</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold tracking-tight">HELIX GENOMICS DECISION SUPPORT</span>
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">REFERRAL SUMMARY &amp; RISK STRATIFICATION REPORT</span>
+</div>
+</div>
+<div class="text-right font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">
+<div>REPORT ID: REF-2026-SYN-0941</div>
+<div>DATE: MARCH 14, 2026</div>
+</div>
+</div>
+<!-- Synthetic Patient Profile -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm p-space-sm rounded bg-surface-container-low font-mono-clinical-sm text-mono-clinical-sm">
+<div>
+<span class="text-on-surface-variant block">PATIENT:</span>
+<span class="text-on-surface font-semibold">DOE, JANE (SYNTHETIC)</span>
+</div>
+<div>
+<span class="text-on-surface-variant block">DOB / AGE:</span>
+<span class="text-on-surface font-semibold">1996-08-14 (29 YRS)</span>
+</div>
+<div>
+<span class="text-on-surface-variant block">GESTATIONAL AGE:</span>
+<span class="text-on-surface font-semibold">14 WEEKS 2 DAYS</span>
+</div>
+<div>
+<span class="text-on-surface-variant block">PRIMARY PATHWAY:</span>
+<span class="text-primary font-semibold">HEREDITARY CANCER</span>
+</div>
+</div>
+<!-- Evaluation Outcome Banner -->
+<div class="p-space-sm rounded bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-3 h-3 rounded-full bg-primary animate-pulse"></span>
+<div class="flex flex-col">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-primary font-bold">RECOMMENDATION: ROUTINE SPECIALTY GENETICS REFERRAL</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Threshold criteria satisfied under ACOG Opinion No. 793 and NCCN HBOC v1.2026.</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-mono-clinical-sm text-mono-clinical-sm hidden sm:inline">CRITERIA MET</span>
+</div>
+<!-- Matched Criteria Evidence Breakdown -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary uppercase font-semibold">Clinical Criteria Evidence Log</span>
+<div class="flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<div class="p-2 rounded bg-surface-container-low flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[16px] mt-0.5">check</span>
+<span><strong>Criterion HBOC-01:</strong> First-degree relative (Mother, II:2) diagnosed with invasive breast carcinoma at or under age 50 (diagnosed at age 41).</span>
+</div>
+<div class="p-2 rounded bg-surface-container-low flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[16px] mt-0.5">check</span>
+<span><strong>Criterion HBOC-04:</strong> Second-degree maternal relative (Maternal Grandmother, I:2) with epithelial ovarian carcinoma at age 52.</span>
+</div>
+<div class="p-2 rounded bg-surface-container-low flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[16px] mt-0.5">check</span>
+<span><strong>Criterion CARRIER-03:</strong> First-degree maternal aunt (II:1) documented BRCA1 pathogenic variant carrier.</span>
+</div>
+</div>
+</div>
+<!-- Antenatal & Obstetric Summary -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm pt-space-xs">
+<div class="p-space-sm rounded bg-surface-container-low flex flex-col gap-1">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface font-semibold">ANTENATAL MONITORING</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">First trimester nuchal translucency: 1.4 mm (Normal range). cell-free DNA (NIPT) low-risk for Trisomies 21, 18, 13; fetal fraction 9.2%.</span>
+</div>
+<div class="p-space-sm rounded bg-surface-container-low flex flex-col gap-1">
+<span class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface font-semibold">PRE-TEST COUNSELING NOTES</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Patient counseled regarding implications of hereditary testing during pregnancy. Discussion prioritized deferred postnatal cascade testing vs prenatal amniocentesis.</span>
+</div>
+</div>
+<!-- Sign-Off & Verification Footer -->
+<div class="pt-space-sm border-t border-surface-container-high flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant">
+<div class="flex flex-col">
+<span>ATTESTING CLINICIAN: E. MORGAN, MD (OB/GYN)</span>
+<span>SHA-256 DIGEST: 8f4a3c9b...e21d5904</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+<span class="text-on-surface">Electronically Attested</span>
+</div>
+</div>
+</div>
+<div class="mt-space-md flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">description</span>
+<span>Available in PDF, HL7 FHIR Genomics, and direct EHR syndication.</span>
+</div>
+<button class="px-space-md py-2 rounded bg-surface-container-high text-on-surface hover:bg-surface-variant font-label-md text-label-md transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Download Sample PDF</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- FINAL CALL TO ACTION -->
+<section class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl lg:py-28 bg-surface-container-lowest">
+<div class="max-w-4xl mx-auto rounded-xl bg-surface-container-low p-space-xl shadow-2xl flex flex-col items-center text-center gap-space-md">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[28px]">biotech</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">
+        Bring Greater Structure to Genetic Referral Decisions
+      </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+        Explore a more organized approach to clinical genetics assessment and referral workflows with our synthetic evaluation workbench.
+      </p>
+<div class="flex flex-wrap items-center justify-center gap-space-md pt-space-xs">
+<a class="inline-flex items-center justify-center gap-space-xs px-space-xl py-3 rounded bg-primary-container text-on-primary-container font-label-md text-label-md hover:bg-primary transition-all shadow-[0_0_16px_rgba(20,184,166,0.35)]" data-path="request-demo" href="#">
+<span>Request a Demo</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="inline-flex items-center justify-center px-space-xl py-3 rounded bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-variant transition-all" href="#platform-capabilities">
+<span>Explore Platform</span>
+</a>
+</div>
+<div class="pt-space-md flex flex-wrap items-center justify-center gap-space-md text-on-surface-variant font-mono-clinical-sm text-mono-clinical-sm">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Controlled Synthetic Workspace
+        </span>
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> No Production PHI Required
+        </span>
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-outline"></span> ACOG Guideline Aligned
+        </span>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-lowest text-on-surface-variant py-space-xl shadow-[0_-4px_24px_rgba(1,15,31,0.4)]"><div class="w-full px-margin md:px-margin-tablet lg:px-margin-desktop"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-xl"><div class="lg:col-span-2 flex flex-col gap-space-sm"><div class="flex items-center gap-space-sm"><div class="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">biotech</span></div><span class="font-headline-sm text-headline-sm font-bold text-on-surface">HELIX</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-md">Next-generation clinical genetics decision support platform purpose-engineered for OB/GYN clinicians, maternal-fetal medicine specialists, and hereditary cancer risk triage.</p><div class="mt-space-sm p-space-sm rounded bg-surface-container-low"><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-secondary text-[16px] mt-0.5">shield_with_heart</span><p class="font-mono-clinical-sm text-mono-clinical-sm text-on-surface-variant"><strong class="text-secondary font-medium">Clinical Governance Notice:</strong> Recommendations are calibrated against ACMG, ACOG, and NCCN clinical guidelines. Final triage determination rests exclusively with the credentialed attending physician.</p></div></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface font-semibold uppercase tracking-wider">Platform</span><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="platform" href="#">Acuity Decision Engine</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="clinical-pathways" href="#">Pedigree Modeling</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="platform" href="#">EHR Bi-directional Sync</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="platform" href="#">ACMG Variant Crosswalk</a></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface font-semibold uppercase tracking-wider">Clinical Resources</span><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="clinical-pathways" href="#">Hereditary Breast &amp; Ovarian</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="clinical-pathways" href="#">Carrier Screening Protocols</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="clinical-pathways" href="#">Lynch Syndrome Triage</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="how-it-works" href="#">Validation Studies</a></div><div class="flex flex-col gap-space-sm"><span class="font-label-md text-label-md text-on-surface font-semibold uppercase tracking-wider">Governance &amp; Trust</span><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="governance" href="#">HIPAA / HITECH Verification</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="governance" href="#">Audit Logging Architecture</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="about" href="#">Clinical Advisory Board</a><a class="font-body-sm text-body-sm hover:text-on-surface transition-colors" data-path="governance" href="#">Security Whitepaper</a></div></div><div class="pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-wrap items-center gap-space-md"><span class="font-mono-clinical-sm text-mono-clinical-sm">© 2026 HELIX Genomics Inc. All rights reserved.</span><span class="font-mono-clinical-sm text-mono-clinical-sm text-secondary bg-surface-container-high px-space-xs py-0.5 rounded">Synthetic Demo Data Mode active</span></div><div class="flex items-center gap-space-lg"><a class="font-mono-clinical-sm text-mono-clinical-sm hover:text-on-surface transition-colors" data-path="governance" href="#">Privacy Policy</a><a class="font-mono-clinical-sm text-mono-clinical-sm hover:text-on-surface transition-colors" data-path="governance" href="#">Terms of Clinical Use</a><a class="font-mono-clinical-sm text-mono-clinical-sm hover:text-on-surface transition-colors" data-path="governance" href="#">BAA Provisions</a></div></div></div></footer></body></html>

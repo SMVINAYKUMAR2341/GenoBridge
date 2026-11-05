@@ -1,0 +1,16 @@
+/* Helix Custom Payload Admin Styles */
+
+:root {
+  --helix-primary: #2563eb;
+  --helix-secondary: #7c3aed;
+  --helix-success: #059669;
+  --helix-warning: #d97706;
+  --helix-danger: #dc2626;
+}
+
+/* Custom styling for Helix clinical application */
+.payload-admin {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Placeholder for future custom admin styles */

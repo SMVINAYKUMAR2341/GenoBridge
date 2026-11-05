@@ -1,0 +1,126 @@
+﻿version: '3.9'
+
+services:
+  # PostgreSQL 16 - Primary Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: helix-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: helix
+      POSTGRES_USER: helix_app
+      POSTGRES_PASSWORD: dev-password-change-in-production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+    ports:
+      - "5432:5432"  # Remove in production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helix_app -d helix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgBouncer - Connection Pooling
+  pgbouncer:
+    image: pgbouncer/pgbouncer:1.21
+    container_name: helix-pgbouncer
+    restart: unless-stopped
+    environment:
+      DATABASES_HOST: postgres
+      DATABASES_PORT: 5432
+      DATABASES_USER: helix_app
+      DATABASES_PASSWORD: dev-password-change-in-production
+      DATABASES_DBNAME: helix
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 25
+    networks:
+      - backend
+    ports:
+      - "6432:6432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Redis - Cache and Session Storage
+  redis:
+    image: redis:7-alpine
+    container_name: helix-redis
+    restart: unless-stopped
+    command: redis-server --requirepass dev-redis-password --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js + Payload CMS Application
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helix-nextjs
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URI: postgresql://helix_app:dev-password-change-in-production@pgbouncer:6432/helix
+      PAYLOAD_SECRET: dev-secret-minimum-32-characters-required-here
+      REDIS_URL: redis://:dev-redis-password@redis:6379/0
+      CRITERIA_SERVICE_URL: http://fastapi:8000
+      CRITERIA_SERVICE_API_KEY: dev-criteria-api-key-min-32-chars
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./node_modules:/app/node_modules
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      pgbouncer:
+        condition: service_started
+      redis:
+        condition: service_healthy
+
+  # FastAPI - Criteria Evaluation Service
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: helix-fastapi
+    restart: unless-stopped
+    environment:
+      CRITERIA_SERVICE_API_KEY: dev-criteria-api-key-min-32-chars
+    networks:
+      - backend
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: false  # Set to true in production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

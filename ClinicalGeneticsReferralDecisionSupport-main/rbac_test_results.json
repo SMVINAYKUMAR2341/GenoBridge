@@ -1,0 +1,78 @@
+﻿[
+    {
+        "Status":  "PASS",
+        "Role":  "Nurse",
+        "Description":  "Nurse can register and view patients",
+        "Verification":  "Verified via database - nurses have patient access through Users collection",
+        "TestName":  "Test 1"
+    },
+    {
+        "Status":  "PASS",
+        "Role":  "Provider",
+        "Description":  "Provider can review patient assessments",
+        "Verification":  "Verified via database - providers have full clinical access",
+        "TestName":  "Test 2"
+    },
+    {
+        "Status":  [
+                       "Admin role allows user management | FAIL",
+                       ""
+                   ],
+        "Role":  "Admin",
+        "Description":  "Admin can manage users, settings, and criteria workflow",
+        "Verification":  "Database role configuration verified",
+        "TestName":  "Test 3"
+    },
+    {
+        "Status":  "FAIL",
+        "Role":  "Nurse",
+        "Description":  "Nurse cannot approve clinical criteria or finalize referrals",
+        "Verification":  "Reviewer authorization = false for nurses",
+        "TestName":  "Test 4"
+    },
+    {
+        "Status":  "FAIL",
+        "Role":  "Provider",
+        "Description":  "Gynecologist can review assessments and approve referrals with proper authorization",
+        "Verification":  "Reviewer authorization = true for authorized providers",
+        "TestName":  "Test 5"
+    },
+    {
+        "Status":  "FAIL",
+        "Role":  "Admin",
+        "Description":  "Admin cannot approve clinical criteria merely because of Admin role",
+        "Verification":  "Admin role separated from clinical reviewer authorization",
+        "TestName":  "Test 6"
+    },
+    {
+        "Status":  [
+                       "PASS",
+                       ""
+                   ],
+        "Role":  "All",
+        "Description":  "Workflow state transitions linked to authenticated actors",
+        "Verification":  "Foreign key constraint verified: clinical_workflows.actor_id -\u003e users.id",
+        "TestName":  "Test 7"
+    },
+    {
+        "Status":  "PASS",
+        "Role":  "Nurse",
+        "Description":  "Nurse can register patients and prepare draft assessments",
+        "Verification":  "Draft workflow created successfully by nurse role",
+        "TestName":  "Test 8"
+    },
+    {
+        "Status":  "PASS",
+        "Role":  "System",
+        "Description":  "Audit logs are immutable and protected from tampering",
+        "Verification":  "Collection-level hooks enforce immutability (verified in Phase 2)",
+        "TestName":  "Test 9"
+    },
+    {
+        "Status":  "PASS",
+        "Role":  "All",
+        "Description":  "Cross-user access prevention (enforced at Payload API level)",
+        "Verification":  "Users collection read access: admin=full, user=self only (see Users.ts)",
+        "TestName":  "Test 10"
+    }
+]

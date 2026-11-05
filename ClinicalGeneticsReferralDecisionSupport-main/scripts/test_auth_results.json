@@ -1,0 +1,152 @@
+[
+  {
+    "name": "Page Route: /login",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /signup",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /forgot-password",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /reset-password",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /verify-email",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /account-pending",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /account-rejected",
+    "status": "PASSED",
+    "details": "HTTP 200"
+  },
+  {
+    "name": "Page Route: /doctor/dashboard",
+    "status": "PASSED",
+    "details": "HTTP 307"
+  },
+  {
+    "name": "Page Route: /nurse/dashboard",
+    "status": "PASSED",
+    "details": "HTTP 307"
+  },
+  {
+    "name": "Page Route: /admin/dashboard",
+    "status": "PASSED",
+    "details": "HTTP 307"
+  },
+  {
+    "name": "Security: Admin Public Registration Blocked",
+    "status": "PASSED",
+    "details": "Status 403: Administrator accounts cannot be created via public signup. Contact clinical governance."
+  },
+  {
+    "name": "Validation: Unsupported Category Blocked",
+    "status": "PASSED",
+    "details": "Status 400: Invalid professional category. Only Gynecologist / OB-GYN and Nurse / Medical Assistant categories are permitted."
+  },
+  {
+    "name": "Validation: Password Mismatch Blocked",
+    "status": "PASSED",
+    "details": "Status 400: Password and confirm password do not match"
+  },
+  {
+    "name": "Registration: Gynecologist / OB-GYN",
+    "status": "PASSED",
+    "details": "Status 201: Registration submitted successfully. Your credentials are now under professional verification."
+  },
+  {
+    "name": "Security: Duplicate Email Prevented",
+    "status": "PASSED",
+    "details": "Status 409: An account with this work email address already exists. Please sign in or use forgot password."
+  },
+  {
+    "name": "Registration: Nurse / Medical Assistant",
+    "status": "PASSED",
+    "details": "Status 201: Registration submitted successfully. Your credentials are now under professional verification."
+  },
+  {
+    "name": "Workflow: Email Verification",
+    "status": "PASSED",
+    "details": "Status 200: Work email has been successfully verified. Your account is currently under professional verification."
+  },
+  {
+    "name": "Login Validation: Missing Role Selection Blocked",
+    "status": "PASSED",
+    "details": "Status 400: Please select your professional role before signing in."
+  },
+  {
+    "name": "Login Validation: Missing Credentials Blocked",
+    "status": "PASSED",
+    "details": "Status 400: Work email and password are required."
+  },
+  {
+    "name": "Login Scenario C: Bad Password Returns Generic 401",
+    "status": "PASSED",
+    "details": "Status 401: Invalid email or password."
+  },
+  {
+    "name": "Login Scenario D: Pending Account Blocked with Awaiting Verification Message",
+    "status": "PASSED",
+    "details": "Status 403: message = \"Your professional account is awaiting administrator verification.\""
+  },
+  {
+    "name": "Login Scenario B: Role Mismatch (Doctor selecting Nurse) Blocked",
+    "status": "PASSED",
+    "details": "Status 403: The selected professional role does not match your registered account."
+  },
+  {
+    "name": "Login Scenario A: Approved Gynecologist Login Granted",
+    "status": "PASSED",
+    "details": "Status 200: redirectTo = /doctor/dashboard"
+  },
+  {
+    "name": "Login Scenario B: Role Mismatch (Nurse selecting Gynecologist) Blocked",
+    "status": "PASSED",
+    "details": "Status 403: The selected professional role does not match your registered account."
+  },
+  {
+    "name": "Login Scenario A: Approved Nurse Login Granted",
+    "status": "PASSED",
+    "details": "Status 200: redirectTo = /nurse/dashboard"
+  },
+  {
+    "name": "Login Scenario E: Rejected Account Blocked with /account-rejected Redirect",
+    "status": "PASSED",
+    "details": "Status 403: redirectTo = /account-rejected"
+  },
+  {
+    "name": "Login Scenario E: Suspended Account Prohibited",
+    "status": "PASSED",
+    "details": "Status 403: Your account has been suspended by clinical administration. Please contact clinical governance."
+  },
+  {
+    "name": "Workflow: Forgot Password Request",
+    "status": "PASSED",
+    "details": "Status 200: If an account exists with that email, a password reset link has been sent."
+  },
+  {
+    "name": "RBAC: Unauthorized Call to Admin Verifications API Blocked",
+    "status": "PASSED",
+    "details": "Status 403: Unauthorized. Administrator privileges required to inspect professional verifications."
+  },
+  {
+    "name": "Session: Logout Clears Session",
+    "status": "PASSED",
+    "details": "Status 200"
+  }
+]

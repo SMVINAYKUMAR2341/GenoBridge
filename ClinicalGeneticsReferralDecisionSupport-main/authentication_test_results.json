@@ -1,0 +1,101 @@
+﻿[
+    {
+        "ActualStatus":  201,
+        "Details":  "{\"success\":true,\"message\":\"Account created successfully. Awaiting administrator approval.\",\"userId\":\"9b085e86-bbd2-4c8c-99df-177e1d03ee07\"}",
+        "ExpectedStatus":  201,
+        "Description":  "Create new nurse account (requires admin approval)",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 1"
+    },
+    {
+        "ActualStatus":  409,
+        "Details":  null,
+        "ExpectedStatus":  409,
+        "Description":  "Attempt to create account with existing email",
+        "Status":  "PASS",
+        "Error":  "The remote server returned an error: (409) Conflict.",
+        "TestName":  "Test 2"
+    },
+    {
+        "ActualStatus":  403,
+        "Details":  null,
+        "ExpectedStatus":  403,
+        "Description":  "Prevent admin role selection during public signup",
+        "Status":  "PASS",
+        "Error":  "The remote server returned an error: (403) Forbidden.",
+        "TestName":  "Test 3"
+    },
+    {
+        "ActualStatus":  403,
+        "Details":  null,
+        "ExpectedStatus":  403,
+        "Description":  "Block login for unapproved (disabled) accounts",
+        "Status":  "PASS",
+        "Error":  "The remote server returned an error: (403) Forbidden.",
+        "TestName":  "Test 4"
+    },
+    {
+        "ActualStatus":  200,
+        "Details":  "{\"success\":true,\"user\":{\"id\":\"9b085e86-bbd2-4c8c-99df-177e1d03ee07\",\"name\":\"Test Nurse User\",\"email\":\"test.nurse@helix-verification.local\",\"role\":\"nurse\"}}",
+        "ExpectedStatus":  200,
+        "Description":  "Successful login with valid credentials",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 6"
+    },
+    {
+        "ActualStatus":  401,
+        "Details":  null,
+        "ExpectedStatus":  401,
+        "Description":  "Reject login with incorrect password",
+        "Status":  "PASS",
+        "Error":  "The remote server returned an error: (401) Unauthorized.",
+        "TestName":  "Test 7"
+    },
+    {
+        "ActualStatus":  401,
+        "Details":  null,
+        "ExpectedStatus":  401,
+        "Description":  "Reject login for non-existent account",
+        "Status":  "PASS",
+        "Error":  "The remote server returned an error: (401) Unauthorized.",
+        "TestName":  "Test 8"
+    },
+    {
+        "ActualStatus":  200,
+        "Details":  "{\"success\":true,\"message\":\"If an account exists with that email, a password reset link has been sent.\"}",
+        "ExpectedStatus":  200,
+        "Description":  "Request password reset link",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 9"
+    },
+    {
+        "ActualStatus":  200,
+        "Details":  "{\"success\":true,\"message\":\"Logged out successfully\"}",
+        "ExpectedStatus":  200,
+        "Description":  "Successful logout and session termination",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 10"
+    },
+    {
+        "ActualStatus":  201,
+        "Details":  "{\"success\":true,\"message\":\"Account created successfully. Awaiting administrator approval.\",\"userId\":\"5be9cb96-98c0-4fc9-aa4a-73fdd6361016\"}",
+        "ExpectedStatus":  201,
+        "Description":  "Create provider account",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 11"
+    },
+    {
+        "ActualStatus":  200,
+        "Details":  "{\"success\":true,\"user\":{\"id\":\"5be9cb96-98c0-4fc9-aa4a-73fdd6361016\",\"name\":\"Dr. Test Provider\",\"email\":\"test.provider@helix-verification.local\",\"role\":\"provider\"}}",
+        "ExpectedStatus":  200,
+        "Description":  "Provider successful login",
+        "Status":  "PASS",
+        "Error":  null,
+        "TestName":  "Test 12"
+    }
+]

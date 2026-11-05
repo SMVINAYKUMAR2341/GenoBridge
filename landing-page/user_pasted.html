@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GenovaHealth — Genetic Clarity for Every Clinical Decision</title>
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#031525',
+              secondary: '#08243B',
+              card: '#102B43',
+              accent: '#00D8C3',
+              cyan: '#22C9EE',
+              border: '#164C60',
+              text: '#F2F7FA',
+              muted: '#A9BDCA'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for Ambient Glows & Subtle Glassmorphism -->
+<style data-purpose="custom-enhancements">
+    body {
+      background-color: #031525;
+      color: #F2F7FA;
+      overflow-x: hidden;
+    }
+    .glass-card {
+      background: rgba(16, 43, 67, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(22, 76, 96, 0.7);
+    }
+    .glass-nav {
+      background: rgba(3, 21, 37, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glow-teal-sm {
+      box-shadow: 0 0 25px -5px rgba(0, 216, 195, 0.25);
+    }
+    .glow-teal-lg {
+      box-shadow: 0 0 60px -10px rgba(0, 216, 195, 0.2);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #00D8C3 0%, #22C9EE 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-[#031525] text-[#F2F7FA] font-sans antialiased selection:bg-[#00D8C3] selection:text-[#031525] relative">
+<!-- WebGL Background Canvas -->
+<canvas class="fixed inset-0 w-full h-full pointer-events-none -z-10" id="webgl-mesh-drift-bg" style="z-index: 0; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"></canvas>
+<!-- Page Content Wrapper to sit cleanly on top of the WebGL canvas -->
+<div class="relative z-10">
+<!-- BEGIN: MainHeader -->
+<header class="sticky top-0 z-50 glass-nav border-b border-[#164C60]/60 transition-all duration-300">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<!-- Brand Logo -->
+<a aria-label="GenovaHealth Home" class="flex items-center gap-3 group focus:outline-none" href="#">
+<div class="w-10 h-10 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] group-hover:border-[#00D8C3] transition-colors">
+<!-- DNA Helix Logo SVG -->
+<svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M2 15c6.667-6 13.333 0 20-6"></path>
+<path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
+<path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path>
+<path d="m17 6-2.5-2.5"></path>
+<path d="m14 8-1-1"></path>
+<path d="m7 18 2.5 2.5"></path>
+<path d="m3.5 14.5.5.5"></path>
+<path d="m20 9 .5.5"></path>
+<path d="m6.5 12.5 1 1"></path>
+<path d="m16.5 10.5 1 1"></path>
+<path d="m10 16 1 1"></path>
+</svg>
+</div>
+<span class="text-xl font-bold tracking-tight text-white flex items-center">
+          Genova<span class="text-[#00D8C3]">Health</span>
+</span>
+</a>
+<!-- Desktop Navigation Menu -->
+<nav aria-label="Main Navigation" class="hidden md:flex items-center gap-8 text-sm font-medium text-[#A9BDCA]">
+<div class="relative group">
+<button aria-expanded="false" class="flex items-center gap-1.5 hover:text-[#00D8C3] transition-colors py-2 focus:outline-none">
+<span>Platform</span>
+<svg class="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<div class="relative group">
+<button aria-expanded="false" class="flex items-center gap-1.5 hover:text-[#00D8C3] transition-colors py-2 focus:outline-none">
+<span>Clinical Pathways</span>
+<svg class="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<div class="relative group">
+<button aria-expanded="false" class="flex items-center gap-1.5 hover:text-[#00D8C3] transition-colors py-2 focus:outline-none">
+<span>Resources</span>
+<svg class="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<div class="relative group">
+<button aria-expanded="false" class="flex items-center gap-1.5 hover:text-[#00D8C3] transition-colors py-2 focus:outline-none">
+<span>About</span>
+<svg class="w-3.5 h-3.5 opacity-70 group-hover:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<a class="hover:text-[#00D8C3] transition-colors" href="#contact">Contact</a>
+</nav>
+<!-- Right Header CTA -->
+<div class="flex items-center gap-4">
+<a class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] shadow-lg shadow-[#00D8C3]/20 hover:shadow-[#00D8C3]/40 transition-all duration-200" href="#demo">
+<span>Request a Demo</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</a>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: HeroSection -->
+<section class="relative pt-12 pb-20 md:py-24 overflow-hidden" data-purpose="hero-container">
+<!-- Ambient Background Light Spotlights -->
+<div class="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#00D8C3]/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-[#22C9EE]/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+<!-- Left Hero Content Column -->
+<div class="lg:col-span-6 space-y-6 sm:space-y-8 z-10 text-left">
+<!-- Category Badge -->
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#08243B]/80 border border-[#164C60] text-xs font-medium text-[#00D8C3]">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Clinical Genetics Platform</span>
+</div>
+<!-- Main Hero Headline -->
+<h1 class="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-white leading-[1.12]">
+            Bringing Genetic Clarity Into <span class="text-[#00D8C3]">Every Clinical Decision.</span>
+</h1>
+<!-- Value Proposition Subtitle -->
+<p class="text-base sm:text-lg text-[#A9BDCA] max-w-xl font-normal leading-relaxed">
+            Empowering clinicians with intelligent genetic insights, streamlined referrals, and personalized care pathways.
+          </p>
+<!-- Interactive Action Buttons -->
+<div class="flex flex-wrap items-center gap-4 pt-2">
+<a class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] hover:shadow-lg hover:shadow-[#00D8C3]/30 transition-all duration-200" href="#platform">
+<span>Explore Platform</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</a>
+<button class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-semibold bg-[#08243B] text-white border border-[#164C60] hover:border-[#00D8C3] hover:bg-[#102B43] transition-all duration-200">
+<span class="w-5 h-5 rounded-full bg-[#00D8C3]/20 flex items-center justify-center text-[#00D8C3] text-xs">▶</span>
+<span>Watch Demo</span>
+</button>
+</div>
+</div>
+<!-- Right Hero Visual Column (DNA Helix Render) -->
+<div class="lg:col-span-6 relative">
+<div class="relative w-full rounded-2xl overflow-hidden shadow-2xl border border-[#164C60]/50 glow-teal-sm">
+<img alt="Photorealistic glowing 3D DNA double-helix genomics data visualization" class="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700 ease-out" loading="eager" src="https://lh3.googleusercontent.com/aida/AEtjO1XIsVXsMJPd3xT-BmGOzr7tZ8u6tefaMtm4GJy9jBkpBpLtpqbuFh7kw-5-ZX4PnhrSeA5QTZpl7JlYuGTVP_vVCidwxpA45eBGjTpkWesIlVuh4vr1VnC124Cbldk3cgfwzqXXxdUMzZZdHt23dPbuUmRdLz6LC3fP-Jdufr07qheGCpuLU4uXvPHCb92fir_XTOcxRPelOh3HgWbd0vz-MB5O9SOifPl70prc-2A"/>
+<!-- Soft Vignette Overlay for Seamless Blend -->
+<div class="absolute inset-0 bg-gradient-to-t from-[#031525]/80 via-transparent to-transparent pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: HeroSection -->
+<!-- BEGIN: MetricsBar -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-20 relative z-20" data-purpose="kpi-metrics-banner">
+<div class="glass-card rounded-2xl p-6 sm:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 items-center divide-y lg:divide-y-0 lg:divide-x divide-[#164C60]/60">
+<!-- Metric 1: Diagnostic Accuracy -->
+<div class="flex items-center gap-4 px-2 sm:px-6">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<div class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">99.4%</div>
+<div class="text-xs sm:text-sm text-[#A9BDCA] font-medium">Diagnostic Accuracy</div>
+</div>
+</div>
+<!-- Metric 2: Clinical Pathways -->
+<div class="flex items-center gap-4 px-2 sm:px-6 pt-4 lg:pt-0">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<div class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">15+</div>
+<div class="text-xs sm:text-sm text-[#A9BDCA] font-medium">Clinical Pathways</div>
+</div>
+</div>
+<!-- Metric 3: SOC2 / HIPAA Compliance -->
+<div class="flex items-center gap-4 px-2 sm:px-6 pt-4 lg:pt-0">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<div class="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-tight">SOC2 / HIPAA</div>
+<div class="text-xs sm:text-sm text-[#A9BDCA] font-medium">Compliant</div>
+</div>
+</div>
+<!-- Metric 4: Live Vitals Waveform Sparkline -->
+<div class="flex items-center justify-center px-2 sm:px-6 pt-4 lg:pt-0">
+<div class="w-full h-12 flex items-center justify-center">
+<svg class="w-full h-10 stroke-[#00D8C3]" fill="none" viewbox="0 0 240 50">
+<path d="M0 25 L40 25 L55 25 L65 5 L75 45 L85 20 L95 30 L105 25 L150 25 L160 12 L170 38 L180 25 L240 25" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<!-- END: MetricsBar -->
+<!-- BEGIN: TheChallengeSection -->
+<section class="py-16 md:py-24 bg-[#08243B]/40 relative" data-purpose="the-challenge">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+<!-- Left Text Content -->
+<div class="lg:col-span-6 space-y-6">
+<div class="text-xs font-bold tracking-widest text-[#00D8C3] uppercase flex items-center gap-2">
+<span class="w-6 h-0.5 bg-[#00D8C3]"></span>
+<span>THE CHALLENGE</span>
+</div>
+<h2 class="text-3xl sm:text-4xl lg:text-[42px] font-bold text-white tracking-tight leading-[1.2]">
+            Genetic Risk is Complex.<br/>The Referral Process Shouldn't Be.
+          </h2>
+<p class="text-[#A9BDCA] text-base sm:text-lg leading-relaxed">
+            From risk assessment to specialized care, our platform simplifies genetic referrals with intelligence and ease.
+          </p>
+<div class="pt-2">
+<a class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] transition-all" href="#solution">
+<span>Learn More</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</a>
+</div>
+</div>
+<!-- Right Clinician Tablet Image -->
+<div class="lg:col-span-6">
+<div class="relative rounded-2xl overflow-hidden border border-[#164C60] shadow-2xl group">
+<img alt="Clinician in lab coat utilizing advanced genetic referral tablet software" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" src="https://lh3.googleusercontent.com/aida/AEtjO1WtkujeqSa_Zk9KiocRWNxiio2VMil5d21fgPzzwImlE0VXc_A9jtT57YtzxGELDWvMR3LgFnPXwuA_N6Nb7shOUlTmTqdzCNRNON39C2o6y8r9itu_YETS1ddoC5-SnElSO0VCXGYu00GwIAZ3yJL0WBOjBhP1Tlf3sZ0yrFbHgLvvLKJtIIoWfngMIGj1aIdC3FpNHVhIptElAJyxui7CctmeHd1PsG5vkNYRP8GB"/>
+<!-- Inner subtle glow effect -->
+<div class="absolute inset-0 bg-gradient-to-tr from-[#031525]/70 via-transparent to-transparent pointer-events-none"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: TheChallengeSection -->
+<!-- BEGIN: OurSolutionWorkflow -->
+<section class="py-20 md:py-28 relative" data-purpose="solution-workflow" id="solution">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- Section Title & Subtitle -->
+<div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+<div class="text-xs font-bold tracking-widest text-[#00D8C3] uppercase">OUR SOLUTION</div>
+<h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+          A Structured Approach to Genetic Referral Decisions.
+        </h2>
+<p class="text-[#A9BDCA] text-base sm:text-lg">
+          A seamless, end-to-end workflow for accurate, timely, and actionable genetic insights.
+        </p>
+</div>
+<!-- 4 Connected Process Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+<!-- Step 1 -->
+<div class="glass-card rounded-2xl p-6 sm:p-7 relative flex flex-col justify-between group hover:border-[#00D8C3] transition-all duration-300">
+<div>
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] mb-6 group-hover:scale-110 transition-transform">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-lg font-bold text-white mb-2 leading-snug">
+              Automated Pedigree &amp; Phenotype Ingestion
+            </h3>
+<p class="text-sm text-[#A9BDCA] leading-relaxed">
+              Capture and structure family history and clinical features efficiently.
+            </p>
+</div>
+<!-- Arrow Indicator -->
+<div class="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-[#08243B] border border-[#164C60] items-center justify-center text-[#00D8C3]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="glass-card rounded-2xl p-6 sm:p-7 relative flex flex-col justify-between group hover:border-[#00D8C3] transition-all duration-300">
+<div>
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] mb-6 group-hover:scale-110 transition-transform">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-lg font-bold text-white mb-2 leading-snug">
+              Deterministic Guideline Engine
+            </h3>
+<p class="text-sm text-[#A9BDCA] leading-relaxed">
+              Apply evidence-based guidelines for precise risk assessment.
+            </p>
+</div>
+<!-- Arrow Indicator -->
+<div class="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-[#08243B] border border-[#164C60] items-center justify-center text-[#00D8C3]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="glass-card rounded-2xl p-6 sm:p-7 relative flex flex-col justify-between group hover:border-[#00D8C3] transition-all duration-300">
+<div>
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] mb-6 group-hover:scale-110 transition-transform">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-lg font-bold text-white mb-2 leading-snug">
+              Real-Time Evidence Gap Identification
+            </h3>
+<p class="text-sm text-[#A9BDCA] leading-relaxed">
+              Identify high-risk cases with clinical evidence.
+            </p>
+</div>
+<!-- Arrow Indicator -->
+<div class="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-[#08243B] border border-[#164C60] items-center justify-center text-[#00D8C3]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="glass-card rounded-2xl p-6 sm:p-7 relative flex flex-col justify-between group hover:border-[#00D8C3] transition-all duration-300">
+<div>
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] mb-6 group-hover:scale-110 transition-transform">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-lg font-bold text-white mb-2 leading-snug">
+              Formatted Specialist Consultation Briefs
+            </h3>
+<p class="text-sm text-[#A9BDCA] leading-relaxed">
+              Generate concise, structured reports for specialists.
+            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: OurSolutionWorkflow -->
+<!-- BEGIN: ClinicalPathwaysGrid -->
+<section class="py-20 md:py-24 bg-[#08243B]/30 relative" data-purpose="clinical-pathways" id="pathways">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- Section Header -->
+<div class="max-w-3xl mb-14 space-y-2">
+<h2 class="text-2xl sm:text-3xl font-extrabold text-[#00D8C3] tracking-wide uppercase">
+          ONE PLATFORM. MULTIPLE CLINICAL PATHWAYS.
+        </h2>
+<p class="text-[#A9BDCA] text-base sm:text-lg">
+          Cover a wide range of genetic conditions with comprehensive clinical pathways.
+        </p>
+</div>
+<!-- 6 Clinical Pathways Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1: Hereditary Cancer Risk -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Hereditary Cancer Risk</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Assess and manage inherited cancer syndromes.</p>
+</div>
+</div>
+<button aria-label="Learn more about Hereditary Cancer Risk" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Card 2: Cardiovascular Genetics -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Cardiovascular Genetics</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Evaluate genetic risk for heart diseases.</p>
+</div>
+</div>
+<button aria-label="Learn more about Cardiovascular Genetics" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Card 3: Reproductive Genetics -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Reproductive Genetics</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Support family planning and prenatal care.</p>
+</div>
+</div>
+<button aria-label="Learn more about Reproductive Genetics" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Card 4: Neurological Genetics -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Neurological Genetics</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Identify and manage neurological disorders.</p>
+</div>
+</div>
+<button aria-label="Learn more about Neurological Genetics" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Card 5: Rare Genetic Disorders -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Rare Genetic Disorders</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Enable early diagnosis and personalized care.</p>
+</div>
+</div>
+<button aria-label="Learn more about Rare Genetic Disorders" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Card 6: Pharmacogenomics -->
+<div class="glass-card rounded-2xl p-6 flex items-start justify-between group hover:-translate-y-1 hover:border-[#00D8C3] transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3] shrink-0 group-hover:border-[#00D8C3] transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-base font-bold text-white mb-1 group-hover:text-[#00D8C3] transition-colors">Pharmacogenomics</h3>
+<p class="text-xs sm:text-sm text-[#A9BDCA]">Optimize drug response based on genetic profile.</p>
+</div>
+</div>
+<button aria-label="Learn more about Pharmacogenomics" class="w-8 h-8 rounded-full border border-[#164C60] flex items-center justify-center text-[#A9BDCA] group-hover:text-[#00D8C3] group-hover:border-[#00D8C3] shrink-0 ml-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- END: ClinicalPathwaysGrid -->
+<!-- BEGIN: InstitutionalTrustBanner -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-purpose="security-compliance-panel">
+<div class="glass-card rounded-2xl p-8 sm:p-10 border border-[#164C60] glow-teal-sm">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+<!-- Left Icon & Description -->
+<div class="lg:col-span-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+<div class="w-16 h-16 rounded-2xl bg-[#00D8C3]/15 border border-[#00D8C3]/40 flex items-center justify-center text-[#00D8C3] shrink-0">
+<svg class="w-9 h-9" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="text-xl sm:text-2xl font-bold text-white mb-2">
+              Institutional Trust Engineered from the Code Up.
+            </h3>
+<p class="text-sm sm:text-base text-[#A9BDCA] leading-relaxed max-w-2xl">
+              Built with enterprise-grade security, privacy, and compliance to protect sensitive patient and genetic data.
+            </p>
+</div>
+</div>
+<!-- Right Trust Points Checklist -->
+<div class="lg:col-span-4 lg:border-l lg:border-[#164C60]/70 lg:pl-8 space-y-3">
+<div class="flex items-center gap-3 text-sm font-semibold text-white">
+<span class="w-5 h-5 rounded-full bg-[#00D8C3]/20 flex items-center justify-center text-[#00D8C3] text-xs">✓</span>
+<span>SOC 2 &amp; HIPAA Compliant</span>
+</div>
+<div class="flex items-center gap-3 text-sm font-semibold text-white">
+<span class="w-5 h-5 rounded-full bg-[#00D8C3]/20 flex items-center justify-center text-[#00D8C3] text-xs">✓</span>
+<span>End-to-End Encryption</span>
+</div>
+<div class="flex items-center gap-3 text-sm font-semibold text-white">
+<span class="w-5 h-5 rounded-full bg-[#00D8C3]/20 flex items-center justify-center text-[#00D8C3] text-xs">✓</span>
+<span>Secure Audit Trails</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: InstitutionalTrustBanner -->
+<!-- BEGIN: FinalConversionBanner -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" data-purpose="call-to-action-banner" id="demo">
+<div class="relative rounded-3xl overflow-hidden border border-[#164C60] bg-gradient-to-r from-[#08243B] via-[#031525] to-[#08243B] text-center px-6 py-16 sm:py-20 shadow-2xl">
+<!-- Ambient Image Background -->
+<img alt="Genomics background mesh visual" class="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-screen" loading="lazy" src="https://lh3.googleusercontent.com/aida/AEtjO1XIsVXsMJPd3xT-BmGOzr7tZ8u6tefaMtm4GJy9jBkpBpLtpqbuFh7kw-5-ZX4PnhrSeA5QTZpl7JlYuGTVP_vVCidwxpA45eBGjTpkWesIlVuh4vr1VnC124Cbldk3cgfwzqXXxdUMzZZdHt23dPbuUmRdLz6LC3fP-Jdufr07qheGCpuLU4uXvPHCb92fir_XTOcxRPelOh3HgWbd0vz-MB5O9SOifPl70prc-2A"/>
+<div class="relative z-10 max-w-3xl mx-auto space-y-6">
+<h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          Standardize Genetic Care Across Your Health System Today.
+        </h2>
+<p class="text-[#A9BDCA] text-base sm:text-lg max-w-2xl mx-auto">
+          Join leading healthcare institutions in delivering consistent, high-quality genetic care.
+        </p>
+<div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+<a class="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-semibold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] shadow-lg shadow-[#00D8C3]/30 transition-all" href="#">
+<span>Request a Demo</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</a>
+<a class="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-semibold bg-[#08243B] text-white border border-[#164C60] hover:border-[#00D8C3] hover:bg-[#102B43] transition-all" href="#pathways">
+<span>Learn More</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- END: FinalConversionBanner -->
+<!-- BEGIN: MainFooter -->
+<footer class="border-t border-[#164C60]/60 bg-[#031525] pt-16 pb-12" data-purpose="site-footer" id="contact">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- Top 4 Columns Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#164C60]/40">
+<!-- Col 1: Brand Info -->
+<div class="lg:col-span-2 space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#00D8C3]">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M2 15c6.667-6 13.333 0 20-6"></path>
+<path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
+<path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path>
+</svg>
+</div>
+<span class="text-xl font-bold tracking-tight text-white">
+              Genova<span class="text-[#00D8C3]">Health</span>
+</span>
+</div>
+<p class="text-sm text-[#A9BDCA] max-w-sm">
+            Genetic Intelligence. Better Care.
+          </p>
+</div>
+<!-- Col 2: Quick Links -->
+<div class="space-y-3">
+<h4 class="text-sm font-semibold text-white tracking-wider">Quick Links</h4>
+<ul class="space-y-2 text-sm text-[#A9BDCA]">
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Platform</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#pathways">Clinical Pathways</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Resources</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">About</a></li>
+</ul>
+</div>
+<!-- Col 3: Support -->
+<div class="space-y-3">
+<h4 class="text-sm font-semibold text-white tracking-wider">Support</h4>
+<ul class="space-y-2 text-sm text-[#A9BDCA]">
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Documentation</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Help Center</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Contact Us</a></li>
+</ul>
+</div>
+<!-- Col 4: Legal & Social -->
+<div class="space-y-4">
+<h4 class="text-sm font-semibold text-white tracking-wider">Legal</h4>
+<ul class="space-y-2 text-sm text-[#A9BDCA]">
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">Terms of Service</a></li>
+<li><a class="hover:text-[#00D8C3] transition-colors" href="#">HIPAA Compliance</a></li>
+</ul>
+<div class="pt-2">
+<h5 class="text-xs font-semibold text-white uppercase tracking-wider mb-2">Follow Us</h5>
+<div class="flex items-center gap-3">
+<!-- LinkedIn -->
+<a aria-label="LinkedIn" class="w-8 h-8 rounded-lg bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#A9BDCA] hover:text-[#00D8C3] hover:border-[#00D8C3] transition-colors" href="#">
+<span class="text-xs font-bold">in</span>
+</a>
+<!-- X (Twitter) -->
+<a aria-label="X (Twitter)" class="w-8 h-8 rounded-lg bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#A9BDCA] hover:text-[#00D8C3] hover:border-[#00D8C3] transition-colors" href="#">
+<span class="text-xs font-bold">𝕏</span>
+</a>
+<!-- YouTube -->
+<a aria-label="YouTube" class="w-8 h-8 rounded-lg bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#A9BDCA] hover:text-[#00D8C3] hover:border-[#00D8C3] transition-colors" href="#">
+<span class="text-xs font-bold">▶</span>
+</a>
+<!-- Podcast / Music -->
+<a aria-label="Podcast" class="w-8 h-8 rounded-lg bg-[#08243B] border border-[#164C60] flex items-center justify-center text-[#A9BDCA] hover:text-[#00D8C3] hover:border-[#00D8C3] transition-colors" href="#">
+<span class="text-xs font-bold">●</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Disclaimer / Copyright -->
+<div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#A9BDCA] gap-4">
+<div>
+          © 2025 GenovaHealth. All rights reserved.
+        </div>
+<div class="font-medium text-white/80">
+          Smarter Genetics. Healthier Tomorrows.
+        </div>
+</div>
+</div>
+</footer>
+<!-- END: MainFooter -->
+</div>
+<!-- WebGL Background Controller Script -->
+<script>
+(function() {
+  const canvas = document.getElementById('webgl-mesh-drift-bg');
+  if (!canvas) return;
+
+  const gl = canvas.getContext('webgl', { antialias: false, depth: false, stencil: false, alpha: false, preserveDrawingBuffer: false }) ||
+             canvas.getContext('experimental-webgl');
+  if (!gl) return;
+
+  const vsSource = `
+    attribute vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+    }
+  `;
+
+  const fsSource = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec3 u_colors[8];
+uniform vec4 u_scene;      // resolution.xy, time, colour count
+uniform vec4 u_shape;      // scale, intensity, paramA, warp
+uniform vec4 u_surface;    // detail, contrast, brightness, saturation
+uniform vec4 u_finish;     // hue, vignette, blur, grain
+uniform vec4 u_transform;  // seed, rotation, drift, OKLab toggle
+uniform vec4 u_space;      // offset.xy, pointer.xy
+uniform vec4 u_cursor;
+#define u_resolution u_scene.xy
+#define u_time u_scene.z
+#define u_colorCount u_scene.w
+#define u_scale u_shape.x
+#define u_intensity u_shape.y
+#define u_paramA u_shape.z
+#define u_warp u_shape.w
+#define u_detail u_surface.x
+#define u_contrast u_surface.y
+#define u_brightness u_surface.z
+#define u_saturation u_surface.w
+#define u_hue u_finish.x
+#define u_vignette u_finish.y
+#define u_blur u_finish.z
+#define u_grain u_finish.w
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+#define u_seed u_transform.x
+#else
+#define u_seed mod(u_transform.x, 31.0)
+#endif
+#define u_rotate u_transform.y
+#define u_drift u_transform.z
+#define u_oklab u_transform.w
+#define u_offset u_space.xy
+#define u_mouse u_space.zw
+#define u_cursorPresence u_cursor.x
+#define u_cursorEffect u_cursor.y
+#define u_cursorStrength u_cursor.z
+#define u_cursorRadius u_cursor.w
+float hash21(vec2 p) {
+#ifndef GL_FRAGMENT_PRECISION_HIGH
+  p = mod(p, 31.0);
+#endif
+  p = fract(p * vec2(234.34, 435.345));
+  p += dot(p, p + 34.23);
+  return fract(p.x * p.y);
+}
+float grainHash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+vec2 hash22(vec2 p) {
+#ifndef GL_FRAGMENT_PRECISION_HIGH
+  p = mod(p, 31.0);
+#endif
+  float n = sin(dot(p, vec2(41.0, 289.0)));
+  return fract(vec2(15731.743, 7892.321) * n);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+    mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+    u.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p = p * 2.03 + vec2(17.0, 9.2);
+    a *= 0.5;
+  }
+  return v;
+}
+vec3 srgbToLinear(vec3 c) {
+  return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)),
+    step(0.04045, c));
+}
+vec3 linearToSrgb(vec3 c) {
+  return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055,
+    step(0.0031308, c));
+}
+vec3 linToOklab(vec3 c) {
+  float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
+  float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
+  float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
+  l = pow(max(l, 0.0), 1.0 / 3.0);
+  m = pow(max(m, 0.0), 1.0 / 3.0);
+  s = pow(max(s, 0.0), 1.0 / 3.0);
+  return vec3(
+    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s);
+}
+vec3 oklabToLin(vec3 c) {
+  float l = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
+  float m = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
+  float s = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
+  l = l * l * l; m = m * m * m; s = s * s * s;
+  return vec3(
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+}
+vec3 mixColour(vec3 a, vec3 b, float t) {
+  if (u_oklab > 0.5) {
+    vec3 la = linToOklab(srgbToLinear(a));
+    vec3 lb = linToOklab(srgbToLinear(b));
+    return clamp(linearToSrgb(oklabToLin(mix(la, lb, t))), 0.0, 1.0);
+  }
+  return mix(a, b, t);
+}
+vec3 palette(float x) {
+  float n = max(u_colorCount - 1.0, 1.0);
+  float f = clamp(x, 0.0, 1.0) * n;
+  vec3 col = u_colors[0];
+  for (int i = 0; i < 7; i++) {
+    if (float(i) < n)
+      col = mixColour(col, u_colors[i + 1],
+        smoothstep(0.0, 1.0, clamp(f - float(i), 0.0, 1.0)));
+  }
+  return col;
+}
+vec3 hueRotate(vec3 col, float a) {
+  const mat3 toYIQ = mat3(0.299, 0.596, 0.211,
+                          0.587, -0.274, -0.523,
+                          0.114, -0.322, 0.312);
+  const mat3 toRGB = mat3(1.0, 1.0, 1.0,
+                          0.956, -0.272, -1.106,
+                          0.621, -0.647, 1.703);
+  vec3 yiq = toYIQ * col;
+  float ca = cos(a), sa = sin(a);
+  yiq = vec3(yiq.x, yiq.y * ca - yiq.z * sa, yiq.y * sa + yiq.z * ca);
+  return toRGB * yiq;
+}
+vec3 shade(vec2 uv, vec2 p, float t) {
+  vec3 acc = u_colors[0] * 0.15;
+  float total = 0.15;
+  for (int i = 0; i < 8; i++) {
+    if (float(i) >= u_colorCount) break;
+    float fi = float(i);
+    vec2 c = vec2(
+      sin(t * (0.21 + fi * 0.071) + fi * 2.4 + u_seed),
+      cos(t * (0.17 + fi * 0.093) + fi * 1.7)) * (0.45 + u_intensity * 0.35);
+    float w = exp(-dot(p - c, p - c) * 6.0);
+    acc += u_colors[i] * w;
+    total += w;
+  }
+  return acc / total;
+}
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  vec2 screenUv = uv;
+  vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy)
+    / min(u_resolution.x, u_resolution.y);
+  float cursorMask = 0.0;
+  if (u_cursorPresence > 0.001) {
+    vec2 cursor = (0.5 * u_mouse * u_resolution.xy)
+      / min(u_resolution.x, u_resolution.y);
+    vec2 cursorDelta = p - cursor;
+    if (u_cursorEffect < 0.5) {
+      p += cursor * u_cursorPresence * u_cursorStrength * 0.55;
+    } else {
+      float cursorDistance = length(cursorDelta);
+      vec2 cursorDirection = cursorDelta / max(cursorDistance, 0.0001);
+      cursorMask = u_cursorPresence
+        * (1.0 - smoothstep(0.0, u_cursorRadius, cursorDistance));
+      if (u_cursorEffect < 1.5) {
+        p -= cursorDirection * cursorMask * u_cursorStrength * 0.24;
+      } else if (u_cursorEffect < 2.5) {
+        float cursorAngle = cursorMask * u_cursorStrength * 2.2;
+        float cc = cos(cursorAngle), cs = sin(cursorAngle);
+        p = cursor + mat2(cc, -cs, cs, cc) * cursorDelta;
+      } else if (u_cursorEffect < 3.5) {
+        float ripple = sin(
+          cursorDistance / max(u_cursorRadius, 0.001) * 18.0 - u_time * 5.0);
+        p -= cursorDirection * ripple * cursorMask * u_cursorStrength * 0.07;
+      }
+    }
+  }
+  uv = p * min(u_resolution.x, u_resolution.y) / u_resolution.xy + 0.5;
+  p *= u_scale;
+  if (abs(u_rotate) > 0.0001) {
+    float cr = cos(u_rotate), sr = sin(u_rotate);
+    p = mat2(cr, -sr, sr, cr) * p;
+  }
+  p += u_offset;
+  if (u_drift > 0.0001)
+    p += u_drift * vec2(sin(u_time * 0.31), cos(u_time * 0.23));
+  if (u_warp > 0.0) {
+    p += u_warp * (vec2(
+      fbm(p * u_detail + u_seed),
+      fbm(p * u_detail + vec2(5.2, 1.3))) - 0.5);
+  }
+  vec3 col;
+  if (u_blur > 0.0) {
+    float e = u_blur;
+    float pe = e * u_scale;
+    vec2 uvE = vec2(e) * min(u_resolution.x, u_resolution.y) / u_resolution.xy;
+    col  = shade(uv, p, u_time) * 0.36;
+    col += shade(uv + vec2(uvE.x, 0.0), p + vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv - vec2(uvE.x, 0.0), p - vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv + vec2(0.0, uvE.y), p + vec2(0.0, pe), u_time) * 0.16;
+    col += shade(uv - vec2(0.0, uvE.y), p - vec2(0.0, pe), u_time) * 0.16;
+  } else {
+    col = shade(uv, p, u_time);
+  }
+  if (abs(u_contrast - 1.0) > 0.0001)
+    col = (col - 0.5) * u_contrast + 0.5;
+  if (abs(u_saturation - 1.0) > 0.0001) {
+    float luma = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(luma), col, u_saturation);
+  }
+  if (abs(u_hue) > 0.0001)
+    col = hueRotate(col, u_hue);
+  if (abs(u_brightness) > 0.0001)
+    col += u_brightness;
+  if (u_vignette > 0.0001) {
+    float vd = length(screenUv - 0.5) * 1.41421356;
+    col *= 1.0 - u_vignette * smoothstep(0.35, 1.0, vd);
+  }
+  if (u_cursorPresence > 0.001 && u_cursorEffect > 3.5)
+    col += (vec3(0.18) + col * 0.12) * cursorMask * u_cursorStrength;
+  if (u_grain > 0.0001)
+    col += (grainHash(
+      gl_FragCoord.xy + vec2(u_seed * 17.0, u_seed * 31.0)) - 0.5) * u_grain;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}
+  `;
+
+  function createShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.warn(gl.getShaderInfoLog(shader));
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  }
+
+  const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+  if (!vs || !fs) return;
+
+  const program = gl.createProgram();
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.warn(gl.getProgramInfoLog(program));
+    return;
+  }
+  gl.useProgram(program);
+
+  // Fullscreen triangle buffer
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+
+  const posAttr = gl.getAttribLocation(program, 'position');
+  gl.enableVertexAttribArray(posAttr);
+  gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+  // Locations
+  const uColorsLoc = gl.getUniformLocation(program, 'u_colors');
+  const uSceneLoc = gl.getUniformLocation(program, 'u_scene');
+  const uShapeLoc = gl.getUniformLocation(program, 'u_shape');
+  const uSurfaceLoc = gl.getUniformLocation(program, 'u_surface');
+  const uFinishLoc = gl.getUniformLocation(program, 'u_finish');
+  const uTransformLoc = gl.getUniformLocation(program, 'u_transform');
+  const uSpaceLoc = gl.getUniformLocation(program, 'u_space');
+  const uCursorLoc = gl.getUniformLocation(program, 'u_cursor');
+
+  // Palette uniforms: 8 vec3s = 24 floats
+  const colorsData = new Float32Array([
+    0.012, 0.071, 0.055,
+    0.055, 0.486, 0.353,
+    0.486, 0.898, 0.467,
+    0.957, 1.000, 0.780,
+    0.0,   0.0,   0.0,
+    0.0,   0.0,   0.0,
+    0.0,   0.0,   0.0,
+    0.0,   0.0,   0.0
+  ]);
+  gl.uniform3fv(uColorsLoc, colorsData);
+
+  // Static uniform values
+  gl.uniform4f(uShapeLoc, 1.16, 0.34, 0.50, 0.00);
+  gl.uniform4f(uSurfaceLoc, 2.40, 1.16, 0.00, 1.00);
+  gl.uniform4f(uFinishLoc, 0.00, 0.00, 0.000, 0.09);
+  gl.uniform4f(uTransformLoc, 1453.0, 0.00, 0.00, 0.0);
+  gl.uniform4f(uSpaceLoc, 0.00, 0.00, 0.00, 0.00);
+  gl.uniform4f(uCursorLoc, 0.0, 2.0, 0.65, 0.46);
+
+  let currentW = 0;
+  let currentH = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.floor(window.innerWidth * dpr);
+    const h = Math.floor(window.innerHeight * dpr);
+    if (w !== currentW || h !== currentH) {
+      canvas.width = w;
+      canvas.height = h;
+      currentW = w;
+      currentH = h;
+      gl.viewport(0, 0, w, h);
+    }
+  }
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+
+  let isRunning = true;
+  let animFrameId = null;
+  const startTime = performance.now();
+
+  function render(now) {
+    if (!isRunning) return;
+    resize();
+    const elapsed = (now - startTime) * 0.001;
+    // u_scene: width, height, seconds * 0.73, 4.0 colorCount
+    gl.uniform4f(uSceneLoc, canvas.width, canvas.height, elapsed * 0.73, 4.0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    animFrameId = requestAnimationFrame(render);
+  }
+
+  animFrameId = requestAnimationFrame(render);
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      isRunning = false;
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+    } else {
+      if (!isRunning) {
+        isRunning = true;
+        animFrameId = requestAnimationFrame(render);
+      }
+    }
+  });
+})();
+</script>
+</body></html>  use this not shit ui 
+
+<ADDITIONAL_METADATA>
+The current local time is: 2026-11-05T10:02:06+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\AsusUser\New folder\Downloads\ClinicalGeneticsReferralDecisionSupport-main\landing-page\index.html (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\AsusUser\New folder\Downloads\ClinicalGeneticsReferralDecisionSupport-main\landing-page\style.css (LANGUAGE_UNSPECIFIED)
+- c:\Users\AsusUser\New folder\Downloads\ClinicalGeneticsReferralDecisionSupport-main\landing-page\script.js (LANGUAGE_UNSPECIFIED)
+
+The user has uploaded 2 image(s):
+- C:/Users/AsusUser/.gemini/antigravity/brain/d627de7a-8af9-4a29-85fd-bd567f9b7894/.user_uploaded/media_1793849497503_2d816c98.jpg
+- C:/Users/AsusUser/.gemini/antigravity/brain/d627de7a-8af9-4a29-85fd-bd567f9b7894/.user_uploaded/media_1793849509831_db3a8ec8.jpg
+You can embed these images in an artifact if you need the USER to review them.
+</ADDITIONAL_METADATA>

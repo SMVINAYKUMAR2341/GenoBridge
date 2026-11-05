@@ -1,0 +1,55 @@
+[
+  {
+    "id": "AUDIT-1793880912638-nehl",
+    "timestamp": "2026-11-05T12:15:12.638Z",
+    "action": "CREATE",
+    "recordId": "ANC-2026-2195",
+    "mrn": "MRN-001",
+    "patientName": "Ritika Singh",
+    "actor": {
+      "name": "Mary Johnson",
+      "role": "nurse",
+      "email": "nurse@hospital.org"
+    },
+    "details": {
+      "isDraft": false,
+      "riskLevel": "HIGH",
+      "status": "HIGH_RISK"
+    }
+  },
+  {
+    "id": "AUDIT-1793880927823-cxf0",
+    "timestamp": "2026-11-05T12:15:27.823Z",
+    "action": "UPDATE",
+    "recordId": "ANC-2026-2195",
+    "mrn": "MRN-001",
+    "patientName": "Ritika Singh",
+    "actor": {
+      "name": "Mary Johnson",
+      "role": "nurse",
+      "email": "nurse@hospital.org"
+    },
+    "details": {
+      "previousStatus": "HIGH_RISK",
+      "newStatus": "HIGH_RISK",
+      "riskLevel": "HIGH"
+    }
+  },
+  {
+    "id": "AUDIT-1793880934810-6ef3",
+    "timestamp": "2026-11-05T12:15:34.810Z",
+    "action": "REPORT_GENERATED",
+    "recordId": "ANC-2026-2195",
+    "mrn": "MRN-001",
+    "patientName": "Ritika Singh",
+    "actor": {
+      "name": "Mary Johnson",
+      "role": "nurse",
+      "email": "nurse@hospital.org"
+    },
+    "details": {
+      "reportId": "REP-1793880934804-95pt",
+      "fileName": "ANC_REPORT_ANC-2026-2195_2026-11-05T12-15-34-801Z.pdf"
+    }
+  }
+]

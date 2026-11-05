@@ -1,0 +1,26 @@
+[
+  {
+    "id": "REP-1793880934804-95pt",
+    "patientId": "ANC-2026-2195",
+    "mrn": "MRN-001",
+    "patientName": "Ritika Singh",
+    "fileName": "ANC_REPORT_ANC-2026-2195_2026-11-05T12-15-34-801Z.pdf",
+    "filePath": "ANC_REPORT_ANC-2026-2195_2026-11-05T12-15-34-801Z.pdf",
+    "fileSize": 11586,
+    "generatedAt": "2026-11-05T12:15:34.804Z",
+    "generatedBy": {
+      "name": "Mary Johnson",
+      "role": "nurse",
+      "email": "nurse@hospital.org"
+    },
+    "recordVersion": 1,
+    "lastUpdatedTimestamp": "2026-11-05",
+    "summary": {
+      "gestationalAge": "44 weeks 1 days (Trimester 3)",
+      "riskLevel": "HIGH",
+      "visitCount": 1,
+      "investigationCount": 20,
+      "ultrasoundCount": 1
+    }
+  }
+]

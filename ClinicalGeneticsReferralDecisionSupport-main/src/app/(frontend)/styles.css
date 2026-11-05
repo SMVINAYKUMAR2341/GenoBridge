@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+
+.figma-custom-code-fragment {
+  display: contents;
+}
+
+.figma-bypass-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 2147483647;
+  transform: translateY(-150%);
+  border-radius: 6px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  font:
+    600 14px/1.2 system-ui,
+    sans-serif;
+  text-decoration: none;
+}
+
+.figma-bypass-link:focus {
+  transform: translateY(0);
+}
+
+@theme {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --color-hx-sidebar: #00261c;
+  --color-hx-dark: #032a1f;
+  --color-hx-forest: #34d399;
+  --color-hx-emerald: #10b981;
+  --color-hx-accent: #00e5ce;
+  --color-hx-mint: #033424;
+  --color-hx-bg: #00261c;
+  --color-hx-border: #0e4331;
+  --color-hx-ink: #ffffff;
+  --color-hx-text: #f1f5f9;
+  --color-hx-slate: #cbd5e1;
+  --color-hx-muted: #94a3b8;
+  --color-hx-warn-bg: #1e1305;
+  --color-hx-warn-line: #422606;
+  --color-hx-warn: #fb923c;
+  --shadow-hx: 0 1px 2px rgb(0 0 0 / 0.25), 0 12px 28px -18px rgb(0 0 0 / 0.6);
+  --shadow-hx-lift: 0 2px 6px rgb(0 0 0 / 0.35), 0 24px 44px -24px rgb(0 0 0 / 0.7);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  }
+  button,
+  summary,
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 2px solid #16a34a;
+    outline-offset: 3px;
+  }
+  dialog::backdrop {
+    backdrop-filter: blur(3px);
+  }
+  /* Remove number input spin buttons (up/down arrows) and prevent mouse wheel increment */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  progress::-webkit-progress-bar {
+    background: #e8f8ec;
+    border-radius: 10px;
+  }
+  progress::-webkit-progress-value {
+    background: #16a34a;
+    border-radius: 10px;
+  }
+  progress::-moz-progress-bar {
+    background: #16a34a;
+    border-radius: 10px;
+  }
+  ::selection {
+    background: #00e5ce;
+    color: #00261c;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Full-bleed band inside the capped <main>: spans the whole content column
+   (viewport minus the 284px sidebar on lg+) while keeping its content aligned. */
+.hx-bleed {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+}
+@media (width >= 64rem) {
+  .hx-bleed {
+    margin-inline: calc(50% - 50vw + 142px);
+    padding-inline: calc(50vw - 50% - 142px);
+  }
+}
+
+/* Mint-to-teal wash behind the dashboard hero; fades into the page at the bottom. */
+.hx-hero-surface {
+  background:
+    radial-gradient(40rem 17rem at 70% 0%, rgb(178 211 206 / 0.9), transparent 70%),
+    radial-gradient(48rem 21rem at 88% 58%, rgb(190 233 204 / 0.95), transparent 70%),
+    linear-gradient(90deg, #f6f7f9 38%, #e8f2ee 68%, #d4eadf 100%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+
+@keyframes hx-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.hx-float {
+  animation: hx-float 10s ease-in-out infinite;
+}

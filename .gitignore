@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js Build Output
+.next/
+out/
+dist/
+build/
+.cache/
+
+# Environment Variables & Secrets
+.env*
+!.env.example
+
+# Logs & Debug
+*.log
+logs/
+*-debug.log*
+
+# System & OS
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# Temporary Files
+.tmp/
+.tmp-*/
+*.txt
+!requirements.txt
+!README.md
