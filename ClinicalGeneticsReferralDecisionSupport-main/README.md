@@ -25,6 +25,19 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 | **Alternative Nurse** | **ANC Coordinator** | `mary.johnson@helix-test.local` | `password123` | Secondary triage nurse account for high-volume intake testing. |
 | **System Administrator** | **Platform Admin** | `admin@helix-test.local` | `password123` | Master governance dashboard, institutional user verification approval, ruleset versioning lifecycle. |
 
+### 🌐 Direct Portal Navigation & Page Redirect Matrix
+
+| Destination Portal / Workspace | Direct Access URL | Recommended Sign-In Route | Default Credentials | Description & Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Public Landing Page** | `/` | Direct Link | *None (Public)* | Public clinical portal homepage with live system metrics and role entry points. |
+| **Doctor / OB-GYN Workspace** | `/doctor/dashboard` | `/login?role=gynecologist` | `doctor@hospital.org`<br/>`password123` | Attending OB-GYN workspace for specialist risk triage, high-risk review, and referral sign-off. |
+| **Nurse Intake Workspace** | `/nurse/dashboard` | `/login?role=nurse` | `nurse@hospital.org`<br/>`password123` | Maternal triage intake, baseline vitals entry, obstetric timeline, and ANC draft registry. |
+| **MCH Antenatal Care Registry** | `/anc` | Auto-redirects from login | Doctor or Nurse credentials | Real-time obstetric surveillance registry, active patient census, and referral tracker. |
+| **Genetic Assessment Catalog** | `/assessment` | Auto-redirects from login | Doctor or Nurse credentials | 6 evidence-based clinical genetic assessment pathways (Hereditary Cancer, NIPT, Carrier, etc.). |
+| **System Governance Dashboard** | `/admin/dashboard` | `/login?role=admin` | `admin@helix-test.local`<br/>`password123` | Institutional administrator portal for verifying clinician credentials (NMC/INC) and audit logs. |
+| **Payload CMS Master Admin Panel** | `/admin` | Direct Admin Login at `/admin` | `admin@helix-test.local`<br/>`password123` | Direct Payload CMS backend collection manager (Users, Admins, Patients, Assessments, Referrals). |
+| **Clinician Self-Registration** | `/signup` | Direct Link | *None (Public)* | Institutional onboarding for OB-GYNs (NMC verified) and Staff Nurses (INC verified). |
+
 > [!NOTE]
 > Public self-registration is also available via `/signup` with role-specific credentialing (NMC registration for doctors, INC registration for nurses). Newly registered accounts enter an approval queue and are granted access upon credential validation.
 
@@ -140,23 +153,24 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 
 ```mermaid
 flowchart TD
-    subgraph ClientLayer ["Client & Edge Layer"]
-        User["Clinicians & Nurses (10M Concurrency)"] --> CF["Cloudflare Global Edge\n(DDoS Protection, WAF, SSL, Anycast CDN)"]
-        CF --> NextMiddleware["Next.js Edge Firewall (middleware.ts)\n• Intercepts unauthenticated routes\n• Enforces role boundaries\n• Zero unauthorized access"]
+    subgraph ClientLayer [Client and Edge Layer]
+        User["Clinicians and Nurses (10M Concurrency)"] --> CF["Cloudflare Global Edge<br/>(DDoS Protection, WAF, SSL, Anycast CDN)"]
+        CF --> NextMiddleware["Next.js Edge Firewall (middleware.ts)<br/>- Intercepts unauthenticated routes<br/>- Enforces role boundaries<br/>- Zero unauthorized access"]
     end
 
-    subgraph AppLayer ["Application & Caching Layer"]
-        NextMiddleware --> L1Cache["Tier 1: In-Process RAM LRU Cache\n(Latency: ~0.001 ms | 0.9 µs)"]
-        L1Cache -- Cache Hit (98%) --> FastReturn["Instant Sub-Millisecond Response"]
-        L1Cache -- Cache Miss --> L2Cache["Tier 2: PostgreSQL UNLOGGED Table\n(Latency: ~0.7 ms | Shared Buffers)"]
-        L2Cache -- Cache Hit --> AutoBackfill["Auto-Backfill L1 RAM"] --> FastReturn
-        L2Cache -- Cache Miss --> NextApp["Next.js 16 + Payload CMS 4 Core"]
+    subgraph AppLayer [Application and Caching Layer]
+        NextMiddleware --> L1Cache["Tier 1: In-Process RAM LRU Cache<br/>(Latency: 0.001 ms / 0.9 µs)"]
+        L1Cache -->|Cache Hit 98%| FastReturn["Instant Sub-Millisecond Response"]
+        L1Cache -->|Cache Miss| L2Cache["Tier 2: PostgreSQL UNLOGGED Table<br/>(Latency: 0.7 ms / Shared Buffers)"]
+        L2Cache -->|Cache Hit| AutoBackfill["Auto-Backfill L1 RAM"]
+        AutoBackfill --> FastReturn
+        L2Cache -->|Cache Miss| NextApp["Next.js 16 and Payload CMS 4 Core"]
     end
 
-    subgraph DataLayer ["Database & Evaluation Layer"]
-        NextApp --> FastAPI["Python FastAPI Rules Service\n(Isolated Deterministic Engine)"]
-        NextApp --> PgPool["PostgreSQL 16 Connection Pool\n(PgBouncer / Tuned 50 Max Pool)"]
-        PgPool --> PgBase["Persistent Collections\n(Users, Patients, ANC, Audits)"]
+    subgraph DataLayer [Database and Evaluation Layer]
+        NextApp --> FastAPI["Python FastAPI Rules Service<br/>(Isolated Deterministic Engine)"]
+        NextApp --> PgPool["PostgreSQL 16 Connection Pool<br/>(PgBouncer / Tuned 50 Max Pool)"]
+        PgPool --> PgBase["Persistent Collections<br/>(Users, Patients, ANC, Audits)"]
     end
 ```
 
