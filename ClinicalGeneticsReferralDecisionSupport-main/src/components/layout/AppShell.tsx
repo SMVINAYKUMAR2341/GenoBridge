@@ -19,6 +19,7 @@ const AUTH_ROUTES = [
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const path = usePathname()
 
   useEffect(() => setOpen(false), [path])
@@ -47,10 +48,23 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <AssessmentsProvider>
       <div className="min-h-screen bg-hx-bg text-white">
-        <Sidebar open={open} onClose={() => setOpen(false)} />
+        <Sidebar
+          open={open}
+          onClose={() => setOpen(false)}
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed(!collapsed)}
+        />
         {/* overflow-x-clip contains full-bleed bands without breaking the sticky top bar */}
-        <div className="overflow-x-clip lg:pl-[284px]">
-          <Topbar onMenu={() => setOpen(true)} />
+        <div
+          className={`overflow-x-clip transition-[padding] duration-300 ${
+            collapsed ? 'lg:pl-0' : 'lg:pl-[284px]'
+          }`}
+        >
+          <Topbar
+            onMenu={() => setOpen(true)}
+            collapsed={collapsed}
+            onToggleCollapse={() => setCollapsed(!collapsed)}
+          />
           <motion.main
             key={path}
             initial={{ opacity: 0, y: 6 }}

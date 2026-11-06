@@ -53,3 +53,4 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json(results, { status: 200 })
 }
+

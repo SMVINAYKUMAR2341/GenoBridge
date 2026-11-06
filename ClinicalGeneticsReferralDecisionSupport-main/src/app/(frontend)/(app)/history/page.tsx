@@ -1,13 +1,8 @@
 export const dynamic = 'force-dynamic'
 
-import { redirect } from 'next/navigation'
-import { appAuth } from '@/lib/app-auth'
 import WorkspaceHistory from '@/components/clinical/WorkspaceHistory'
 
 export default async function HistoryPage() {
-  const user = await appAuth.currentSessionUser()
-  if (!user) {
-    redirect('/login')
-  }
   return <WorkspaceHistory view="history" />
 }
+
