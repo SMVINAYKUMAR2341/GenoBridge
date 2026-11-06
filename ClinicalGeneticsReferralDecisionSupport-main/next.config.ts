@@ -31,6 +31,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
+  async redirects() {
+    return [
+      {
+        source: '/assessment/hereditary-cancer',
+        destination: '/assessment/hereditary-cancer-risk',
+        permanent: false,
+      },
+    ]
+  },
   output: 'standalone',
   images: {
     loader: 'custom',

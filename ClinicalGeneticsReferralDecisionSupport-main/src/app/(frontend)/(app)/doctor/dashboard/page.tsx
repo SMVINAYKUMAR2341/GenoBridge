@@ -78,7 +78,7 @@ export default async function DoctorDashboardPage() {
             <span>Antenatal Care (ANC) Module</span>
           </Link>
           <Link
-            href="/assessment/hereditary-cancer"
+            href="/assessment"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold bg-[#102B43] text-white border border-[#164C60] hover:bg-[#164C60] transition-all"
           >
             <Sparkles className="w-4 h-4" />
