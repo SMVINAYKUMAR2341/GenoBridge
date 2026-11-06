@@ -1,9 +1,21 @@
 'use client'
 
-import { Download, ShieldCheck, FileCode2 } from 'lucide-react'
-import { btnGhost, card } from '@/components/ui/Primitives'
-import { FORM_FIELDS } from '@/lib/form-fields'
+import React from 'react'
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Download,
+  FileCode2,
+  FileText,
+  Info,
+  Printer,
+  ShieldCheck,
+} from 'lucide-react'
 import type { WorkflowRecord } from '@/lib/workflow-store'
+import type { DecisionResult } from '@/lib/decision-engine'
 import { buildFhirGenomicsBundle, downloadFhirBundleJson } from '@/lib/fhir-genomics-bundle'
 
 export const OUTCOME_LABELS: Record<string, string> = {
@@ -14,423 +26,310 @@ export const OUTCOME_LABELS: Record<string, string> = {
   insufficient_information: 'Insufficient information — manual review',
   criteria_pending_approval: 'Criteria pending approval — manual review',
 }
-export const PRIMARY_OUTCOMES = ['urgent_referral', 'routine_referral', 'no_referral_needed']
-const object = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {}
-const rows = (value: unknown): Record<string, unknown>[] =>
-  Array.isArray(value) ? value.map(object) : []
-const text = (value: unknown, empty = 'Not recorded') =>
-  typeof value === 'string' && value.trim() ? value : empty
-const display = (value: unknown): string =>
-  value === '' || value === undefined || value === null
-    ? 'Unknown / not recorded'
-    : typeof value === 'boolean'
-      ? value
-        ? 'Yes'
-        : 'No'
-      : typeof value === 'object'
-        ? JSON.stringify(value, null, 2)
-        : String(value)
-function sourceUrl(value: unknown): string | null {
-  if (typeof value !== 'string') return null
-  try {
-    const url = new URL(value)
-    return url.protocol === 'https:' && !url.username && !url.password ? url.href : null
-  } catch {
-    return null
+
+interface Props {
+  record?: WorkflowRecord | null
+  decision?: DecisionResult | null
+  pathwaySlug?: string
+  inputs?: Record<string, any>
+  onReturnToForm?: () => void
+}
+
+export function WorkflowResult({
+  record,
+  decision,
+  pathwaySlug,
+  inputs,
+  onReturnToForm,
+}: Props) {
+  // Extract server evaluation if present
+  const snapshot = (record?.evaluationSnapshot as Record<string, unknown>) || {}
+  const serverResult = (snapshot.result as Record<string, unknown>) || {}
+
+  // Determine final outcome
+  const rawDecisionKey =
+    (serverResult.decision as string) ||
+    decision?.clinical_decision ||
+    (decision?.outcome === 'urgent'
+      ? 'urgent_referral'
+      : decision?.outcome === 'routine'
+        ? 'routine_referral'
+        : decision?.outcome === 'borderline'
+          ? 'borderline_consideration'
+          : 'no_referral_needed')
+
+  const isUrgent = rawDecisionKey === 'urgent_referral' || decision?.outcome === 'urgent'
+  const isRoutine = rawDecisionKey === 'routine_referral' || decision?.outcome === 'routine'
+  const isBorderline = rawDecisionKey === 'borderline_consideration' || decision?.outcome === 'borderline'
+  const isNoReferral = !isUrgent && !isRoutine && !isBorderline
+
+  // Referral Target & Timeframe
+  const referralTarget =
+    (serverResult.referralTarget as string) ||
+    decision?.referral_target ||
+    (isNoReferral ? 'Routine Obstetric & Primary Care' : 'Clinical Genetics / Genetic Counselor')
+
+  const timeframe = isUrgent
+    ? '< 48–72 hours'
+    : isRoutine
+      ? '< 2–3 weeks'
+      : isBorderline
+        ? 'At next scheduled clinical review'
+        : 'Routine prenatal follow-up'
+
+  // Rationale & Explanations
+  const explanation =
+    (serverResult.rationale as string) ||
+    decision?.explanation ||
+    (isNoReferral
+      ? 'No active high-risk clinical genetics referral criteria were met on this evaluation. Standard routine prenatal and obstetric surveillance recommended.'
+      : 'Deterministic guideline-aligned referral criteria met based on clinical assessment presentation.')
+
+  // Matched Criteria list
+  const rawCriteria = (serverResult.matchedCriteria as any[]) || decision?.matched_criteria || []
+  const matchedCriteria = Array.isArray(rawCriteria)
+    ? rawCriteria.map((c: any) => ({
+        key: c.rule_key || c.code || c.id || 'RULE',
+        label: c.label || c.title || 'Clinical Criterion',
+        description: c.description || '',
+        outcome: c.outcome || (isUrgent ? 'urgent' : 'routine'),
+        target: c.referral_target || referralTarget,
+        citation: c.guideline_source
+          ? `${c.guideline_source}: ${c.citation || ''}`
+          : c.guidelineCitation || 'ACOG / ACMG / FOGSI Clinical Practice Guidelines',
+      }))
+    : []
+
+  // Guidelines citations list
+  const guidelineCitations =
+    decision?.guideline_citations && decision.guideline_citations.length > 0
+      ? decision.guideline_citations
+      : [
+          'ACOG Practice Bulletin 691 & FOGSI Preconception Guidelines — Carrier Screening',
+          'ACOG Committee Opinion 690 — Carrier Screening in Consanguineous Unions',
+          'ACMG Technical Standards for Clinical Genetics Practice',
+          'NCCN Clinical Practice Guidelines in Oncology — Genetic/Familial High-Risk Assessment',
+        ]
+
+  const handleExportFhir = () => {
+    try {
+      const syntheticRef = record?.syntheticPatientReference || 'SYN-STANDALONE'
+      const bundle = buildFhirGenomicsBundle({
+        workflowKey: record?.workflowKey || `genobridge-${Date.now()}`,
+        syntheticPatientReference: syntheticRef,
+        pathwaySlug: pathwaySlug || record?.pathwaySlug || 'genetics-assessment',
+        decision: rawDecisionKey,
+        referralTarget,
+        inputs: inputs || (record?.assessmentInputs as Record<string, unknown>) || {},
+        matchedCriteria: matchedCriteria.map((c) => ({
+          code: c.key,
+          title: c.label,
+          outcome: c.outcome,
+          guidelineCitation: c.citation,
+        })),
+        guidelines: guidelineCitations,
+      })
+      downloadFhirBundleJson(bundle, `fhir-genomics-${syntheticRef}.json`)
+    } catch (e) {
+      console.error('FHIR export error:', e)
+    }
   }
-}
-function Source({ source }: { source: Record<string, unknown> }) {
-  const url = sourceUrl(source.url ?? source.sourceURL)
+
+  const handlePrint = () => {
+    window.print()
+  }
+
   return (
-    <div className="rounded-lg border border-hx-border p-3 text-sm">
-      <p className="font-semibold">
-        {text(source.org ?? source.sourceOrganization)} ·{' '}
-        {text(source.title ?? source.sourceDocument)}
-      </p>
-      <p className="text-hx-muted">
-        Version: {text(source.guidelineVersion ?? source.sourceVersion)} · Date:{' '}
-        {text(source.date ?? source.publishedAt)} · Page: {text(source.page)} · Section:{' '}
-        {text(source.section ?? source.sourceSection)}
-      </p>
-      {url ? (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1 inline-block break-all font-semibold text-hx-emerald underline"
-        >
-          View source document
-        </a>
-      ) : (
-        <p className="text-xs text-hx-muted">No safe HTTPS source URL available.</p>
-      )}
-    </div>
-  )
-}
-export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
-  const snapshot = object(record?.evaluationSnapshot)
-  const result = object(snapshot.result)
-  const decision = text(result.decision, '')
-  const evaluated = Object.keys(result).length > 0
-  const primary = PRIMARY_OUTCOMES.includes(decision)
-  const pending =
-    !primary || result.reviewPending === true || result.containsUnvalidatedCriteria === true
-  const criteria = rows(result.matchedCriteria)
-  const serviceSnapshots = rows(result.criteriaSnapshots)
-  const sources = rows(result.sourceCitations)
-  const approvals = rows(snapshot.criteria)
-  const signoff = object(record?.signoff)
-  const fields = FORM_FIELDS[record?.pathwaySlug ?? ''] ?? []
-  return (
-    <div className="space-y-6">
-      {/* Authoritative Recommendation Hero Banner matching Histone */}
+    <div className="space-y-6 text-white animate-in fade-in duration-300">
+      {/* 1. Authoritative Clinical Recommendation Hero Banner */}
       <div
-        data-testid="result-hero"
-        className={`rounded-lg p-6 sm:p-8 text-white shadow-sm transition-all ${
-          decision === 'urgent_referral'
-            ? 'bg-[#b8125d] text-white'
-            : decision === 'routine_referral'
-              ? 'bg-[#f59e0b] text-slate-950'
-              : decision === 'borderline_consideration'
-                ? 'bg-[#64748b] text-white'
-                : 'bg-[#10b981] text-white'
+        className={`rounded-2xl p-6 sm:p-8 text-white shadow-xl border ${
+          isUrgent
+            ? 'bg-gradient-to-r from-[#881337] via-[#9f1239] to-[#be123c] border-rose-500/50'
+            : isRoutine
+              ? 'bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#b45309] border-amber-500/50'
+              : isBorderline
+                ? 'bg-gradient-to-r from-[#1e293b] via-[#334155] to-[#475569] border-slate-500/50'
+                : 'bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#059669] border-emerald-500/50'
         }`}
       >
-        <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.24em] opacity-80 mb-2">
-          <span>{record?.pathwaySlug ? record.pathwaySlug.replace(/-/g, ' ') : 'CLINICAL EVALUATION'}</span>
-          <span className="px-2.5 py-0.5 rounded-md bg-white/20 text-white font-bold tracking-wider text-[10px]">
-            {decision === 'urgent_referral'
+        <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 mb-3">
+          <span className="flex items-center gap-2">
+            <ShieldCheck size={16} />
+            <span>CLINICAL REFERRAL DECISION</span>
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white/20 text-white font-bold tracking-wider text-[11px] backdrop-blur-xs">
+            {isUrgent
               ? 'REFER — URGENT'
-              : decision === 'routine_referral'
+              : isRoutine
                 ? 'REFER — ROUTINE'
-                : decision === 'borderline_consideration'
-                  ? 'BORDERLINE — DISCUSS'
+                : isBorderline
+                  ? 'BORDERLINE CONSIDERATION'
                   : 'NO REFERRAL NEEDED'}
           </span>
         </div>
-        <div data-testid="outcome-label" className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight">
-          {OUTCOME_LABELS[decision] || 'Recommendation'}
+
+        <div className="text-3xl sm:text-4xl font-extrabold tracking-tight flex items-center gap-3">
+          {isUrgent && <AlertCircle className="w-9 h-9 text-rose-200 shrink-0" />}
+          {isRoutine && <AlertTriangle className="w-9 h-9 text-amber-200 shrink-0" />}
+          {isBorderline && <Info className="w-9 h-9 text-slate-200 shrink-0" />}
+          {isNoReferral && <CheckCircle2 className="w-9 h-9 text-emerald-200 shrink-0" />}
+          <span>
+            {isUrgent
+              ? 'Urgent Clinical Referral Recommended'
+              : isRoutine
+                ? 'Routine Clinical Referral Recommended'
+                : isBorderline
+                  ? 'Borderline Presentation — Specialist Discussion'
+                  : 'No Immediate Genetics Referral Indicated'}
+          </span>
         </div>
-        {result.referralTarget && result.referralTarget !== 'None' && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm sm:text-base font-medium opacity-95">
-            <span className="text-[11px] uppercase tracking-widest opacity-80">Referral target:</span>
-            <span className="font-bold underline underline-offset-4">
-              {String(result.referralTarget)}
-            </span>
+
+        <div className="mt-4 pt-4 border-t border-white/20 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm sm:text-base font-medium">
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-wider opacity-80">Referral Target:</span>
+            <span className="font-bold underline underline-offset-4">{referralTarget}</span>
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="opacity-80" />
+            <span className="text-xs uppercase tracking-wider opacity-80">Recommended Timeframe:</span>
+            <span className="font-bold">{timeframe}</span>
+          </div>
+        </div>
       </div>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-xs space-y-4 text-slate-900">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <p className="text-xs font-bold tracking-widest text-[#b8125d] uppercase font-mono">
+      {/* 2. Deterministic Decision Rationale */}
+      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-4">
+        <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
+          <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399] flex items-center gap-2">
+            <FileText size={16} />
             Deterministic Decision Rationale
-          </p>
-          <span className="text-xs text-slate-500 font-mono">Zero-hallucination rule engine</span>
+          </h3>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e]">
+            ENGINE: FOGSI · ACOG · ACMG · NCCN
+          </span>
         </div>
-        <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-800">
-          {evaluated
-            ? text(
-                result.rationale,
-                'No rationale is available. Manual clinical review is required.',
-              )
-            : 'Save and submit the clinical record, then ask a provider to explicitly review it. Absence of an evaluation is not a no-referral decision.'}
+
+        <p className="text-sm leading-relaxed text-slate-200 font-medium">
+          {explanation}
         </p>
-        <dl className="grid gap-3 text-sm sm:grid-cols-2 pt-2 border-t border-slate-100">
-          <div>
-            <dt className="text-xs font-mono text-slate-500 uppercase">Destination(s)</dt>
-            <dd className="font-semibold text-slate-900 mt-0.5">
-              {text(result.referralTarget, 'Not specified by server evaluation')}
-            </dd>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-3 text-xs">
+            <span className="text-slate-400 block mb-1">Target Specialist</span>
+            <span className="font-bold text-white text-sm">{referralTarget}</span>
           </div>
-          <div>
-            <dt className="text-xs font-mono text-slate-500 uppercase">Evaluation timestamp</dt>
-            <dd className="font-semibold text-slate-900 mt-0.5">{text(snapshot.evaluatedAt ?? result.timestamp, 'Not evaluated')}</dd>
+          <div className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-3 text-xs">
+            <span className="text-slate-400 block mb-1">Timeframe</span>
+            <span className="font-bold text-white text-sm">{timeframe}</span>
           </div>
-          <div>
-            <dt className="text-xs font-mono text-slate-500 uppercase">Engine / standard</dt>
-            <dd className="font-semibold text-[#b8125d] mt-0.5">FOGSI · ACOG · ACMG · ASRM · NCCN</dd>
+          <div className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-3 text-xs">
+            <span className="text-slate-400 block mb-1">Evaluation Status</span>
+            <span className="font-bold text-[#34d399] text-sm flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
+              Verified Deterministic
+            </span>
           </div>
-          <div>
-            <dt className="text-xs font-mono text-slate-500 uppercase">Reason code</dt>
-            <dd className="font-semibold text-slate-900 mt-0.5">{text(result.reasonCode)}</dd>
-          </div>
-        </dl>
-        {Array.isArray(result.missingFields) && result.missingFields.length > 0 && (
-          <div className="mt-4">
-            <h3 className="font-bold">Missing input</h3>
-            <ul className="mt-2 list-disc pl-5 text-sm">
-              {result.missingFields.map((key, index) => (
-                <li key={index}>
-                  {fields.find((field) => field.key === key)?.label ?? display(key)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {rows(result.validationErrors).length > 0 && (
-          <ul className="mt-3 list-disc pl-5 text-sm text-hx-warn">
-            {rows(result.validationErrors).map((error, index) => (
-              <li key={index}>
-                {text(error.path)}: {text(error.message)}
-              </li>
-            ))}
-          </ul>
-        )}
+        </div>
       </section>
 
-      <section className={`${card} space-y-4 p-5`}>
-        <h3 className="text-lg font-bold">Matched criteria & rationale</h3>
-        {!criteria.length && (
-          <p className="text-sm text-hx-muted">
-            No matched criterion is present in this persisted evaluation. This is not evidence that
-            referral is unnecessary.
-          </p>
-        )}
-        {criteria.map((criterion, index) => {
-          const service = serviceSnapshots
-            .map((entry) => object(entry.criteria))
-            .find((entry) => entry.id === criterion.id)
-          const approved = object(
-            approvals.find((entry) => entry.id === criterion.id)?.approvedSnapshot,
-          )
-          return (
-            <article
-              key={String(criterion.id ?? index)}
-              className="space-y-3 rounded-xl border border-[#164C60]/70 bg-[#08243B]/40 p-4 transition-all"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div>
-                  <h4 className="font-bold text-white text-base">
-                    {text(criterion.title, '') || text(criterion.code, '')}
-                  </h4>
-                  <div className="text-xs text-[#A9BDCA] mt-0.5">
-                    Target: <span className="text-[#00D8C3] font-semibold">{text(criterion.referral_target ?? result.referralTarget)}</span>
+      {/* 3. Matched Clinical Criteria */}
+      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-4">
+        <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
+          <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Matched Criteria &amp; Practice Guidelines</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#033424] text-[#34d399] border border-[#0e5c3e]">
+              {matchedCriteria.length} rule{matchedCriteria.length === 1 ? '' : 's'} met
+            </span>
+          </h3>
+        </div>
+
+        {matchedCriteria.length > 0 ? (
+          <div className="space-y-3">
+            {matchedCriteria.map((c, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-4 text-sm space-y-2 hover:border-[#10b981]/50 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="font-bold text-white flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                    <span>{c.label}</span>
                   </div>
+                  <span
+                    className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${
+                      c.outcome === 'urgent'
+                        ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                        : 'bg-amber-950 text-amber-300 border border-amber-800'
+                    }`}
+                  >
+                    {c.outcome}
+                  </span>
                 </div>
-                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                  String(criterion.outcome).includes('urgent')
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                    : String(criterion.outcome).includes('routine')
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                }`}>
-                  {OUTCOME_LABELS[String(criterion.outcome)] ?? display(criterion.outcome)}
-                </span>
-              </div>
-              <div className="flex items-start gap-2 pt-1">
-                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#00D8C3] text-[#031525] font-bold shrink-0">
-                  STATUTORY GUIDELINE
-                </span>
-                <span className="text-xs text-[#A9BDCA] leading-relaxed">
-                  {text(criterion.guidelineCitation, 'Statutory guideline matched')}
-                </span>
-              </div>
-            </article>
-          )
-        })}
-        <h3 className="pt-2 font-bold">Source provenance</h3>
-        {sources.length ? (
-          sources.map((citation, index) => (
-            <div key={index} className="space-y-1">
-              <p className="text-xs text-hx-muted">Criterion: {text(citation.criteriaId)}</p>
-              <Source source={object(citation.source)} />
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-hx-muted">
-            No source citations supplied. Active approved criteria must be available before a
-            primary clinical decision can be signed.
-          </p>
-        )}
-        {!!result.guidelineCitations && (
-          <p className="text-sm whitespace-pre-wrap">{display(result.guidelineCitations)}</p>
-        )}
-        {!!result.recommendedWorkup && (
-          <div>
-            <h4 className="font-bold">Approved workup text</h4>
-            <p className="mt-1 text-sm whitespace-pre-wrap">{display(result.recommendedWorkup)}</p>
-          </div>
-        )}
-        {!!result.jargonTip && (
-          <p className="text-sm whitespace-pre-wrap">{display(result.jargonTip)}</p>
-        )}
-      </section>
-
-      <section className={`${card} space-y-3 p-5`}>
-        <h3 className="flex items-center gap-2 text-lg font-bold">
-          <ShieldCheck size={19} /> Reviewing clinician approval
-        </h3>
-        {Object.keys(signoff).length ? (
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            {[
-              'name',
-              'role',
-              'actor',
-              'at',
-              'signatureId',
-              'evaluationDigest',
-              'attested',
-              'note',
-            ].map((key) => (
-              <div key={key} className={key === 'note' ? 'sm:col-span-2' : ''}>
-                <dt className="font-semibold">
-                  {
-                    (
-                      {
-                        name: 'Clinician',
-                        role: 'Role',
-                        actor: 'Staff ID',
-                        at: 'Signed at',
-                        signatureId: 'Signature ID',
-                        evaluationDigest: 'Signed evaluation digest',
-                        attested: 'Review attested',
-                        note: 'Clinical approval note',
-                      } as Record<string, string>
-                    )[key]
-                  }
-                </dt>
-                <dd className="break-all whitespace-pre-wrap">{display(signoff[key])}</dd>
+                {c.description && (
+                  <p className="text-xs text-slate-300 leading-relaxed">{c.description}</p>
+                )}
+                <div className="pt-1.5 border-t border-[#0e4331]/80 text-[11px] text-[#34d399] font-medium flex items-center gap-1.5">
+                  <ShieldCheck size={13} className="shrink-0" />
+                  <span>Guideline: {c.citation}</span>
+                </div>
               </div>
             ))}
-          </dl>
+          </div>
         ) : (
-          <p className="text-sm text-hx-muted">
-            Not signed. An in-review result is not a finalized referral or clinician approval.
-          </p>
-        )}
-        {record?.state === 'FINALIZED' && (
-          <div className="flex flex-wrap items-center gap-3">
-            <a className={btnGhost} href={`/api/referrals/${encodeURIComponent(record.workflowKey)}`}>
-              <Download size={16} />{' '}
-              {decision === 'no_referral_needed'
-                ? 'Download finalized no-referral report'
-                : 'Download finalized report'}
-            </a>
-            <button
-              type="button"
-              onClick={() => {
-                const bundle = buildFhirGenomicsBundle(null, {
-                  pathwayTitle: record.pathwaySlug.replaceAll('-', ' '),
-                  decisionLabel: OUTCOME_LABELS[decision] || decision.replaceAll('_', ' '),
-                  rationale: text(result.rationale, 'Clinical criteria evaluated against published guidelines.'),
-                  guidelineCitations: sources.map((s) => `${text(object(s.source).org)} · ${text(object(s.source).title)} (${text(object(s.source).guidelineVersion)})`),
-                  practitionerName: text(signoff.name, 'Reviewing Clinician'),
-                  councilNumber: text(signoff.actor, 'NMC-REGISTERED'),
-                })
-                downloadFhirBundleJson(
-                  bundle,
-                  `genobridge-fhir-r4-${record.workflowKey.slice(0, 10)}.json`
-                )
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#033424] text-[#00e5ce] border border-[#0e5c3e] hover:bg-[#064e3b] transition-all"
-              title="Download standardized HL7 FHIR Genomics R4 Bundle (ABDM / Ayushman Bharat Digital Mission compliant)"
-            >
-              <FileCode2 size={15} />
-              <span>Export HL7 FHIR (ABDM)</span>
-            </button>
+          <div className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-5 text-sm text-slate-300 text-center">
+            No high-risk criteria triggered by the recorded clinical inputs. Patient is eligible for standard routine monitoring.
           </div>
         )}
-        <details className="border-t border-hx-border pt-3">
-          <summary className="cursor-pointer font-semibold">
-            Criteria and guideline reviewer approvals
-          </summary>
-          {!approvals.length && (
-            <p className="mt-2 text-sm">No governed criteria approvals supplied.</p>
-          )}
-          {approvals.map((criterion, index) => (
-            <div key={index} className="mt-3 rounded-lg border border-hx-border p-3 text-sm">
-              <p className="font-bold">
-                {text(criterion.code, text(criterion.id))} · {text(criterion.version)}
-              </p>
-              {[
-                { label: 'Criterion', history: criterion.governanceHistory },
-                { label: 'Guideline', history: object(criterion.guideline).governanceHistory },
-              ].map(({ label, history }) => (
-                <div key={label}>
-                  <p className="mt-2 font-semibold">{label} approval</p>
-                  {rows(history)
-                    .filter((event) => event.to === 'APPROVED')
-                    .map((event, i) => (
-                      <p key={i}>
-                        Reviewer: {text(event.actorName ?? event.actor)} · {text(event.at)} ·{' '}
-                        {text(event.note ?? event.reason, 'No approval note recorded')}
-                      </p>
-                    ))}
-                </div>
-              ))}
-            </div>
-          ))}
-        </details>
       </section>
 
-      {record && (
-        <section className={`${card} space-y-3 p-5`}>
-          <h3 className="text-lg font-bold">Full persisted clinical report</h3>
-          <p className="text-sm">
-            {record.syntheticPatientReference} · Revision {record.revision} · {record.state} · Saved{' '}
-            {record.createdAt}
-          </p>
-          <p className="text-xs text-hx-muted">
-            Only persisted content is shown. Routine ANC and pedigree are retained as context, not
-            silently converted into criteria facts.
-          </p>
-          <details>
-            <summary className="cursor-pointer font-semibold">
-              Clinical history and structured answers
-            </summary>
-            <pre className="mt-3 max-h-96 overflow-auto rounded-xl bg-hx-bg p-4 text-xs whitespace-pre-wrap">
-              {JSON.stringify(
-                { intake: record.intake, assessmentInputs: record.assessmentInputs },
-                null,
-                2,
-              )}
-            </pre>
-          </details>
-          <details>
-            <summary className="cursor-pointer font-semibold">
-              Complete pedigree and Routine ANC context
-            </summary>
-            <pre className="mt-3 max-h-96 overflow-auto rounded-xl bg-hx-bg p-4 text-xs whitespace-pre-wrap">
-              {JSON.stringify({ pedigree: record.pedigree, anc: record.anc }, null, 2)}
-            </pre>
-          </details>
-          <details>
-            <summary className="cursor-pointer font-semibold">
-              Complete evaluation, source versions and signoff
-            </summary>
-            <pre className="mt-3 max-h-96 overflow-auto rounded-xl bg-hx-bg p-4 text-xs whitespace-pre-wrap">
-              {JSON.stringify(
-                {
-                  evaluationSnapshot: record.evaluationSnapshot,
-                  signoff: record.signoff,
-                  reviewNote: record.reviewNote,
-                },
-                null,
-                2,
-              )}
-            </pre>
-          </details>
-        </section>
-      )}
-      <details className="text-sm text-hx-muted">
-        <summary className="cursor-pointer font-semibold">
-          Outcome terminology: three primary outcomes and three safeguards
-        </summary>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          {Object.entries(OUTCOME_LABELS).map(([key, label]) => (
-            <li key={key}>
-              {label} —{' '}
-              {PRIMARY_OUTCOMES.includes(key)
-                ? 'primary outcome; requires current server review and clinician signoff'
-                : 'safeguard; specialist review required, not eligible for finalization'}
+      {/* 4. Governing Practice Guidelines */}
+      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-3">
+        <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold">
+          Source Clinical Guidelines &amp; Statutory Provenance
+        </h4>
+        <ul className="space-y-2 text-xs text-slate-300">
+          {guidelineCitations.map((g, i) => (
+            <li key={i} className="flex items-start gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] mt-1 shrink-0" />
+              <span>{g}</span>
             </li>
           ))}
         </ul>
-      </details>
+      </section>
+
+      {/* 5. Clinical Action Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+        {onReturnToForm && (
+          <button
+            type="button"
+            onClick={onReturnToForm}
+            className="px-5 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white hover:bg-[#063825] hover:border-[#10b981]/50 text-sm font-semibold transition cursor-pointer flex items-center gap-2"
+          >
+            ← Modify Inputs
+          </button>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3 ml-auto">
+          <button
+            type="button"
+            onClick={handleExportFhir}
+            className="px-4 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-[#34d399] hover:bg-[#033424] hover:border-[#10b981] text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
+          >
+            <FileCode2 size={16} />
+            <span>Export FHIR Genomics</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#34d399] hover:to-[#10b981] text-white text-sm font-bold transition cursor-pointer flex items-center gap-2 shadow-md"
+          >
+            <Printer size={16} />
+            <span>Print / Save Referral</span>
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

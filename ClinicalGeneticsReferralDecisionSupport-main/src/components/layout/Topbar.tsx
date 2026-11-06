@@ -1,32 +1,21 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeftRight,
-  BarChart3,
   Bell,
-  CheckCircle2,
   ChevronDown,
-  Clock,
-  History as HistoryIcon,
-  LayoutGrid,
+  ChevronRight,
+  House,
   LogOut,
   Menu,
-  PanelLeft,
-  PanelLeftClose,
   Search,
   Settings,
   ShieldCheck,
-  Sparkles,
-  Stethoscope,
   User as UserIcon,
-  UserCheck,
-  Users,
 } from 'lucide-react'
 import { PATHWAYS } from '@/data/pathways'
-import { GUIDELINES, KNOWLEDGE, PATIENTS } from '@/data/content'
+import { GUIDELINES, KNOWLEDGE, PATIENTS, STAFF } from '@/data/content'
 import { useAssessments } from '@/components/providers/AssessmentsProvider'
 
 type AuthUser = {
@@ -38,8 +27,6 @@ type AuthUser = {
   role?: string
   category?: string
   designation?: string
-  medicalRegistrationNumber?: string
-  stateMedicalCouncil?: string
 }
 
 function computeInitials(name?: string, email?: string): string {
@@ -53,34 +40,53 @@ function computeInitials(name?: string, email?: string): string {
   if (email && email.trim()) {
     return email.slice(0, 2).toUpperCase()
   }
-  return 'S'
+  return 'CS'
 }
 
-export default function Topbar({
-  onMenu,
-  collapsed = false,
-  onToggleCollapse,
-}: {
-  onMenu: () => void
-  collapsed?: boolean
-  onToggleCollapse?: () => void
-}) {
-  const path = usePathname()
-  const router = useRouter()
+function computeRole(user: AuthUser): string {
+  if (user.designation && user.designation.trim()) {
+    return user.designation.trim()
+  }
+  if (user.category === 'gynecologist') {
+    return 'Staff · OB/GYN'
+  }
+  if (user.category === 'nurse') {
+    return 'Staff · Clinical Nurse'
+  }
+  if (user.role === 'provider') {
+    return 'Attending Physician'
+  }
+  if (user.role === 'nurse') {
+    return 'Clinical Nurse'
+  }
+  if (user.role === 'admin') {
+    return 'Administrator'
+  }
+  return 'Clinical Staff'
+}
+
+const TITLES: Record<string, string> = {
+  '/': 'New Assessment',
+  '/history': 'Patient History',
+  '/referrals': 'Referral Overview',
+  '/analytics': 'Reports & Analytics',
+  '/guidelines': 'Clinical Guidelines',
+  '/calculator': 'Risk Calculator',
+  '/saved': 'Saved Assessments',
+  '/knowledge': 'Knowledge Base',
+  '/safety': 'Safety & Setup',
+}
+export default function Topbar({ onMenu }: { onMenu: () => void }) {
+  const path = usePathname(),
+    router = useRouter()
   const { items } = useAssessments()
-  const [q, setQ] = useState('')
-  const [menu, setMenu] = useState<null | 'search' | 'notif' | 'profile'>(null)
+  const [q, setQ] = useState(''),
+    [menu, setMenu] = useState<null | 'search' | 'notif' | 'profile'>(null)
   const ref = useRef<HTMLElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  const title = path.startsWith('/assessment') ? 'Assessment' : (TITLES[path] ?? 'Workspace')
 
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>({
-    name: 'SM VINAY KUMAR',
-    role: 'provider',
-    category: 'gynecologist',
-    designation: 'Consultant Gynecologist & Fetal Medicine Specialist',
-    medicalRegistrationNumber: 'KMC-89241-DSS',
-    stateMedicalCouncil: 'Karnataka Medical Council / FOGSI',
-  })
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
 
   useEffect(() => {
     let active = true
@@ -89,11 +95,17 @@ export default function Topbar({
         const res = await fetch('/api/auth/me', { cache: 'no-store' })
         if (res.ok) {
           const data = await res.json()
-          if (active && data.authenticated && data.user) {
-            setCurrentUser(data.user)
+          if (active) {
+            if (data.authenticated && data.user) {
+              setCurrentUser(data.user)
+            } else {
+              setCurrentUser(null)
+            }
           }
         }
-      } catch {}
+      } catch {
+        if (active) setCurrentUser(null)
+      }
     }
     checkUser()
     window.addEventListener('clinical-workspace-refresh', checkUser)
@@ -107,9 +119,12 @@ export default function Topbar({
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
     } catch {}
+    setCurrentUser(null)
+    setMenu(null)
+    window.dispatchEvent(new Event('clinical-workspace-refresh'))
     router.push('/login')
+    router.refresh()
   }
-
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setMenu(null)
@@ -121,10 +136,6 @@ export default function Topbar({
         searchRef.current?.focus()
         setMenu('search')
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault()
-        onToggleCollapse?.()
-      }
     }
     document.addEventListener('mousedown', close)
     document.addEventListener('keydown', keys)
@@ -132,8 +143,7 @@ export default function Topbar({
       document.removeEventListener('mousedown', close)
       document.removeEventListener('keydown', keys)
     }
-  }, [onToggleCollapse])
-
+  }, [])
   const results = useMemo(() => {
     const t = q.trim().toLowerCase()
     if (!t) return []
@@ -165,288 +175,178 @@ export default function Topbar({
       })),
     ].slice(0, 8)
   }, [q, items])
-
   const go = (href: string) => {
     setMenu(null)
     setQ('')
     router.push(href)
   }
-
-  const isAssessment = path === '/' || path.startsWith('/assessment')
-  const isReferrals = path.startsWith('/referrals')
-  const isPatients = path.startsWith('/pedigree') || path.startsWith('/anc')
-  const isHistory = path.startsWith('/history')
-  const isAnalytics = path.startsWith('/analytics')
-
+  const pop =
+    'absolute z-30 mt-2 rounded-2xl border border-[#0e4331] bg-[#00261c] p-2 shadow-2xl backdrop-blur-xl text-white'
+  const iconBtn =
+    'relative flex h-10 w-10 items-center justify-center rounded-xl text-white transition hover:bg-white/10 hover:text-hx-accent'
   return (
     <header
       ref={ref}
-      className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 sm:px-6 backdrop-blur-md text-slate-900 shadow-xs"
+      className="sticky top-0 z-30 flex h-[74px] items-center gap-3 border-b border-[#0e4331] bg-[#00261c]/95 px-4 backdrop-blur-xl lg:pr-[30px] lg:pl-[37px] text-white"
     >
-      {/* Brand & Sidebar Toggles */}
-      <div className="flex items-center gap-3">
-        {/* Mobile menu trigger */}
-        <button
-          onClick={onMenu}
-          aria-label="Open navigation menu"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden"
-        >
-          <Menu size={20} />
-        </button>
-
-        {/* Desktop collapsible toggle button */}
-        {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar for full-screen mode (Ctrl+B)'}
-            className="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-          >
-            {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
-          </button>
-        )}
-
-        {/* Brand Header */}
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#b8125d] text-white font-extrabold text-sm shadow-sm">
-            H
-          </span>
-          <div className="text-left leading-tight hidden sm:block">
-            <div className="font-heading font-extrabold text-[16px] text-[#b8125d] tracking-tight">
-              HistoNe
-            </div>
-            <div className="text-[10px] tracking-[0.2em] uppercase font-semibold text-slate-500">
-              GENETICS DSS
-            </div>
-          </div>
+      <button onClick={onMenu} aria-label="Open menu" className={`${iconBtn} lg:hidden`}>
+        <Menu size={20} />
+      </button>
+      <nav aria-label="Breadcrumb" className="hidden shrink-0 items-center text-[14px] xl:flex">
+        <Link href="/" aria-label="Home" className="text-white transition hover:text-hx-accent">
+          <House size={23} strokeWidth={1.8} />
         </Link>
-      </div>
-
-      {/* Histone Parity Top Navigation Tabs */}
-      <nav aria-label="Top navigation" className="hidden md:flex items-center gap-1.5 lg:gap-2">
-        {/* New assessment tab (Rich Magenta Pill matching Histone) */}
-        <Link
-          href="/assessment"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
-            isAssessment
-              ? 'bg-[#b8125d] text-white shadow-xs'
-              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
-          }`}
-        >
-          <LayoutGrid size={15} className="shrink-0" />
-          <span>New assessment</span>
-        </Link>
-
-        {/* Referrals */}
-        <Link
-          href="/referrals"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
-            isReferrals
-              ? 'bg-[#b8125d] text-white shadow-xs'
-              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
-          }`}
-        >
-          <ArrowLeftRight size={15} className="shrink-0" />
-          <span>Referrals</span>
-        </Link>
-
-        {/* Patients & Pedigree */}
-        <Link
-          href="/pedigree"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
-            isPatients
-              ? 'bg-[#b8125d] text-white shadow-xs'
-              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
-          }`}
-        >
-          <Users size={15} className="shrink-0" />
-          <span>Patients</span>
-        </Link>
-
-        {/* History */}
-        <Link
-          href="/history"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
-            isHistory
-              ? 'bg-[#b8125d] text-white shadow-xs'
-              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
-          }`}
-        >
-          <HistoryIcon size={15} className="shrink-0" />
-          <span>History</span>
-        </Link>
-
-        {/* Reports & Analytics */}
-        <Link
-          href="/analytics"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
-            isAnalytics
-              ? 'bg-[#b8125d] text-white shadow-xs'
-              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
-          }`}
-        >
-          <BarChart3 size={15} className="shrink-0" />
-          <span>Analytics</span>
-        </Link>
+        <span className="ml-[21px] font-medium text-slate-400">Workspace</span>
+        <ChevronRight size={15} strokeWidth={2} className="mx-4 text-slate-500" />
+        <span className="font-bold text-white">{title}</span>
       </nav>
-
-      {/* Right Section: Quick Search & Histone Provider Badge [ S ] SM VINAY KUMAR */}
-      <div className="flex items-center gap-3">
-        {/* Quick Search */}
-        <div className="relative hidden xl:block w-[240px]">
-          <Search
-            size={15}
-            strokeWidth={2}
-            className="pointer-events-none absolute top-1/2 left-[12px] -translate-y-1/2 text-slate-400"
-          />
-          <input
-            ref={searchRef}
-            aria-label="Search"
-            value={q}
-            onFocus={() => setMenu('search')}
-            onChange={(e) => {
-              setQ(e.target.value)
-              setMenu('search')
-            }}
-            placeholder="Search guidelines, rules..."
-            className="h-9 w-full rounded-md border border-slate-200 bg-slate-50 pr-3 pl-[34px] text-xs text-slate-900 outline-none placeholder:text-slate-400 hover:border-slate-300 focus:border-[#b8125d] focus:bg-white"
-          />
-          {menu === 'search' && q.trim() && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-lg z-50 text-slate-900">
-              {results.length ? (
-                results.map((r, i) => (
-                  <button
-                    key={i}
-                    onClick={() => go(r.href)}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs text-slate-800 hover:bg-slate-100"
-                  >
-                    <span className="w-16 shrink-0 text-[9px] font-bold tracking-wider text-[#b8125d] uppercase">
-                      {r.k}
-                    </span>
-                    <span className="truncate">{r.label}</span>
-                  </button>
-                ))
-              ) : (
-                <p className="px-3 py-2 text-xs text-slate-500">No matches found.</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Notifications */}
+      <div className="relative mx-auto w-full max-w-[398px]">
+        <Search
+          size={18}
+          strokeWidth={2}
+          className="pointer-events-none absolute top-1/2 left-[15px] -translate-y-1/2 text-slate-400"
+        />
+        <input
+          ref={searchRef}
+          aria-label="Search"
+          aria-keyshortcuts="Control+K"
+          value={q}
+          onFocus={() => setMenu('search')}
+          onChange={(e) => {
+            setQ(e.target.value)
+            setMenu('search')
+          }}
+          onKeyDown={(e) => e.key === 'Enter' && results[0] && go(results[0].href)}
+          placeholder="Search patients, assessments, guidelines..."
+          className="h-11 w-full rounded-full border border-[#0e4331] bg-[#021f17] pr-4 pl-[46px] text-[13px] text-white shadow-[0_1px_2px_rgb(0_0_0/0.2)] transition outline-none placeholder:text-slate-400 hover:border-[#137a2c] focus:border-hx-accent focus:ring-4 focus:ring-hx-accent/20 sm:pr-[70px]"
+        />
+        <kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md bg-[#063327] border border-[#0e4331] px-2 py-[3px] font-sans text-[12px] font-medium text-slate-300 sm:block">
+          Ctrl K
+        </kbd>
+        {menu === 'search' && q.trim() && (
+          <div className={`${pop} left-0 w-full`}>
+            {results.length ? (
+              results.map((r, i) => (
+                <button
+                  key={i}
+                  onClick={() => go(r.href)}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-white transition hover:bg-white/10"
+                >
+                  <span className="w-20 shrink-0 text-[10px] font-bold tracking-wider text-hx-accent uppercase">
+                    {r.k}
+                  </span>
+                  <span className="truncate">{r.label}</span>
+                </button>
+              ))
+            ) : (
+              <p className="px-3 py-3 text-sm text-slate-400">No matches for “{q}”.</p>
+            )}
+          </div>
+        )}
+      </div>
+      <span className="hidden shrink-0 items-center gap-[9px] text-[13px] font-medium text-slate-400 2xl:flex">
+        <span className="h-2.5 w-2.5 rounded-full bg-hx-accent shadow-[0_0_0_3px_rgb(22_163_74/0.2)]" />
+        Decision support workspace
+      </span>
+      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-[#0e4331] 2xl:block" />
+      <div className="relative">
         <button
           aria-label="Notifications"
+          aria-expanded={menu === 'notif'}
           onClick={() => setMenu(menu === 'notif' ? null : 'notif')}
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
+          className={iconBtn}
         >
-          <Bell size={18} />
-          <span className="absolute top-[6px] right-[6px] h-2 w-2 rounded-full bg-[#b8125d]" />
+          <Bell size={23} strokeWidth={1.8} />
+          <span className="absolute top-[7px] right-[8px] h-[9px] w-[9px] rounded-full bg-hx-accent ring-2 ring-[#00261c]" />
         </button>
-
         {menu === 'notif' && (
-          <div className="absolute right-4 top-16 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-xl z-50 text-slate-900">
-            <p className="text-xs font-bold text-slate-900 mb-1.5 flex items-center justify-between">
-              <span>Guidelines &amp; Decision Status</span>
-              <span className="text-[10px] font-semibold text-emerald-600">Active</span>
-            </p>
-            <p className="text-xs text-slate-600 leading-relaxed rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-              Deterministic clinical decision engine running all 6 pathways calibrated against ACOG, NCCN, ACMG, and FOGSI clinical criteria.
+          <div className={`${pop} right-0 w-72`}>
+            <p className="px-3 py-2 text-xs font-bold text-slate-300">Notifications</p>
+            <p className="rounded-xl border border-hx-warn-line bg-hx-warn-bg px-3 py-3 text-sm text-hx-warn">
+              Clinical criteria are not yet clinically validated. Use simulated inputs only.
             </p>
             <Link
-              href="/account"
+              href="/safety"
               onClick={() => setMenu(null)}
-              className="mt-2.5 block text-center text-xs font-bold text-[#b8125d] hover:underline"
+              className="mt-1 block rounded-xl px-3 py-2 text-sm font-semibold text-hx-accent transition hover:bg-white/10"
             >
-              Review OPD Staff &amp; Council Details &rarr;
+              Review Safety &amp; Setup
             </Link>
           </div>
         )}
-
-        {/* Histone Provider Badge [ S ] SM VINAY KUMAR · PROVIDER */}
-        <div className="relative">
-          <button
-            onClick={() => setMenu(menu === 'profile' ? null : 'profile')}
-            aria-label="Clinician Profile"
-            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer"
-          >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#b8125d] text-xs font-bold text-white shadow-xs">
-              {computeInitials(currentUser?.name, currentUser?.email)}
+      </div>
+      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-[#0e4331] sm:block" />
+      <div className="relative">
+        <button
+          aria-label="User menu"
+          aria-expanded={menu === 'profile'}
+          onClick={() => setMenu(menu === 'profile' ? null : 'profile')}
+          className="flex items-center gap-[18px] rounded-2xl p-1 transition hover:bg-white/10 sm:pr-2"
+        >
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#13703a,#0b4f26_70%)] text-[15px] font-bold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)] ring-2 ring-[#00e5ce]/40">
+            {computeInitials(currentUser?.name, currentUser?.email)}
+          </span>
+          <span className="hidden text-left sm:block">
+            <span className="block text-[13.5px] leading-tight font-extrabold text-white">
+              {currentUser?.name || (currentUser?.email ? currentUser.email.split('@')[0] : 'Clinical Staff')}
             </span>
-            <div className="text-left hidden sm:block">
-              <span className="block text-xs font-bold text-slate-900 leading-tight">
-                {currentUser?.name || 'SM VINAY KUMAR'}
-              </span>
-              <span className="block text-[9.5px] font-bold text-slate-500 tracking-wider uppercase leading-tight">
-                PROVIDER
-              </span>
+            <span className="mt-0.5 block text-[13px] leading-tight text-slate-400">
+              {currentUser ? computeRole(currentUser) : 'Staff · OB/GYN'}
+            </span>
+          </span>
+          <ChevronDown size={17} strokeWidth={2} className="hidden text-slate-400 sm:block" />
+        </button>
+        {menu === 'profile' && (
+          <div className={`${pop} right-0 w-64`}>
+            <div className="border-b border-[#0e4331] px-3 pt-1 pb-3">
+              <p className="text-sm font-extrabold text-white">
+                {currentUser?.name || 'Clinical Staff'}
+              </p>
+              <p className="text-xs text-slate-300">
+                {currentUser ? computeRole(currentUser) : 'Staff · OB/GYN'}
+              </p>
+              {currentUser?.email && (
+                <p className="mt-1 text-[11px] font-medium text-[#00e5ce] truncate">
+                  {currentUser.email}
+                </p>
+              )}
             </div>
-            <ChevronDown size={14} className="text-slate-400 ml-0.5" />
-          </button>
-
-          {/* Profile Dropdown */}
-          {menu === 'profile' && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-slate-200 bg-white p-3 shadow-xl z-50 text-slate-900">
-              <div className="border-b border-slate-100 pb-3 mb-2 px-1">
-                <p className="text-sm font-bold text-slate-900">
-                  {currentUser?.name || 'SM VINAY KUMAR'}
-                </p>
-                <p className="text-xs text-[#b8125d] font-semibold mt-0.5">
-                  {currentUser?.designation || 'Consultant Gynecologist & Fetal Medicine'}
-                </p>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Reg: {currentUser?.medicalRegistrationNumber || 'KMC-89241-DSS'} · Karnataka Medical Council
-                </p>
-              </div>
-
-              {/* Quick links */}
-              <div className="space-y-1">
+            {[
+              ['/saved', 'Saved assessments', Settings],
+              ['/safety', 'Safety & setup', ShieldCheck],
+            ].map(([h, l, I]) => {
+              const Icon = I as typeof Settings
+              return (
                 <Link
-                  href="/doctor/dashboard"
+                  key={h as string}
+                  href={h as string}
                   onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
+                  className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white transition hover:bg-white/10"
                 >
-                  <Stethoscope size={15} className="text-[#b8125d]" />
-                  <span>Doctor Dashboard (Gynecologist)</span>
+                  <Icon size={15} className="text-[#00e5ce]" />
+                  {l as string}
                 </Link>
-                <Link
-                  href="/nurse/dashboard"
-                  onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
-                >
-                  <UserCheck size={15} className="text-[#b8125d]" />
-                  <span>Nurse Dashboard (Intake OPD)</span>
-                </Link>
-                <Link
-                  href="/account"
-                  onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
-                >
-                  <UserIcon size={15} className="text-[#b8125d]" />
-                  <span>Staff &amp; Account Delegation</span>
-                </Link>
-                <Link
-                  href="/guidelines"
-                  onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
-                >
-                  <ShieldCheck size={15} className="text-[#b8125d]" />
-                  <span>Clinical Guidelines (FOGSI / ACOG)</span>
-                </Link>
-              </div>
-
-              <div className="border-t border-slate-100 pt-2 mt-2">
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition"
-                >
-                  <LogOut size={14} />
-                  <span>Sign out</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+              )
+            })}
+            {currentUser ? (
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-[#0e4331] px-3 pt-3 pb-1 text-sm font-semibold text-red-400 hover:text-red-300 transition"
+              >
+                <LogOut size={15} /> Sign out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenu(null)}
+                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-[#0e4331] px-3 pt-3 pb-1 text-sm font-semibold text-[#00e5ce] hover:brightness-110 transition"
+              >
+                <UserIcon size={15} /> Sign in
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </header>
   )

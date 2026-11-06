@@ -24,6 +24,7 @@ import { ClinicalHistory } from './ClinicalHistory'
 import { WorkflowResult, OUTCOME_LABELS } from './WorkflowResult'
 import { canFinalizeWorkflow } from './workflow-result-model'
 import { useAssessmentWorkflow, type SpecialistReviewAction } from './useAssessmentWorkflow'
+import { evaluatePathway, type DecisionResult } from '@/lib/decision-engine'
 
 const TABS = ['Clinical history', 'Pedigree', 'Routine ANC', 'Result']
 type Props = { pathway: Pathway; requestSpecialistReviewAction?: SpecialistReviewAction }
@@ -97,6 +98,7 @@ function ClinicalAssessment({
 }: Props & { provider: boolean }) {
   const workflow = useAssessmentWorkflow(pathway.slug, provider, requestSpecialistReviewAction)
   const [tab, setTab] = useState(0)
+  const [evaluationResult, setEvaluationResult] = useState<DecisionResult | null>(null)
   const [emptyPedigree] = useState(createEmptyPedigree)
   const [emptyAnc] = useState(createEmptyRoutineAnc)
   const record = workflow.record
@@ -275,7 +277,7 @@ function ClinicalAssessment({
       >
         {tab === 0 && (
           <div className="grid lg:grid-cols-3 gap-6 items-start">
-            <div className="lg:col-span-2 rounded-lg border border-slate-200 bg-white p-6 lg:p-8 text-slate-900 shadow-xs">
+            <div className="lg:col-span-2 rounded-xl border border-[#0e4331] bg-[#021f17] p-6 lg:p-8 text-white shadow-hx">
               <fieldset disabled={disabled}>
                 <ClinicalHistory
                   slug={pathway.slug}
@@ -291,52 +293,52 @@ function ClinicalAssessment({
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-lg border border-slate-200 bg-white p-5 text-slate-900 shadow-xs space-y-3">
-                <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-slate-500">
+              <div className="rounded-xl border border-[#0e4331] bg-[#021f17] p-5 text-white shadow-hx space-y-3">
+                <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-[#34d399]">
                   Patient (Optional)
                 </div>
                 <select
                   value={workflow.syntheticReference || ''}
                   onChange={(e) => workflow.changeReference(e.target.value)}
-                  className="w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-slate-900 text-xs font-semibold focus:outline-none focus:border-[#b8125d]"
+                  className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-semibold focus:outline-none focus:border-[#10b981] [&>option]:bg-[#032a1f] [&>option]:text-white"
                 >
                   <option value="SYN-standalone">Standalone / no patient record</option>
                   <option value="SYN-pat-01">K.S. · MRN 94821</option>
                   <option value="SYN-pat-02">A.R. · MRN 83719</option>
                   <option value="SYN-pat-03">P.M. · MRN 62104</option>
                 </select>
-                <div className="text-xs text-slate-500 leading-relaxed">
+                <div className="text-xs text-slate-300 leading-relaxed">
                   Assessment can be saved to a chart or run standalone.
                 </div>
                 {Object.keys(workflow.pedigree).length > 0 && (
-                  <div className="rounded-md bg-[#fdf2f8] border border-pink-200 p-2.5 text-xs text-[#b8125d]">
-                    <div className="font-bold">Pedigree on file</div>
-                    <div className="mt-0.5 text-slate-600">Family history is auto-derived from the pedigree.</div>
+                  <div className="rounded-xl bg-[#033424] border border-[#0e5c3e] p-3 text-xs text-[#a7f3d0]">
+                    <div className="font-bold text-[#34d399]">Pedigree on file</div>
+                    <div className="mt-0.5 text-slate-300">Family history is auto-derived from the pedigree.</div>
                   </div>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <button
                   type="button"
                   data-testid="run-assessment-btn"
                   onClick={async () => {
+                    const evaluated = evaluatePathway(pathway.slug, workflow.inputs)
+                    setEvaluationResult(evaluated)
                     try {
                       if (workflow.editable) {
-                        await workflow.saveDraft()
-                        await workflow.transition('submit').catch(() => {})
-                        await workflow.transition('review').catch(() => {})
+                        await workflow.saveDraft().catch(() => {})
                       }
                     } catch {}
                     setTab(3)
                   }}
                   disabled={workflow.busy}
-                  className="w-full h-11 rounded-md bg-[#b8125d] hover:bg-[#9d0f4e] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition cursor-pointer"
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-[#10b981] via-[#059669] to-[#047857] hover:brightness-110 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-white" />
                   <span>{workflow.busy ? 'Evaluating…' : 'Run decision support'}</span>
                 </button>
-                <p className="text-[11px] text-slate-500 leading-relaxed text-center">
+                <p className="text-[11px] text-slate-400 leading-relaxed text-center">
                   Decision support only. Not a diagnosis. Every recommendation is inspectable.
                 </p>
               </div>
@@ -398,7 +400,13 @@ function ClinicalAssessment({
                 can be reviewed or signed.
               </p>
             )}
-            <WorkflowResult record={record} />
+            <WorkflowResult
+              record={record}
+              decision={evaluationResult || evaluatePathway(pathway.slug, workflow.inputs)}
+              pathwaySlug={pathway.slug}
+              inputs={workflow.inputs}
+              onReturnToForm={() => setTab(0)}
+            />
             {record && record.state !== 'DRAFT' && record.state !== 'FINALIZED' && (
               <section className={`${card} space-y-4 p-5`}>
                 <h2 className="text-lg font-bold">Clinical review & signoff</h2>

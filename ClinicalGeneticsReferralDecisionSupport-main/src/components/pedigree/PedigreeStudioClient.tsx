@@ -166,7 +166,7 @@ export default function PedigreeStudioClient({
   const [pedigree, setPedigree] = useState<PedigreeData>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('histone_active_pedigree')
+        const saved = localStorage.getItem('genobridge_active_pedigree') || localStorage.getItem('histone_active_pedigree')
         if (saved) {
           const parsed = JSON.parse(saved)
           return {
@@ -209,7 +209,7 @@ export default function PedigreeStudioClient({
 
   const savePedigree = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('histone_active_pedigree', JSON.stringify(pedigree))
+      localStorage.setItem('genobridge_active_pedigree', JSON.stringify(pedigree))
       setSavedNotice(true)
       setTimeout(() => setSavedNotice(false), 3000)
     }

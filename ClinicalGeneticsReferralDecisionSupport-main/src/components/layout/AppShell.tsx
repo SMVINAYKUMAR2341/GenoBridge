@@ -19,7 +19,6 @@ const AUTH_ROUTES = [
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
   const path = usePathname()
 
   useEffect(() => setOpen(false), [path])
@@ -47,30 +46,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <AssessmentsProvider>
-      <div className="min-h-screen bg-slate-50 text-slate-900">
-        <Sidebar
-          open={open}
-          onClose={() => setOpen(false)}
-          collapsed={collapsed}
-          onToggleCollapse={() => setCollapsed(!collapsed)}
-        />
+      <div className="min-h-screen bg-hx-bg text-white">
+        <Sidebar open={open} onClose={() => setOpen(false)} />
         {/* overflow-x-clip contains full-bleed bands without breaking the sticky top bar */}
-        <div
-          className={`overflow-x-clip transition-[padding] duration-300 ${
-            collapsed ? 'lg:pl-0' : 'lg:pl-[284px]'
-          }`}
-        >
-          <Topbar
-            onMenu={() => setOpen(true)}
-            collapsed={collapsed}
-            onToggleCollapse={() => setCollapsed(!collapsed)}
-          />
+        <div className="overflow-x-clip lg:pl-[284px]">
+          <Topbar onMenu={() => setOpen(true)} />
           <motion.main
             key={path}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28 }}
-            className="mx-auto max-w-[1400px] px-4 pt-8 pb-14 lg:px-8 text-slate-900"
+            className="mx-auto max-w-[1400px] px-4 pt-8 pb-14 lg:px-8"
           >
             {children}
           </motion.main>

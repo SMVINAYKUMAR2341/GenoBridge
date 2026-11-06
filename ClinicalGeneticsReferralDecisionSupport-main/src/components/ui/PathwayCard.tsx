@@ -1,48 +1,38 @@
 import Link from 'next/link'
 import {
   ArrowRight,
+  Bean,
+  BookOpen,
+  ClipboardPlus,
   Dna,
   Users,
-  Baby,
-  Waves,
-  Activity,
-  GitBranch,
   type LucideIcon,
 } from 'lucide-react'
 import type { Pathway } from '@/data/pathways'
+import { CardArt } from './Graphics'
+import { FamilyTree, UltrasoundScan } from './Icons'
 
-const ICONS_MAP: Record<string, { icon: LucideIcon; category: string; shortDesc: string }> = {
-  'hereditary-cancer-risk': {
-    icon: Dna,
-    category: 'CANCER',
-    shortDesc: 'BRCA1/2, Lynch, HBOC — family/personal cancer history.',
-  },
-  'preconception-carrier-screening': {
-    icon: Users,
-    category: 'CARRIER',
-    shortDesc: 'Ethnicity, consanguinity, known carrier status.',
-  },
-  'nipt-results': {
-    icon: Activity,
-    category: 'NIPT',
-    shortDesc: 'High-risk, discordant, or no-call cfDNA screens.',
-  },
-  'abnormal-ultrasound-findings': {
-    icon: Waves,
-    category: 'ULTRASOUND',
-    shortDesc: 'Structural anomalies or multiple soft markers.',
-  },
-  'infertility-recurrent-pregnancy-loss': {
-    icon: Baby,
-    category: 'RPL',
-    shortDesc: 'Chromosomal or genetic causes of RPL and infertility.',
-  },
-  'positive-family-history': {
-    icon: GitBranch,
-    category: 'FAMILY HX',
-    shortDesc: 'Non-cancer heritable conditions surfaced on history-taking.',
-  },
+const TILES: { icon: LucideIcon; tone: string }[] = [
+  { icon: Dna, tone: 'bg-[#033424] text-[#00e5ce] border border-[#0e5c3e]' },
+  { icon: Users, tone: 'bg-[#062c38] text-[#38d8f0] border border-[#12586e]' },
+  { icon: Bean, tone: 'bg-[#2b172a] text-[#f472b6] border border-[#5c244f]' },
+  { icon: FamilyTree, tone: 'bg-[#2e1d0c] text-[#fbbf24] border border-[#6b4217]' },
+  { icon: UltrasoundScan, tone: 'bg-[#0d233a] text-[#60a5fa] border border-[#1e4976]' },
+  { icon: ClipboardPlus, tone: 'bg-[#033424] text-[#34d399] border border-[#0e5c3e]' },
+]
+
+/** Sentence-case for display only (acronyms kept); stored pathway titles are unchanged. */
+function sentenceCase(title: string) {
+  return title
+    .split(' ')
+    .map((w, i) => (i === 0 || /^[A-Z0-9]{2,}$/.test(w) ? w : w.toLowerCase()))
+    .join(' ')
 }
+
+const pill =
+  'inline-flex h-[34px] shrink-0 items-center gap-2.5 rounded-full px-5 text-[13px] font-bold transition duration-200'
+const pillPrimary = `${pill} bg-[linear-gradient(180deg,#1db342_0%,#0c7f2e_52%,#04561c_100%)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_8px_16px_-8px_rgb(4_86_28/0.7)] hover:brightness-110`
+const pillOutline = `${pill} border border-[#0e4331] bg-[#032a1f] text-white shadow-sm hover:border-[#00e5ce]/60 hover:bg-[#063825] hover:text-[#00e5ce]`
 
 export default function PathwayCard({
   pathway,
@@ -53,39 +43,70 @@ export default function PathwayCard({
   index: number
   layout?: 'grid' | 'list'
 }) {
-  const meta = ICONS_MAP[pathway.slug] || {
-    icon: Dna,
-    category: 'PATHWAY',
-    shortDesc: pathway.description,
+  const { icon: Icon, tone } = TILES[index % TILES.length]
+  const featured = index === 0
+  const title = sentenceCase(pathway.title)
+  const surface = featured
+    ? 'border-2 border-[#10b981] bg-[linear-gradient(165deg,#032b1f_35%,#011912_100%)] shadow-[0_0_0_2px_rgb(16_185_129/0.2),0_16px_32px_-20px_rgb(0_0_0/0.8)] text-white'
+    : 'border border-[#0e4331] bg-[#021f17] shadow-hx hover:border-[#10b981]/50 hover:bg-[#03261c] hover:shadow-hx-lift text-white'
+  const tile = (
+    <span
+      className={`relative flex h-[45px] w-[57px] shrink-0 items-center justify-center rounded-xl ${tone}`}
+    >
+      <Icon size={24} strokeWidth={1.8} />
+    </span>
+  )
+  const guidelines = (
+    <span className="flex items-center gap-[13px] text-[13px] font-medium text-slate-300">
+      <BookOpen size={18} strokeWidth={1.7} className="text-[#00e5ce]" />
+      {pathway.guidelines}
+    </span>
+  )
+  const cta = (
+    <Link href={`/assessment/${pathway.slug}`} className={featured ? pillPrimary : pillOutline}>
+      Start assessment
+      <ArrowRight
+        size={16}
+        strokeWidth={2}
+        className="transition-transform duration-200 group-hover:translate-x-0.5"
+      />
+    </Link>
+  )
+
+  if (layout === 'list') {
+    return (
+      <article
+        className={`group relative flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[14px] py-4 pr-4 pl-5 transition duration-300 ${surface}`}
+      >
+        {tile}
+        <div className="min-w-[220px] flex-1">
+          <h3 className="text-[16px] leading-snug font-bold tracking-[-0.01em] text-white">
+            {title}
+          </h3>
+          <p className="mt-1 text-[13px] leading-[18px] text-slate-300">{pathway.description}</p>
+        </div>
+        <span className="hidden lg:block">{guidelines}</span>
+        {cta}
+      </article>
+    )
   }
-  const Icon = meta.icon
 
   return (
-    <Link
-      href={`/assessment/${pathway.slug}`}
-      data-testid={`pathway-card-${pathway.slug}`}
-      className="group text-left rounded-lg border border-slate-200 bg-white p-6 hover:border-[#b8125d] hover:shadow-md transition-all duration-150 flex flex-col justify-between"
+    <article
+      className={`group relative flex flex-col overflow-hidden rounded-[14px] pt-[13px] pr-4 pb-3 pl-[26px] transition duration-300 hover:-translate-y-0.5 ${surface}`}
     >
-      <div>
-        <div className="flex items-start justify-between">
-          <div className="w-10 h-10 rounded-md bg-[#fce7f3] text-[#b8125d] group-hover:bg-[#b8125d] group-hover:text-white flex items-center justify-center transition-colors duration-150">
-            <Icon className="w-5 h-5" />
-          </div>
-          <span className="font-mono text-[10px] tracking-widest uppercase text-slate-400 font-bold">
-            {meta.category}
-          </span>
-        </div>
-        <div className="mt-5 font-heading font-semibold text-xl leading-tight text-slate-900 group-hover:text-[#b8125d] transition-colors">
-          {pathway.title}
-        </div>
-        <div className="mt-2 text-sm text-slate-600 leading-relaxed">
-          {meta.shortDesc || pathway.description}
-        </div>
+      <CardArt index={index} />
+      {tile}
+      <h3 className="relative mt-[11px] text-[17px] leading-[22px] font-bold tracking-[-0.01em] text-white">
+        {title}
+      </h3>
+      <p className="relative mt-[6px] max-w-[285px] text-[13px] leading-[17px] text-slate-300">
+        {pathway.description}
+      </p>
+      <div className="relative mt-auto flex flex-wrap items-center justify-between gap-3 pt-[27px]">
+        {guidelines}
+        {cta}
       </div>
-      <div className="mt-6 flex items-center gap-1.5 text-sm font-semibold text-slate-900 group-hover:text-[#b8125d] transition-colors">
-        <span>Start</span>
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-150" />
-      </div>
-    </Link>
+    </article>
   )
 }

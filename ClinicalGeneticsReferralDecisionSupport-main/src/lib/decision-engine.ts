@@ -713,47 +713,71 @@ export function evaluateHereditaryCancer(input: Record<string, unknown>, criteri
   const age = normalizeNumber(d.personal_breast_cancer_age) ?? 999
   const youngRule = _fires(criteria, 'hc_personal_breast_young')
   const youngThreshold = youngRule?.threshold ?? 50
-  if (normalizeBoolean(d.personal_breast_cancer) && age <= youngThreshold) {
+  if (
+    (normalizeBoolean(d.personal_breast_cancer) ||
+      d.hcrPersonalCancer === 'active_surgical_planning' ||
+      d.hcrPersonalCancer === 'prior_breast_ovarian_endometrial') &&
+    age <= youngThreshold
+  ) {
     if (youngRule) matches.push(_match(youngRule))
   }
 
   // Ovarian cancer any age (self or first-degree)
-  const ovarianSelf = normalizeBoolean(d.personal_ovarian_cancer)
-  const ovarianFamily = (normalizeNumber(d.family_ovarian_cancer_count) ?? 0) >= 1
+  const ovarianSelf =
+    normalizeBoolean(d.personal_ovarian_cancer) || d.hcrPersonalCancer === 'prior_breast_ovarian_endometrial'
+  const ovarianFamily =
+    (normalizeNumber(d.family_ovarian_cancer_count) ?? normalizeNumber(d.relatives_ovarian) ?? 0) >= 1
   if (ovarianSelf || ovarianFamily) {
     const c = _fires(criteria, 'hc_ovarian_any_age')
     if (c) matches.push(_match(c))
   }
 
   // 2+ first-degree relatives with breast cancer
-  const firstDegBreast = normalizeNumber(d.family_breast_cancer_first_degree_count) ?? 0
+  const firstDegBreast =
+    normalizeNumber(d.family_breast_cancer_first_degree_count) ??
+    normalizeNumber(d.relatives_breast) ??
+    0
   const twoPlusRule = _fires(criteria, 'hc_two_plus_first_degree_breast')
   const twoPlusThreshold = twoPlusRule?.threshold ?? 2
-  if (firstDegBreast >= twoPlusThreshold) {
+  if (firstDegBreast >= twoPlusThreshold || normalizeBoolean(d.hcrFirstDegreeEarlyBreastOrOvarian)) {
     if (twoPlusRule) matches.push(_match(twoPlusRule))
   }
 
   // Ashkenazi Jewish + any breast/ovarian
-  const aj = normalizeBoolean(d.ashkenazi_ancestry)
+  const aj = normalizeBoolean(d.ashkenazi_ancestry) || normalizeBoolean(d.hcrAshkenaziAncestry)
   if (aj && (normalizeBoolean(d.personal_breast_cancer) || ovarianSelf || firstDegBreast >= 1 || ovarianFamily)) {
     const c = _fires(criteria, 'hc_ashkenazi_breast_ovarian')
     if (c) matches.push(_match(c))
   }
 
   // Male breast cancer in family
-  if (normalizeBoolean(d.male_breast_cancer_family)) {
+  if (
+    normalizeBoolean(d.male_breast_cancer_family) ||
+    normalizeBoolean(d.hcrMultipleRelativesOrPancreaticMaleBreast)
+  ) {
     const c = _fires(criteria, 'hc_male_breast_family')
     if (c) matches.push(_match(c))
   }
 
   // Lynch: 3+ colon cancers or endometrial + colon
-  const colonCount = normalizeNumber(d.family_colon_cancer_count) ?? 0
+  const colonCount =
+    normalizeNumber(d.family_colon_cancer_count) ?? normalizeNumber(d.relatives_colorectal) ?? 0
   const lynchColonRule = _fires(criteria, 'hc_lynch_three_colon')
   if (colonCount >= (lynchColonRule?.threshold ?? 3)) {
     if (lynchColonRule) matches.push(_match(lynchColonRule))
   }
-  if (normalizeBoolean(d.personal_endometrial_cancer) && colonCount >= 1) {
+  if (
+    (normalizeBoolean(d.personal_endometrial_cancer) ||
+      d.hcrPersonalCancer === 'prior_breast_ovarian_endometrial') &&
+    colonCount >= 1
+  ) {
     const c = _fires(criteria, 'hc_lynch_endometrial_colon')
+    if (c) matches.push(_match(c))
+  }
+
+  // Known familial mutation
+  if (normalizeBoolean(d.known_familial_mutation) || normalizeBoolean(d.hcrKnownFamilialMutation)) {
+    const c = _fires(criteria, 'hc_brca1_2_mutation') || _fires(criteria, 'hc_personal_breast_young')
     if (c) matches.push(_match(c))
   }
 
@@ -765,36 +789,53 @@ export function evaluateCarrierScreening(input: Record<string, unknown>, criteri
   const d = input
 
   // Consanguinity
-  if (normalizeBoolean(d.consanguinity)) {
+  if (normalizeBoolean(d.consanguinity) || normalizeBoolean(d.pcsConsanguinity)) {
     const c = _fires(criteria, 'cs_consanguinity')
     if (c) matches.push(_match(c))
   }
 
   // Both partners carriers of same condition
-  if (normalizeBoolean(d.both_partners_same_carrier)) {
+  if (
+    normalizeBoolean(d.both_partners_same_carrier) ||
+    normalizeBoolean(d.both_partners_carrier) ||
+    normalizeBoolean(d.both_carriers) ||
+    d.pcsPartnerStatus === 'concordant_positive'
+  ) {
     const c = _fires(criteria, 'cs_both_partners_carrier')
     if (c) matches.push(_match(c))
   }
 
   // One partner carrier
-  if (normalizeBoolean(d.one_partner_carrier)) {
+  if (
+    normalizeBoolean(d.one_partner_carrier) ||
+    d.pcsPatientStatus === 'ar_carrier_positive' ||
+    d.pcsPatientStatus === 'xlinked_carrier_positive'
+  ) {
     const c = _fires(criteria, 'cs_one_partner_carrier')
     if (c) matches.push(_match(c))
   }
 
   // Ancestries
-  const ancestries = normalizeArray(d.ancestries).map((s) => s.toLowerCase())
-  if (ancestries.includes('ashkenazi')) {
+  const rawAncestries = normalizeArray(d.ancestries || d.reported_ancestries)
+  const ancestries = rawAncestries.map((s) => s.toLowerCase())
+  if (ancestries.some((a) => a.includes('ashkenazi'))) {
     const c = _fires(criteria, 'cs_ashkenazi')
     if (c) matches.push(_match(c))
   }
-  if (ancestries.some((a) => ['mediterranean', 'southeast_asian', 'african', 'indian', 'latino'].includes(a))) {
+  if (
+    ancestries.some((a) =>
+      ['mediterranean', 'southeast_asian', 'african', 'indian', 'latino'].some((k) => a.includes(k)),
+    )
+  ) {
     const c = _fires(criteria, 'cs_thalassemia_ancestry')
     if (c) matches.push(_match(c))
   }
 
   // Family history of recessive condition
-  if (normalizeBoolean(d.family_history_recessive_condition)) {
+  if (
+    normalizeBoolean(d.family_history_recessive_condition) ||
+    normalizeBoolean(d.pcsFamilyHistoryRecessive)
+  ) {
     const c = _fires(criteria, 'cs_family_recessive')
     if (c) matches.push(_match(c))
   }
@@ -805,25 +846,30 @@ export function evaluateCarrierScreening(input: Record<string, unknown>, criteri
 export function evaluateNipt(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
   const matches: MatchedCriterion[] = []
   const d = input
-  const result = String(d.result_type || '').toLowerCase()
+  const result = String(d.result_type || d.niptFinding || '').toLowerCase()
 
-  if (['t21_positive', 't18_positive', 't13_positive'].includes(result)) {
+  if (['t21_positive', 't18_positive', 't13_positive', 'high_risk_common_trisomy'].some((k) => result.includes(k))) {
     const c = _fires(criteria, 'nipt_common_aneuploidy_positive')
     if (c) matches.push(_match(c))
   }
-  if (result === 'sex_chromosome_positive') {
+  if (['sex_chromosome_positive', 'high_risk_sca_or_rat'].some((k) => result.includes(k))) {
     const c = _fires(criteria, 'nipt_sex_chromosome_positive')
     if (c) matches.push(_match(c))
   }
-  if (result === 'microdeletion_positive') {
+  if (['microdeletion_positive', 'repeat_low_ff_or_microdeletion'].some((k) => result.includes(k))) {
     const c = _fires(criteria, 'nipt_microdeletion_positive')
     if (c) matches.push(_match(c))
   }
 
-  const ff = normalizeNumber(d.fetal_fraction)
+  const ff = normalizeNumber(d.fetal_fraction) ?? normalizeNumber(d.niptFetalFraction)
   const lowFfRule = _fires(criteria, 'nipt_low_fetal_fraction')
   const ffThreshold = lowFfRule?.threshold ?? 4.0
-  if (normalizeBoolean(d.no_call) || result === 'no_call' || (ff !== null && ff < ffThreshold)) {
+  if (
+    normalizeBoolean(d.no_call) ||
+    result.includes('no_call') ||
+    result.includes('single_early_nocall') ||
+    (ff !== null && ff < ffThreshold)
+  ) {
     if (lowFfRule) matches.push(_match(lowFfRule))
   }
 
@@ -840,13 +886,20 @@ export function evaluateUltrasound(input: Record<string, unknown>, criteria: Cri
   const d = input
 
   // Major structural anomaly
-  if (normalizeBoolean(d.structural_anomaly)) {
+  if (
+    normalizeBoolean(d.structural_anomaly) ||
+    normalizeBoolean(d.major_structural_anomaly) ||
+    normalizeBoolean(d.aufMajorStructuralAnomaly)
+  ) {
     const c = _fires(criteria, 'us_structural_anomaly')
     if (c) matches.push(_match(c))
   }
 
   // NT >= 3.5 mm
-  const nt = normalizeNumber(d.nuchal_translucency_mm)
+  const nt =
+    normalizeNumber(d.nuchal_translucency_mm) ??
+    normalizeNumber(d.nuchal_translucency) ??
+    normalizeNumber(d.aufNuchalTranslucencyMm)
   const ntRule = _fires(criteria, 'us_increased_nt')
   const ntThreshold = ntRule?.threshold ?? 3.5
   if (nt !== null && nt >= ntThreshold) {
@@ -854,7 +907,7 @@ export function evaluateUltrasound(input: Record<string, unknown>, criteria: Cri
   }
 
   // Soft markers
-  const soft = normalizeArray(d.soft_markers)
+  const soft = normalizeArray(d.soft_markers || d.aufSoftMarkers)
   const softCount = soft.length
   const multiRule = _fires(criteria, 'us_multiple_soft_markers')
   const multiThreshold = multiRule?.threshold ?? 2
@@ -866,7 +919,11 @@ export function evaluateUltrasound(input: Record<string, unknown>, criteria: Cri
   }
 
   // Early-onset severe IUGR
-  if (normalizeBoolean(d.iugr_early_severe)) {
+  if (
+    normalizeBoolean(d.iugr_early_severe) ||
+    normalizeBoolean(d.early_onset_severe_iugr) ||
+    normalizeBoolean(d.aufEarlyOnsetSevereIugr)
+  ) {
     const c = _fires(criteria, 'us_iugr_early_severe')
     if (c) matches.push(_match(c))
   }
@@ -877,7 +934,11 @@ export function evaluateUltrasound(input: Record<string, unknown>, criteria: Cri
 export function evaluateInfertilityRpl(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
   const matches: MatchedCriterion[] = []
   const d = input
-  const losses = normalizeNumber(d.pregnancy_loss_count) ?? 0
+  const losses =
+    normalizeNumber(d.pregnancy_loss_count) ??
+    normalizeNumber(d.recurrent_losses_count) ??
+    normalizeNumber(d.irplLossesCount) ??
+    0
 
   const thrUrgentRule = _fires(criteria, 'rpl_three_or_more_losses')
   const thrUrgent = thrUrgentRule?.threshold ?? 3
@@ -890,15 +951,23 @@ export function evaluateInfertilityRpl(input: Record<string, unknown>, criteria:
     if (thrRoutineRule) matches.push(_match(thrRoutineRule))
   }
 
-  if (normalizeBoolean(d.parental_karyotype_abnormal)) {
+  if (
+    normalizeBoolean(d.parental_karyotype_abnormal) ||
+    normalizeBoolean(d.prior_karyotype_abnormal) ||
+    normalizeBoolean(d.irplPriorKaryotypeAbnormal)
+  ) {
     const c = _fires(criteria, 'rpl_parental_karyotype_abnormal')
     if (c) matches.push(_match(c))
   }
-  if (normalizeBoolean(d.azoospermia_or_severe_oligo)) {
+  if (
+    normalizeBoolean(d.azoospermia_or_severe_oligo) ||
+    normalizeBoolean(d.severe_male_factor) ||
+    normalizeBoolean(d.irplSevereMaleFactor)
+  ) {
     const c = _fires(criteria, 'rpl_azoospermia')
     if (c) matches.push(_match(c))
   }
-  if (normalizeBoolean(d.primary_ovarian_insufficiency)) {
+  if (normalizeBoolean(d.primary_ovarian_insufficiency) || normalizeBoolean(d.irplPoi)) {
     const c = _fires(criteria, 'rpl_poi')
     if (c) matches.push(_match(c))
   }
@@ -909,10 +978,22 @@ export function evaluateInfertilityRpl(input: Record<string, unknown>, criteria:
 export function evaluateFamilyHistory(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
   const matches: MatchedCriterion[] = []
   const d = input
-  const degree = String(d.closest_affected_degree || '').toLowerCase()
-  const planning = normalizeBoolean(d.reproductive_planning)
-  const severity = String(d.condition_severity || '').toLowerCase()
-  const multiple = normalizeBoolean(d.multiple_affected)
+  const degree = String(
+    d.closest_affected_degree ||
+      (normalizeBoolean(d.first_degree_affected) || normalizeBoolean(d.fhFirstDegreeAffected)
+        ? 'first'
+        : normalizeBoolean(d.two_or_more_generations) || normalizeBoolean(d.fhTwoOrMoreGenerations)
+          ? 'second'
+          : ''),
+  ).toLowerCase()
+  const planning = normalizeBoolean(d.reproductive_planning) || normalizeBoolean(d.fhReproductivePlanning)
+  const severity = String(
+    d.condition_severity ||
+      (normalizeBoolean(d.early_onset_condition) || normalizeBoolean(d.rare_genetic_condition_in_family)
+        ? 'severe'
+        : ''),
+  ).toLowerCase()
+  const multiple = normalizeBoolean(d.multiple_affected) || normalizeBoolean(d.two_or_more_generations)
 
   if (degree === 'first' && planning) {
     const c = _fires(criteria, 'fh_first_degree_reproductive_planning')
