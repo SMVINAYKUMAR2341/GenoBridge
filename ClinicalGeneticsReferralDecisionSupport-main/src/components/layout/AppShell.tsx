@@ -47,7 +47,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <AssessmentsProvider>
-      <div className="min-h-screen bg-hx-bg text-white">
+      <div className="min-h-screen bg-slate-50 text-slate-900">
         <Sidebar
           open={open}
           onClose={() => setOpen(false)}
@@ -70,7 +70,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28 }}
-            className="mx-auto max-w-[1400px] px-4 pt-8 pb-14 lg:px-8"
+            className="mx-auto max-w-[1400px] px-4 pt-8 pb-14 lg:px-8 text-slate-900"
           >
             {children}
           </motion.main>

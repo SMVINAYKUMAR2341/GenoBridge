@@ -28,7 +28,6 @@ import {
 import { PATHWAYS } from '@/data/pathways'
 import { GUIDELINES, KNOWLEDGE, PATIENTS } from '@/data/content'
 import { useAssessments } from '@/components/providers/AssessmentsProvider'
-import { GenoBridgeLogo } from '@/components/ui/Graphics'
 
 type AuthUser = {
   id?: string | number
@@ -94,9 +93,7 @@ export default function Topbar({
             setCurrentUser(data.user)
           }
         }
-      } catch {
-        // Keep active mock user if offline/unauthenticated so zero permission blocks occur
-      }
+      } catch {}
     }
     checkUser()
     window.addEventListener('clinical-workspace-refresh', checkUser)
@@ -184,15 +181,15 @@ export default function Topbar({
   return (
     <header
       ref={ref}
-      className="sticky top-0 z-40 flex h-[68px] items-center justify-between border-b border-[#0e4331]/80 bg-[#00261c]/95 px-4 backdrop-blur-xl lg:px-6 text-white"
+      className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 sm:px-6 backdrop-blur-md text-slate-900 shadow-xs"
     >
-      {/* Left section: Toggle Button & Brand Icon when sidebar collapsed */}
+      {/* Brand & Sidebar Toggles */}
       <div className="flex items-center gap-3">
         {/* Mobile menu trigger */}
         <button
           onClick={onMenu}
           aria-label="Open navigation menu"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-white hover:bg-white/10 lg:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 lg:hidden"
         >
           <Menu size={20} />
         </button>
@@ -203,95 +200,97 @@ export default function Topbar({
             onClick={onToggleCollapse}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar for full-screen mode (Ctrl+B)'}
-            className="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-800/40 hover:text-white transition"
+            className="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
           >
             {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
           </button>
         )}
 
-        {/* When sidebar is collapsed or on smaller screen, show mini brand header */}
-        {collapsed && (
-          <Link href="/" className="hidden lg:flex items-center gap-2 pl-1">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#b8125d] text-white font-extrabold text-sm shadow-sm">
-              G
-            </span>
-            <span className="flex flex-col">
-              <span className="text-[13px] font-black tracking-wider text-white">GENOBRIDGE</span>
-              <span className="text-[9px] font-bold text-emerald-400 tracking-widest uppercase">GENETICS DSS</span>
-            </span>
-          </Link>
-        )}
+        {/* Brand Header */}
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#b8125d] text-white font-extrabold text-sm shadow-sm">
+            H
+          </span>
+          <div className="text-left leading-tight hidden sm:block">
+            <div className="font-heading font-extrabold text-[16px] text-[#b8125d] tracking-tight">
+              HistoNe
+            </div>
+            <div className="text-[10px] tracking-[0.2em] uppercase font-semibold text-slate-500">
+              GENETICS DSS
+            </div>
+          </div>
+        </Link>
       </div>
 
-      {/* Histone Parity Top Navigation Bar (Image 4 & 10) */}
+      {/* Histone Parity Top Navigation Tabs */}
       <nav aria-label="Top navigation" className="hidden md:flex items-center gap-1.5 lg:gap-2">
-        {/* New assessment tab (Rich Magenta Pill matching Histone Image 4) */}
+        {/* New assessment tab (Rich Magenta Pill matching Histone) */}
         <Link
           href="/assessment"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition shadow-sm ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
             isAssessment
-              ? 'bg-[#b8125d] text-white shadow-[#b8125d]/30 ring-1 ring-white/20'
-              : 'text-white/80 hover:text-white hover:bg-white/10'
+              ? 'bg-[#b8125d] text-white shadow-xs'
+              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
           }`}
         >
-          <LayoutGrid size={14} className="shrink-0" />
+          <LayoutGrid size={15} className="shrink-0" />
           <span>New assessment</span>
         </Link>
 
         {/* Referrals */}
         <Link
           href="/referrals"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
             isReferrals
-              ? 'bg-emerald-500/20 text-[#00D8C3] ring-1 ring-[#00D8C3]/40'
-              : 'text-white/80 hover:text-white hover:bg-white/10'
+              ? 'bg-[#b8125d] text-white shadow-xs'
+              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
           }`}
         >
-          <ArrowLeftRight size={14} className="shrink-0" />
+          <ArrowLeftRight size={15} className="shrink-0" />
           <span>Referrals</span>
         </Link>
 
-        {/* Patients / Pedigree & ANC */}
+        {/* Patients & Pedigree */}
         <Link
           href="/pedigree"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
             isPatients
-              ? 'bg-emerald-500/20 text-[#00D8C3] ring-1 ring-[#00D8C3]/40'
-              : 'text-white/80 hover:text-white hover:bg-white/10'
+              ? 'bg-[#b8125d] text-white shadow-xs'
+              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
           }`}
         >
-          <Users size={14} className="shrink-0" />
+          <Users size={15} className="shrink-0" />
           <span>Patients</span>
         </Link>
 
         {/* History */}
         <Link
           href="/history"
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
             isHistory
-              ? 'bg-emerald-500/20 text-[#00D8C3] ring-1 ring-[#00D8C3]/40'
-              : 'text-white/80 hover:text-white hover:bg-white/10'
+              ? 'bg-[#b8125d] text-white shadow-xs'
+              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
           }`}
         >
-          <HistoryIcon size={14} className="shrink-0" />
+          <HistoryIcon size={15} className="shrink-0" />
           <span>History</span>
         </Link>
 
         {/* Reports & Analytics */}
         <Link
           href="/analytics"
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-semibold transition-colors duration-150 ${
             isAnalytics
-              ? 'bg-emerald-500/20 text-[#00D8C3] ring-1 ring-[#00D8C3]/40'
-              : 'text-white/80 hover:text-white hover:bg-white/10'
+              ? 'bg-[#b8125d] text-white shadow-xs'
+              : 'text-slate-700 hover:bg-[#fce7f3] hover:text-[#b8125d]'
           }`}
         >
-          <BarChart3 size={14} className="shrink-0" />
+          <BarChart3 size={15} className="shrink-0" />
           <span>Analytics</span>
         </Link>
       </nav>
 
-      {/* Right Section: Search, Bell, and Histone Provider Avatar Badge (Image 4 & 10) */}
+      {/* Right Section: Quick Search & Histone Provider Badge [ S ] SM VINAY KUMAR */}
       <div className="flex items-center gap-3">
         {/* Quick Search */}
         <div className="relative hidden xl:block w-[240px]">
@@ -309,26 +308,26 @@ export default function Topbar({
               setQ(e.target.value)
               setMenu('search')
             }}
-            placeholder="Search guidelines, cases..."
-            className="h-8.5 w-full rounded-full border border-[#0e4331] bg-[#021f17] pr-3 pl-[34px] text-[12px] text-white outline-none placeholder:text-slate-400 hover:border-emerald-500/40 focus:border-emerald-400"
+            placeholder="Search guidelines, rules..."
+            className="h-9 w-full rounded-md border border-slate-200 bg-slate-50 pr-3 pl-[34px] text-xs text-slate-900 outline-none placeholder:text-slate-400 hover:border-slate-300 focus:border-[#b8125d] focus:bg-white"
           />
           {menu === 'search' && q.trim() && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-[#0e4331] bg-[#00261c] p-2 shadow-2xl backdrop-blur-xl z-50 text-white">
+            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-lg z-50 text-slate-900">
               {results.length ? (
                 results.map((r, i) => (
                   <button
                     key={i}
                     onClick={() => go(r.href)}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs text-white hover:bg-white/10"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs text-slate-800 hover:bg-slate-100"
                   >
-                    <span className="w-16 shrink-0 text-[9px] font-bold tracking-wider text-[#00D8C3] uppercase">
+                    <span className="w-16 shrink-0 text-[9px] font-bold tracking-wider text-[#b8125d] uppercase">
                       {r.k}
                     </span>
                     <span className="truncate">{r.label}</span>
                   </button>
                 ))
               ) : (
-                <p className="px-3 py-2 text-xs text-slate-400">No matches found.</p>
+                <p className="px-3 py-2 text-xs text-slate-500">No matches found.</p>
               )}
             </div>
           )}
@@ -338,108 +337,108 @@ export default function Topbar({
         <button
           aria-label="Notifications"
           onClick={() => setMenu(menu === 'notif' ? null : 'notif')}
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition"
+          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
         >
           <Bell size={18} />
-          <span className="absolute top-[6px] right-[6px] h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="absolute top-[6px] right-[6px] h-2 w-2 rounded-full bg-[#b8125d]" />
         </button>
 
         {menu === 'notif' && (
-          <div className="absolute right-4 top-[64px] w-80 rounded-2xl border border-[#0e4331] bg-[#00261c] p-3 shadow-2xl z-50 text-white">
-            <p className="text-xs font-bold text-white mb-1.5 flex items-center justify-between">
-              <span>System &amp; Guideline Status</span>
-              <span className="text-[10px] font-medium text-emerald-400">Active</span>
+          <div className="absolute right-4 top-16 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-xl z-50 text-slate-900">
+            <p className="text-xs font-bold text-slate-900 mb-1.5 flex items-center justify-between">
+              <span>Guidelines &amp; Decision Status</span>
+              <span className="text-[10px] font-semibold text-emerald-600">Active</span>
             </p>
-            <p className="text-xs text-[#A9BDCA] leading-relaxed rounded-xl bg-white/[0.04] p-2.5 border border-white/5">
-              Deterministic genetic decision support indexed to published FOGSI, ACOG, and ACMG criteria. All calculations operate client-side.
+            <p className="text-xs text-slate-600 leading-relaxed rounded-lg bg-slate-50 p-2.5 border border-slate-100">
+              Deterministic clinical decision engine running all 6 pathways calibrated against ACOG, NCCN, ACMG, and FOGSI clinical criteria.
             </p>
             <Link
               href="/account"
               onClick={() => setMenu(null)}
-              className="mt-2 block text-center text-xs font-bold text-[#00D8C3] hover:underline"
+              className="mt-2.5 block text-center text-xs font-bold text-[#b8125d] hover:underline"
             >
-              Review OPD Delegation &amp; Staff Roles &rarr;
+              Review OPD Staff &amp; Council Details &rarr;
             </Link>
           </div>
         )}
 
-        {/* Histone Provider Badge [ S ] SM VINAY KUMAR · PROVIDER (Image 4 & 10) */}
+        {/* Histone Provider Badge [ S ] SM VINAY KUMAR · PROVIDER */}
         <div className="relative">
           <button
             onClick={() => setMenu(menu === 'profile' ? null : 'profile')}
             aria-label="Clinician Profile"
-            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-full border border-emerald-500/30 bg-[#021f17] hover:border-emerald-400/60 hover:bg-[#032a20] transition cursor-pointer"
+            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer"
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#008f82] text-xs font-black text-white shadow-sm ring-1 ring-emerald-300/40">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#b8125d] text-xs font-bold text-white shadow-xs">
               {computeInitials(currentUser?.name, currentUser?.email)}
             </span>
             <div className="text-left hidden sm:block">
-              <span className="block text-[12px] font-extrabold text-white leading-tight">
+              <span className="block text-xs font-bold text-slate-900 leading-tight">
                 {currentUser?.name || 'SM VINAY KUMAR'}
               </span>
-              <span className="block text-[9.5px] font-bold text-[#00D8C3] tracking-widest uppercase leading-tight">
+              <span className="block text-[9.5px] font-bold text-slate-500 tracking-wider uppercase leading-tight">
                 PROVIDER
               </span>
             </div>
             <ChevronDown size={14} className="text-slate-400 ml-0.5" />
           </button>
 
-          {/* Clinician Profile Dropdown */}
+          {/* Profile Dropdown */}
           {menu === 'profile' && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-[#0e4331] bg-[#00261c] p-3 shadow-2xl backdrop-blur-xl z-50 text-white">
-              <div className="border-b border-[#0e4331] pb-3 mb-2 px-1">
-                <p className="text-sm font-extrabold text-white">
+            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-slate-200 bg-white p-3 shadow-xl z-50 text-slate-900">
+              <div className="border-b border-slate-100 pb-3 mb-2 px-1">
+                <p className="text-sm font-bold text-slate-900">
                   {currentUser?.name || 'SM VINAY KUMAR'}
                 </p>
-                <p className="text-xs text-[#00D8C3] font-semibold mt-0.5">
+                <p className="text-xs text-[#b8125d] font-semibold mt-0.5">
                   {currentUser?.designation || 'Consultant Gynecologist & Fetal Medicine'}
                 </p>
-                <p className="text-[11px] text-slate-300 mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   Reg: {currentUser?.medicalRegistrationNumber || 'KMC-89241-DSS'} · Karnataka Medical Council
                 </p>
               </div>
 
-              {/* Direct Workspace Views */}
+              {/* Quick links */}
               <div className="space-y-1">
                 <Link
                   href="/doctor/dashboard"
                   onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 transition"
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
                 >
-                  <Stethoscope size={15} className="text-[#00D8C3]" />
+                  <Stethoscope size={15} className="text-[#b8125d]" />
                   <span>Doctor Dashboard (Gynecologist)</span>
                 </Link>
                 <Link
                   href="/nurse/dashboard"
                   onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 transition"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
                 >
-                  <UserCheck size={15} className="text-[#00D8C3]" />
+                  <UserCheck size={15} className="text-[#b8125d]" />
                   <span>Nurse Dashboard (Intake OPD)</span>
                 </Link>
                 <Link
                   href="/account"
                   onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 transition"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
                 >
-                  <UserIcon size={15} className="text-[#00D8C3]" />
+                  <UserIcon size={15} className="text-[#b8125d]" />
                   <span>Staff &amp; Account Delegation</span>
                 </Link>
                 <Link
                   href="/guidelines"
                   onClick={() => setMenu(null)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 transition"
+                  className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 transition"
                 >
-                  <ShieldCheck size={15} className="text-[#00D8C3]" />
-                  <span>Clinical Guidelines (FOGSI/ACOG)</span>
+                  <ShieldCheck size={15} className="text-[#b8125d]" />
+                  <span>Clinical Guidelines (FOGSI / ACOG)</span>
                 </Link>
               </div>
 
-              <div className="border-t border-[#0e4331] pt-2 mt-2">
+              <div className="border-t border-slate-100 pt-2 mt-2">
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition"
                 >
                   <LogOut size={14} />
                   <span>Sign out</span>

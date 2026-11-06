@@ -44,46 +44,46 @@ export default async function NurseDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Nurse Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#08243B] via-[#041e33] to-[#08243B] border border-[#164C60] shadow-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 sm:p-8 rounded-xl bg-white border border-slate-200 shadow-xs">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D8C3]/15 border border-[#00D8C3]/30 text-[#00D8C3] text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fce7f3] text-[#b8125d] text-xs font-semibold">
             <HeartHandshake className="w-3.5 h-3.5" />
             <span>VERIFIED NURSE / MEDICAL ASSISTANT WORKSPACE</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {user.name}
           </h1>
-          <p className="text-xs sm:text-sm text-[#A9BDCA] max-w-2xl">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
             {user.designation || 'Clinical Nurse Coordinator'} • {user.hospitalClinicName || 'Hospital Unit'} • {user.department || 'Obstetrics & Genetics'}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href="/anc/register"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] shadow-lg shadow-[#00D8C3]/20 transition-all"
+            href="/pedigree"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-semibold bg-[#b8125d] text-white hover:bg-[#9d0f4e] shadow-xs transition"
           >
-            <Baby className="w-4 h-4" />
-            <span>Register ANC Patient</span>
+            <GitFork className="w-4 h-4" />
+            <span>Open Pedigree Studio</span>
           </Link>
           <Link
-            href="/anc"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold bg-[#102B43] text-white border border-[#164C60] hover:bg-[#164C60] transition-all"
+            href="/assessment"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 transition"
           >
-            <span>ANC Registry</span>
+            <span>New Genetic Assessment</span>
           </Link>
         </div>
       </div>
 
       {/* Role Governance Boundary Warning */}
-      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
+      <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-4">
+        <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
           <ShieldAlert className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-1">
-          <div className="font-semibold text-amber-200">Clinical Governance Role Boundary</div>
-          <div className="text-[#A9BDCA] leading-relaxed">
-            In accordance with GENOBRIDGE clinical safety rules, your account is authorized to register patients, capture multi-generation pedigree trees, record ANC risk indicators, and create draft assessments. Final approval and diagnostic referral generation must be completed by an authorized Gynecologist.
+          <div className="font-semibold text-amber-900">Clinical Governance Role Boundary</div>
+          <div className="text-slate-600 leading-relaxed">
+            In accordance with clinical safety rules, your account is authorized to register patients, capture multi-generation pedigree trees, record risk indicators, and create draft assessments. Final approval and diagnostic referral generation are reviewed by an authorized Gynecologist.
           </div>
         </div>
       </div>

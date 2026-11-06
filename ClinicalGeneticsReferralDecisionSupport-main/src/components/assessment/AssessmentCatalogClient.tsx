@@ -7,10 +7,7 @@ import {
   LayoutGrid,
   List,
   Plus,
-  ShieldCheck,
-  Zap,
-  BookOpen,
-  Users,
+  ArrowRight,
 } from 'lucide-react'
 import PathwayCard from '@/components/ui/PathwayCard'
 import { PATHWAYS } from '@/data/pathways'
@@ -23,17 +20,16 @@ export function AssessmentCatalogClient() {
 
   return (
     <div className="space-y-8">
-      {/* Histone Parity Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-[#164C60]/50">
+      {/* Histone Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
         <div>
-          <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-[#00D8C3] mb-2 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#00D8C3] animate-pulse" />
-            <span>New assessment</span>
+          <div className="text-[11px] font-mono tracking-[0.22em] uppercase font-bold text-[#b8125d] mb-2">
+            NEW ASSESSMENT
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white">
+          <h1 className="font-heading font-bold text-4xl sm:text-5xl tracking-tight text-slate-900">
             Which clinical scenario applies?
           </h1>
-          <p className="mt-3 text-sm sm:text-base text-[#A9BDCA] max-w-2xl leading-relaxed">
+          <p className="mt-3 text-base text-slate-600 max-w-2xl leading-relaxed">
             Pick the pathway that matches this patient&apos;s presentation. Every result is linked to its source guideline and takes under two minutes.
           </p>
         </div>
@@ -45,7 +41,7 @@ export function AssessmentCatalogClient() {
               aria-label="Select simulated patient"
               value={patientId}
               onChange={(e) => setPatientId(e.target.value)}
-              className="h-10 w-[240px] appearance-none rounded-xl border border-[#164C60] bg-[#08243B] pr-10 pl-4 text-xs font-semibold text-white transition outline-none hover:border-[#00D8C3] focus:border-[#00D8C3]"
+              className="h-10 w-[220px] appearance-none rounded-md border border-slate-200 bg-white pr-9 pl-3.5 text-xs font-semibold text-slate-800 outline-none hover:border-slate-300 focus:border-[#b8125d] shadow-xs"
             >
               {PATIENTS.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -54,61 +50,18 @@ export function AssessmentCatalogClient() {
               ))}
             </select>
             <ChevronDown
-              size={15}
-              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[#00D8C3]"
+              size={14}
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400"
             />
           </div>
 
           <Link
-            href="/anc/register"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#00D8C3] text-[#031525] hover:bg-[#22C9EE] shadow-md shadow-[#00D8C3]/20 transition-all"
+            href="/pedigree"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 shadow-xs transition"
           >
             <Plus className="w-4 h-4" />
             <span>Add patient</span>
           </Link>
-        </div>
-      </div>
-
-      {/* Sub-bar with Layout Controls and Count */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#8aaec3]">
-          <span className="px-2.5 py-0.5 rounded-full bg-[#08243B] border border-[#164C60] text-white">
-            {PATHWAYS.length} Clinical Pathways
-          </span>
-          <span className="hidden sm:inline">· FOGSI / ACOG / ACMG / ASRM Aligned</span>
-        </div>
-
-        <div
-          role="group"
-          aria-label="Pathway layout"
-          className="flex items-center gap-1 rounded-xl border border-[#164C60] bg-[#031525] p-1"
-        >
-          <button
-            type="button"
-            aria-label="Grid view"
-            aria-pressed={view === 'grid'}
-            onClick={() => setView('grid')}
-            className={`flex h-7 w-9 items-center justify-center rounded-lg text-xs font-semibold transition ${
-              view === 'grid'
-                ? 'bg-[#00D8C3] text-[#031525]'
-                : 'text-[#8aaec3] hover:text-white'
-            }`}
-          >
-            <LayoutGrid size={15} />
-          </button>
-          <button
-            type="button"
-            aria-label="List view"
-            aria-pressed={view === 'list'}
-            onClick={() => setView('list')}
-            className={`flex h-7 w-9 items-center justify-center rounded-lg text-xs font-semibold transition ${
-              view === 'list'
-                ? 'bg-[#00D8C3] text-[#031525]'
-                : 'text-[#8aaec3] hover:text-white'
-            }`}
-          >
-            <List size={15} />
-          </button>
         </div>
       </div>
 

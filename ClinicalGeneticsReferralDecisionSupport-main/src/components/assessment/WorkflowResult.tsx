@@ -89,19 +89,19 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
       {/* Authoritative Recommendation Hero Banner matching Histone */}
       <div
         data-testid="result-hero"
-        className={`rounded-2xl p-6 sm:p-8 text-white border shadow-xl transition-all ${
+        className={`rounded-lg p-6 sm:p-8 text-white shadow-sm transition-all ${
           decision === 'urgent_referral'
-            ? 'bg-gradient-to-r from-rose-950/90 via-red-900/80 to-rose-900/90 border-rose-500 shadow-rose-950/50'
+            ? 'bg-[#b8125d] text-white'
             : decision === 'routine_referral'
-              ? 'bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-orange-950/90 border-amber-500 shadow-amber-950/50'
+              ? 'bg-[#f59e0b] text-slate-950'
               : decision === 'borderline_consideration'
-                ? 'bg-gradient-to-r from-sky-950/90 via-cyan-900/80 to-blue-950/90 border-cyan-500 shadow-cyan-950/50'
-                : 'bg-gradient-to-r from-emerald-950/90 via-emerald-900/80 to-teal-950/90 border-emerald-500 shadow-emerald-950/50'
+                ? 'bg-[#64748b] text-white'
+                : 'bg-[#10b981] text-white'
         }`}
       >
-        <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.22em] opacity-80 mb-2">
+        <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.24em] opacity-80 mb-2">
           <span>{record?.pathwaySlug ? record.pathwaySlug.replace(/-/g, ' ') : 'CLINICAL EVALUATION'}</span>
-          <span className="px-3 py-0.5 rounded-full bg-white/15 text-white font-bold tracking-wider">
+          <span className="px-2.5 py-0.5 rounded-md bg-white/20 text-white font-bold tracking-wider text-[10px]">
             {decision === 'urgent_referral'
               ? 'REFER — URGENT'
               : decision === 'routine_referral'
@@ -111,27 +111,27 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
                   : 'NO REFERRAL NEEDED'}
           </span>
         </div>
-        <div data-testid="outcome-label" className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+        <div data-testid="outcome-label" className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight">
           {OUTCOME_LABELS[decision] || 'Recommendation'}
         </div>
         {result.referralTarget && result.referralTarget !== 'None' && (
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm sm:text-base font-medium opacity-95">
-            <span className="text-[11px] uppercase tracking-widest opacity-70">Referral target:</span>
-            <span className="font-bold text-[#00D8C3] bg-black/20 px-3 py-1 rounded-lg">
+            <span className="text-[11px] uppercase tracking-widest opacity-80">Referral target:</span>
+            <span className="font-bold underline underline-offset-4">
               {String(result.referralTarget)}
             </span>
           </div>
         )}
       </div>
 
-      <section className={`${card} p-5 space-y-4`}>
-        <div className="flex items-center justify-between border-b border-[#164C60]/50 pb-3">
-          <p className="text-xs font-bold tracking-widest text-[#00D8C3] uppercase font-mono">
+      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-xs space-y-4 text-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <p className="text-xs font-bold tracking-widest text-[#b8125d] uppercase font-mono">
             Deterministic Decision Rationale
           </p>
-          <span className="text-xs text-[#A9BDCA] font-mono">Zero-hallucination rule engine</span>
+          <span className="text-xs text-slate-500 font-mono">Zero-hallucination rule engine</span>
         </div>
-        <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
+        <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-800">
           {evaluated
             ? text(
                 result.rationale,
@@ -139,24 +139,24 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
               )
             : 'Save and submit the clinical record, then ask a provider to explicitly review it. Absence of an evaluation is not a no-referral decision.'}
         </p>
-        <dl className="grid gap-3 text-sm sm:grid-cols-2 pt-2 border-t border-[#164C60]/50">
+        <dl className="grid gap-3 text-sm sm:grid-cols-2 pt-2 border-t border-slate-100">
           <div>
-            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Destination(s)</dt>
-            <dd className="font-semibold text-white mt-0.5">
+            <dt className="text-xs font-mono text-slate-500 uppercase">Destination(s)</dt>
+            <dd className="font-semibold text-slate-900 mt-0.5">
               {text(result.referralTarget, 'Not specified by server evaluation')}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Evaluation timestamp</dt>
-            <dd className="font-semibold text-white mt-0.5">{text(snapshot.evaluatedAt ?? result.timestamp, 'Not evaluated')}</dd>
+            <dt className="text-xs font-mono text-slate-500 uppercase">Evaluation timestamp</dt>
+            <dd className="font-semibold text-slate-900 mt-0.5">{text(snapshot.evaluatedAt ?? result.timestamp, 'Not evaluated')}</dd>
           </div>
           <div>
-            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Engine / standard</dt>
-            <dd className="font-semibold text-[#00D8C3] mt-0.5">FOGSI · ACOG · ACMG · ASRM · NCCN</dd>
+            <dt className="text-xs font-mono text-slate-500 uppercase">Engine / standard</dt>
+            <dd className="font-semibold text-[#b8125d] mt-0.5">FOGSI · ACOG · ACMG · ASRM · NCCN</dd>
           </div>
           <div>
-            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Reason code</dt>
-            <dd className="font-semibold text-white mt-0.5">{text(result.reasonCode)}</dd>
+            <dt className="text-xs font-mono text-slate-500 uppercase">Reason code</dt>
+            <dd className="font-semibold text-slate-900 mt-0.5">{text(result.reasonCode)}</dd>
           </div>
         </dl>
         {Array.isArray(result.missingFields) && result.missingFields.length > 0 && (
