@@ -42,18 +42,18 @@ export default async function NurseDashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-white">
       {/* Nurse Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 sm:p-8 rounded-xl bg-white border border-slate-200 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 sm:p-8 rounded-2xl bg-[#021f17] border border-[#0e4331] shadow-hx text-white">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fce7f3] text-[#b8125d] text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#033424] text-[#34d399] border border-[#0e5c3e] text-xs font-semibold">
             <HeartHandshake className="w-3.5 h-3.5" />
             <span>VERIFIED NURSE / MEDICAL ASSISTANT WORKSPACE</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             {user.name}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
             {user.designation || 'Clinical Nurse Coordinator'} • {user.hospitalClinicName || 'Hospital Unit'} • {user.department || 'Obstetrics & Genetics'}
           </p>
         </div>
@@ -61,14 +61,14 @@ export default async function NurseDashboardPage() {
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/pedigree"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-semibold bg-[#b8125d] text-white hover:bg-[#9d0f4e] shadow-xs transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-[#032a1f] text-[#34d399] border border-[#0e4331] hover:bg-[#033424] hover:border-[#10b981] shadow-xs transition"
           >
-            <GitFork className="w-4 h-4" />
+            <GitFork className="w-4 h-4 text-[#34d399]" />
             <span>Open Pedigree Studio</span>
           </Link>
           <Link
             href="/assessment"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#10b981] via-[#059669] to-[#047857] text-white shadow-md hover:brightness-110 transition"
           >
             <span>New Genetic Assessment</span>
           </Link>
@@ -76,13 +76,13 @@ export default async function NurseDashboardPage() {
       </div>
 
       {/* Role Governance Boundary Warning */}
-      <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+      <div className="p-4 rounded-xl bg-[#021f17] border border-[#0e4331] flex items-start gap-4 text-white">
+        <div className="w-10 h-10 rounded-xl bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-300 shrink-0">
           <ShieldAlert className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-1">
-          <div className="font-semibold text-amber-900">Clinical Governance Role Boundary</div>
-          <div className="text-slate-600 leading-relaxed">
+          <div className="font-semibold text-amber-300">Clinical Governance Role Boundary</div>
+          <div className="text-slate-300 leading-relaxed">
             In accordance with clinical safety rules, your account is authorized to register patients, capture multi-generation pedigree trees, record risk indicators, and create draft assessments. Final approval and diagnostic referral generation are reviewed by an authorized Gynecologist.
           </div>
         </div>
@@ -90,34 +90,34 @@ export default async function NurseDashboardPage() {
 
       {/* Primary Intake Duties */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="p-6 rounded-2xl bg-[#08243B]/70 border border-[#164C60] space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-[#00D8C3]/15 border border-[#00D8C3]/30 flex items-center justify-center text-[#00D8C3]">
+        <div className="p-6 rounded-2xl bg-[#021f17] border border-[#0e4331] shadow-hx space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-[#033424] border border-[#0e5c3e] flex items-center justify-center text-[#34d399]">
             <Baby className="w-5 h-5" />
           </div>
           <h3 className="text-base font-bold text-white">1. ANC Patient Registration</h3>
-          <p className="text-xs text-[#A9BDCA] leading-relaxed">
+          <p className="text-xs text-slate-300 leading-relaxed">
             Register new obstetric patients, calculate gestational age, G/P/L/A, Naegele's EDD, baseline vitals, and socio-demographics.
           </p>
           <div className="pt-2 flex items-center gap-3">
             <Link
               href="/anc/register"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#00D8C3] hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#34d399] hover:underline"
             >
               <span>Register Patient</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-            <span className="text-[#164C60]">•</span>
+            <span className="text-[#0e4331]">•</span>
             <Link
               href="/anc"
-              className="inline-flex items-center gap-1 text-xs text-[#A9BDCA] hover:text-white"
+              className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white"
             >
               <span>View Registry</span>
             </Link>
           </div>
         </div>
 
-        <div className="p-6 rounded-2xl bg-[#08243B]/70 border border-[#164C60] space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-[#00D8C3]/15 border border-[#00D8C3]/30 flex items-center justify-center text-[#00D8C3]">
+        <div className="p-6 rounded-2xl bg-[#021f17] border border-[#0e4331] shadow-hx space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-[#033424] border border-[#0e5c3e] flex items-center justify-center text-[#34d399]">
             <Clock className="w-5 h-5" />
           </div>
           <h3 className="text-base font-bold text-white">2. Antenatal Visits &amp; Vitals</h3>

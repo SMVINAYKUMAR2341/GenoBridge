@@ -63,26 +63,26 @@ export default function PublishedGuidelinesIndex({
   compact?: boolean
 }) {
   return (
-    <div className="rounded-2xl border border-[#164C60] bg-gradient-to-br from-[#08243B] via-[#041e33] to-[#08243B] p-5 sm:p-6 shadow-xl space-y-4">
+    <div className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-5 sm:p-6 shadow-hx space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#00D8C3] uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-[#00D8C3]" />
+          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#34d399] uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-[#34d399]" />
             <span>Direct Statutory Evidence Base · Zero-Hallucination Rules</span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
             Published Clinical Guidelines Index (FOGSI · ACOG · ACMG · ASRM · NCCN)
           </h2>
-          <p className="text-xs text-[#A9BDCA] max-w-3xl leading-relaxed">
+          <p className="text-xs text-slate-300 max-w-3xl leading-relaxed">
             All 6 triage pathways in GenoBridge are indexed directly to published professional society guidelines. Every referral urgency level is mathematically calibrated against verified document editions with zero LLM hallucination.
           </p>
         </div>
 
         <Link
           href="/guidelines"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#031525] border border-[#164C60] hover:border-[#00D8C3] text-[#A9BDCA] hover:text-white transition-all shrink-0 w-fit"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#032a1f] border border-[#0e4331] hover:border-[#10b981] text-slate-300 hover:text-white transition-all shrink-0 w-fit"
         >
-          <BookOpen className="w-3.5 h-3.5 text-[#00D8C3]" />
+          <BookOpen className="w-3.5 h-3.5 text-[#34d399]" />
           <span>Full Governance Catalog</span>
           <ExternalLink className="w-3 h-3 ml-0.5 opacity-60" />
         </Link>
@@ -92,20 +92,20 @@ export default function PublishedGuidelinesIndex({
         {PUBLISHED_GUIDELINES.map((item) => (
           <div
             key={item.docNumber}
-            className="p-3.5 rounded-xl bg-[#031525]/80 border border-[#164C60]/80 hover:border-[#00D8C3]/50 transition-all space-y-1.5"
+            className="p-3.5 rounded-xl bg-[#032a1f]/70 border border-[#0e4331] hover:border-[#10b981]/60 transition-all space-y-1.5"
           >
             <div className="flex items-center justify-between">
               <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${item.tone}`}>
                 {item.docNumber}
               </span>
-              <span className="text-[10px] font-mono text-[#8aaec3] font-semibold">
+              <span className="text-[10px] font-mono text-slate-400 font-semibold">
                 {item.org}
               </span>
             </div>
             <div className="text-xs font-bold text-white">
               {item.title}
             </div>
-            <div className="text-[11px] text-[#8aaec3] leading-snug">
+            <div className="text-[11px] text-slate-300 leading-snug">
               {item.scope}
             </div>
           </div>
