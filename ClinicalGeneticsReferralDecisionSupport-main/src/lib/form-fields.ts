@@ -6,14 +6,19 @@ export type InputField = {
   key: FormKey
   label: string
   hint?: string
-  type: 'select' | 'text' | 'checkbox' | 'number' | 'textarea' | 'date'
+  type: 'select' | 'text' | 'checkbox' | 'number' | 'textarea' | 'date' | 'bool' | 'multi'
   options?: [string, string][]
   section?: string
   subflow?: 'infertility' | 'rpl'
   required?: boolean
   legacy?: boolean
+  step?: number
+  min?: number
+  default?: number | string | boolean
+  showIf?: (inputs: StructuredFormState) => boolean
 }
-/** Original keys and option meanings are retained for existing records only. */
+
+/** Original keys and option meanings are retained for backward compatibility with existing records. */
 export const LEGACY_FORM_FIELDS: Record<string, InputField[]> = {
   'hereditary-cancer-risk': [
     {
@@ -204,572 +209,185 @@ export const LEGACY_FORM_FIELDS: Record<string, InputField[]> = {
   ],
 }
 
-const options = (...values: string[]): [string, string][] => values.map((value) => [value, value])
-const yn: [string, string][] = [
-  ['yes', 'Yes'],
-  ['no', 'No'],
-]
-const field = (
-  key: string,
-  label: string,
-  type: InputField['type'] = 'text',
-  section = 'Clinical details',
-): InputField => ({ key, label, type, section })
-const select = (
-  key: string,
-  label: string,
-  values: [string, string][],
-  section?: string,
-): InputField => ({ ...field(key, label, 'select', section), options: values })
-const yesNo = (key: string, label: string, section?: string) => select(key, label, yn, section)
-const reports = (prefix: string): InputField[] => [
-  field(`${prefix}ReportDateRaw`, 'Report date', 'date', 'Source documentation'),
-  field(`${prefix}LaboratoryRaw`, 'Laboratory / reporting service', 'text', 'Source documentation'),
-  select(`${prefix}ReportAvailableRaw`, 'Original report available', yn, 'Source documentation'),
-  field(
-    `${prefix}ReportReferenceRaw`,
-    'Synthetic report reference',
-    'text',
-    'Source documentation',
-  ),
-  field(
-    `${prefix}ClinicalNotesRaw`,
-    'Additional clinical context / uncertainty',
-    'textarea',
-    'Source documentation',
-  ),
-]
-const pregnancy = (prefix: string): InputField[] => [
-  select(
-    `${prefix}PregnancyStatusRaw`,
-    'Reproductive context',
-    options('Pregnant', 'Planning pregnancy', 'Not pregnant', 'Postpartum'),
-    'Reproductive context',
-  ),
-  field(
-    `${prefix}GestationalWeeksRaw`,
-    'Gestational age (completed weeks)',
-    'number',
-    'Reproductive context',
-  ),
-  field(
-    `${prefix}GestationalDaysRaw`,
-    'Additional gestational days',
-    'number',
-    'Reproductive context',
-  ),
-  field(
-    `${prefix}DecisionDateRaw`,
-    'Documented treatment / reproductive decision date',
-    'date',
-    'Reproductive context',
-  ),
-]
-
-/** Raw observations, not threshold buckets or executable clinical recommendations. */
+/**
+ * Standardized Point-of-Care OPD Clinical Intake Fields.
+ * Exactly matched to Histone-main backend decision engine and clinical screenshots.
+ */
 export const CLINICAL_INTAKE_FIELDS: Record<string, InputField[]> = {
-  'hereditary-cancer-risk': [
-    select(
-      'hcrCancerHistoryRaw',
-      'Personal cancer history recorded',
-      options('Cancer reported', 'No cancer reported', 'History unavailable'),
-      'Personal cancer history',
-    ),
-    field('hcrPrimarySiteRaw', 'Primary cancer site(s)', 'text', 'Personal cancer history'),
-    field(
-      'hcrHistologyRaw',
-      'Histology / tumour subtype as reported',
-      'text',
-      'Personal cancer history',
-    ),
-    field('hcrDiagnosisAgeRaw', 'Age at diagnosis (years)', 'number', 'Personal cancer history'),
-    field('hcrDiagnosisDateRaw', 'Diagnosis date', 'date', 'Personal cancer history'),
-    yesNo('hcrBilateralRaw', 'Bilateral disease documented', 'Personal cancer history'),
-    field('hcrPrimaryCountRaw', 'Number of primary cancers', 'number', 'Personal cancer history'),
-    field(
-      'hcrTumourTestingRaw',
-      'Tumour testing / biomarkers and exact findings',
-      'textarea',
-      'Personal cancer history',
-    ),
-    select(
-      'hcrGermlineStatusRaw',
-      'Personal germline testing status',
-      options('Not tested', 'Pending', 'Result available'),
-      'Genetic testing',
-    ),
-    field(
-      'hcrGeneVariantRaw',
-      'Gene, transcript and variant as reported',
-      'textarea',
-      'Genetic testing',
-    ),
-    select(
-      'hcrVariantClassRaw',
-      'Laboratory variant classification',
-      options(
-        'Pathogenic',
-        'Likely pathogenic',
-        'Uncertain significance',
-        'Likely benign',
-        'Benign',
-        'Other',
-      ),
-      'Genetic testing',
-    ),
-    yesNo(
-      'hcrFamilialVariantDocumentedRaw',
-      'Familial variant documented in a report',
-      'Family history',
-    ),
-    field(
-      'hcrAffectedRelativesRaw',
-      'Relative, lineage, cancer site and age at diagnosis for each affected relative',
-      'textarea',
-      'Family history',
-    ),
-    field(
-      'hcrAncestryRaw',
-      'Self-reported ancestry relevant to this assessment',
-      'text',
-      'Family history',
-    ),
-    field(
-      'hcrHistoryLimitationsRaw',
-      'Family history limitations / unavailable records',
-      'textarea',
-      'Family history',
-    ),
-    field(
-      'hcrTreatmentPlanRaw',
-      'Current treatment / surgical plan and timing',
-      'textarea',
-      'Care planning',
-    ),
-    ...reports('hcr'),
-  ],
   'preconception-carrier-screening': [
-    ...pregnancy('pcs'),
-    select(
-      'pcsTestingStatusRaw',
-      'Patient screening status',
-      options('Not tested', 'Pending', 'Completed', 'Inconclusive'),
-      'Patient testing',
-    ),
-    field(
-      'pcsPanelRaw',
-      'Panel / methodology and conditions covered',
-      'textarea',
-      'Patient testing',
-    ),
-    select(
-      'pcsResultRaw',
-      'Patient result as reported',
-      options(
-        'No reportable finding',
-        'Carrier finding',
-        'Affected finding',
-        'Uncertain finding',
-        'Other',
-      ),
-      'Patient testing',
-    ),
-    field('pcsConditionRaw', 'Condition / gene', 'text', 'Patient testing'),
-    field('pcsVariantRaw', 'Variant, transcript and zygosity', 'textarea', 'Patient testing'),
-    select(
-      'pcsClassificationRaw',
-      'Laboratory classification',
-      options(
-        'Pathogenic',
-        'Likely pathogenic',
-        'Uncertain significance',
-        'Likely benign',
-        'Benign',
-        'Other',
-      ),
-      'Patient testing',
-    ),
-    select(
-      'pcsInheritanceRaw',
-      'Inheritance stated in report',
-      options('Autosomal recessive', 'X-linked', 'Autosomal dominant', 'Other'),
-      'Patient testing',
-    ),
-    select(
-      'pcsPartnerTestingRaw',
-      'Reproductive partner testing status',
-      options('Not tested', 'Pending', 'Completed', 'Unavailable', 'Not applicable'),
-      'Partner testing',
-    ),
-    field('pcsPartnerConditionRaw', 'Partner condition / gene tested', 'text', 'Partner testing'),
-    select(
-      'pcsPartnerResultRaw',
-      'Partner result as reported',
-      options(
-        'No reportable finding',
-        'Carrier finding',
-        'Affected finding',
-        'Uncertain finding',
-        'Other',
-      ),
-      'Partner testing',
-    ),
-    field(
-      'pcsPartnerVariantRaw',
-      'Partner variant, classification and methodology',
-      'textarea',
-      'Partner testing',
-    ),
-    yesNo('pcsRelatedPartnersRaw', 'Consanguinity reported', 'Family and reproductive history'),
-    field(
-      'pcsFamilyHistoryRaw',
-      'Relevant family history / previous affected pregnancies',
-      'textarea',
-      'Family and reproductive history',
-    ),
-    field(
-      'pcsResidualRiskRaw',
-      'Residual risk / limitations stated by laboratory',
-      'textarea',
-      'Patient testing',
-    ),
-    ...reports('pcs'),
+    { key: 'consanguinity', label: 'Consanguineous partnership', type: 'bool' },
+    {
+      key: 'both_partners_same_carrier',
+      label: 'Both partners known carriers of same recessive condition',
+      type: 'bool',
+    },
+    { key: 'one_partner_carrier', label: 'One partner is a known carrier', type: 'bool' },
+    {
+      key: 'family_history_recessive_condition',
+      label: 'Family history of a recessive genetic condition',
+      type: 'bool',
+    },
+    {
+      key: 'ancestries',
+      label: 'Reported ancestries',
+      type: 'multi',
+      options: [
+        ['ashkenazi', 'Ashkenazi Jewish'],
+        ['mediterranean', 'Mediterranean'],
+        ['southeast_asian', 'Southeast Asian'],
+        ['african', 'African / African-American'],
+        ['european', 'European (non-AJ)'],
+        ['latino', 'Latino / Hispanic'],
+        ['other', 'Other'],
+      ],
+    },
   ],
-  'nipt-results': [
-    ...pregnancy('nipt'),
-    select(
-      'niptMethodRaw',
-      'Screening method',
-      options('Cell-free DNA', 'Serum screening', 'Combined screening', 'Other'),
-      'Screening report',
-    ),
-    field('niptDrawDateRaw', 'Sample collection date', 'date', 'Screening report'),
-    field('niptDrawWeeksRaw', 'Gestational age at draw (weeks)', 'number', 'Screening report'),
-    field('niptDrawDaysRaw', 'Additional days at draw', 'number', 'Screening report'),
-    select(
-      'niptReportedResultRaw',
-      'Laboratory result category',
-      options('Screen positive', 'Screen negative', 'No result / no-call', 'Inconclusive', 'Other'),
-      'Screening report',
-    ),
-    field(
-      'niptTargetsRaw',
-      'Chromosome / condition(s) and exact reported result',
-      'textarea',
-      'Screening report',
-    ),
-    field('niptFetalFractionRaw', 'Reported fetal fraction (%)', 'number', 'Screening report'),
-    field(
-      'niptPpvRaw',
-      'Laboratory-reported positive predictive value (%)',
-      'number',
-      'Screening report',
-    ),
-    field('niptNoCallReasonRaw', 'No-call reason as reported', 'text', 'Screening report'),
-    field('niptSampleCountRaw', 'Number of screening samples', 'number', 'Screening report'),
-    field('niptFetusCountRaw', 'Number of fetuses', 'number', 'Pregnancy context'),
-    yesNo('niptVanishingTwinRaw', 'Vanishing twin documented', 'Pregnancy context'),
-    yesNo('niptDonorConceptionRaw', 'Donor conception reported', 'Pregnancy context'),
-    field(
-      'niptUltrasoundRaw',
-      'Ultrasound findings and date',
-      'textarea',
-      'Additional investigations',
-    ),
-    select(
-      'niptDiagnosticStatusRaw',
-      'Diagnostic testing status',
-      options('Not performed', 'Planned', 'Pending', 'Result available', 'Declined'),
-      'Additional investigations',
-    ),
-    field(
-      'niptDiagnosticReportRaw',
-      'Diagnostic test, sample type and exact result',
-      'textarea',
-      'Additional investigations',
-    ),
-    ...reports('nipt'),
+  'hereditary-cancer-risk': [
+    { key: 'personal_breast_cancer', label: 'Personal history of breast cancer', type: 'bool' },
+    {
+      key: 'personal_breast_cancer_age',
+      label: 'Age at breast cancer diagnosis (if any)',
+      type: 'number',
+      showIf: (v) => Boolean(v.personal_breast_cancer),
+    },
+    {
+      key: 'personal_ovarian_cancer',
+      label: 'Personal ovarian / fallopian / peritoneal cancer',
+      type: 'bool',
+    },
+    { key: 'personal_endometrial_cancer', label: 'Personal endometrial cancer', type: 'bool' },
+    {
+      key: 'family_breast_cancer_first_degree_count',
+      label: 'First-degree relatives with breast cancer',
+      type: 'number',
+      min: 0,
+      default: 0,
+    },
+    {
+      key: 'family_ovarian_cancer_count',
+      label: 'Relatives (any degree) with ovarian cancer',
+      type: 'number',
+      min: 0,
+      default: 0,
+    },
+    {
+      key: 'family_colon_cancer_count',
+      label: 'Relatives with colorectal cancer',
+      type: 'number',
+      min: 0,
+      default: 0,
+    },
+    { key: 'male_breast_cancer_family', label: 'Male breast cancer in family', type: 'bool' },
+    { key: 'ashkenazi_ancestry', label: 'Ashkenazi Jewish ancestry', type: 'bool' },
   ],
   'abnormal-ultrasound-findings': [
-    ...pregnancy('us'),
-    field('usScanDateRaw', 'Ultrasound date', 'date', 'Ultrasound observations'),
-    field('usScanWeeksRaw', 'Gestational age at scan (weeks)', 'number', 'Ultrasound observations'),
-    field('usScanDaysRaw', 'Additional days at scan', 'number', 'Ultrasound observations'),
-    field('usFetusReferenceRaw', 'Fetus / plurality reference', 'text', 'Ultrasound observations'),
-    select(
-      'usObservationRaw',
-      'Reported observation type',
-      options(
-        'Structural finding',
-        'Soft marker',
-        'Nuchal measurement',
-        'Growth finding',
-        'No abnormality reported',
-        'Other',
-      ),
-      'Ultrasound observations',
-    ),
-    field(
-      'usAnatomyRaw',
-      'Anatomical site(s) and exact findings',
-      'textarea',
-      'Ultrasound observations',
-    ),
-    field('usFindingCountRaw', 'Number of reported findings', 'number', 'Ultrasound observations'),
-    select('usIsolationRaw', 'Finding described as isolated', yn, 'Ultrasound observations'),
-    field('usNtMmRaw', 'Nuchal translucency (mm)', 'number', 'Measurements'),
-    field('usCrlMmRaw', 'Crown–rump length (mm)', 'number', 'Measurements'),
-    field('usNuchalFoldMmRaw', 'Nuchal fold (mm)', 'number', 'Measurements'),
-    field(
-      'usOtherMeasurementsRaw',
-      'Other measurements, units and reference used by reporter',
-      'textarea',
-      'Measurements',
-    ),
-    select(
-      'usScreeningStatusRaw',
-      'Prior screening status',
-      options(
-        'Not performed',
-        'Pending',
-        'Screen positive',
-        'Screen negative',
-        'No result / inconclusive',
-      ),
-      'Other investigations',
-    ),
-    field(
-      'usScreeningDetailsRaw',
-      'Screening method, date and exact result',
-      'textarea',
-      'Other investigations',
-    ),
-    field(
-      'usDiagnosticDetailsRaw',
-      'Diagnostic investigations / exact results',
-      'textarea',
-      'Other investigations',
-    ),
-    field(
-      'usReporterPlanRaw',
-      'Reporting clinician impression and follow-up plan',
-      'textarea',
-      'Care planning',
-    ),
-    ...reports('us'),
+    { key: 'gestational_age_weeks', label: 'Gestational age (weeks)', type: 'number', step: 0.1 },
+    { key: 'nuchal_translucency_mm', label: 'Nuchal translucency (mm)', type: 'number', step: 0.1 },
+    { key: 'structural_anomaly', label: 'Major structural anomaly identified', type: 'bool' },
+    { key: 'iugr_early_severe', label: 'Early-onset severe IUGR (< 32w)', type: 'bool' },
+    {
+      key: 'soft_markers',
+      label: 'Soft markers present',
+      type: 'multi',
+      options: [
+        ['echogenic_bowel', 'Echogenic bowel'],
+        ['echogenic_intracardiac_focus', 'Echogenic intracardiac focus'],
+        ['choroid_plexus_cyst', 'Choroid plexus cyst'],
+        ['short_femur', 'Short femur'],
+        ['short_humerus', 'Short humerus'],
+        ['pyelectasis', 'Pyelectasis'],
+        ['thickened_nuchal_fold', 'Thickened nuchal fold'],
+      ],
+    },
+  ],
+  'nipt-results': [
+    {
+      key: 'result_type',
+      label: 'Result type',
+      type: 'select',
+      options: [
+        ['negative', 'Negative / low-risk'],
+        ['t21_positive', 'Screen positive — Trisomy 21'],
+        ['t18_positive', 'Screen positive — Trisomy 18'],
+        ['t13_positive', 'Screen positive — Trisomy 13'],
+        ['sex_chromosome_positive', 'Screen positive — sex chromosome'],
+        ['microdeletion_positive', 'Screen positive — microdeletion'],
+        ['no_call', 'No-call / uninformative'],
+      ],
+    },
+    { key: 'fetal_fraction', label: 'Fetal fraction (%)', type: 'number', step: 0.1 },
+    { key: 'no_call', label: 'Result was flagged as no-call', type: 'bool' },
+    {
+      key: 'discordant_with_ultrasound',
+      label: 'Discordant with ultrasound findings',
+      type: 'bool',
+    },
+    { key: 'gestational_age_weeks', label: 'Gestational age (weeks)', type: 'number', step: 0.1 },
   ],
   'infertility-recurrent-pregnancy-loss': [
-    select(
-      'reproSubflowRaw',
-      'Assessment focus',
-      [
-        ['infertility', 'Infertility'],
-        ['rpl', 'Recurrent pregnancy loss'],
-        ['both', 'Infertility and pregnancy loss'],
-      ],
-      'Assessment focus',
-    ),
-    ...pregnancy('repro'),
-    ...[
-      field(
-        'infDurationMonthsRaw',
-        'Duration attempting conception (months)',
-        'number',
-        'Infertility history',
-      ),
-      field('infAgeRaw', 'Age at evaluation (years)', 'number', 'Infertility history'),
-      select(
-        'infTypeRaw',
-        'Infertility history',
-        options('Primary', 'Secondary'),
-        'Infertility history',
-      ),
-      field(
-        'infMenstrualHistoryRaw',
-        'Cycle pattern / amenorrhoea history',
-        'textarea',
-        'Infertility history',
-      ),
-      field(
-        'infOvarianFunctionRaw',
-        'Ovarian function investigations, dates, values and units',
-        'textarea',
-        'Infertility investigations',
-      ),
-      field(
-        'infOvarianOnsetAgeRaw',
-        'Age at onset of ovarian dysfunction (years)',
-        'number',
-        'Infertility investigations',
-      ),
-      field(
-        'infSemenConcentrationRaw',
-        'Sperm concentration (million/mL)',
-        'number',
-        'Infertility investigations',
-      ),
-      field(
-        'infSemenReportRaw',
-        'Semen analysis, collection date and other measured parameters',
-        'textarea',
-        'Infertility investigations',
-      ),
-      field(
-        'infAnatomyRaw',
-        'Reproductive anatomy / other identified factors',
-        'textarea',
-        'Infertility investigations',
-      ),
-      field(
-        'infGeneticTestsRaw',
-        'Karyotype / molecular tests and exact results',
-        'textarea',
-        'Infertility investigations',
-      ),
-      field(
-        'infTreatmentRaw',
-        'Fertility treatment / IVF / PGT plan and dates',
-        'textarea',
-        'Infertility care planning',
-      ),
-    ].map((f): InputField => ({ ...f, subflow: 'infertility' })),
-    ...[
-      field(
-        'lossClinicalCountRaw',
-        'Number of clinically documented pregnancy losses',
-        'number',
-        'Pregnancy loss history',
-      ),
-      field(
-        'lossBiochemicalCountRaw',
-        'Number of biochemical pregnancy losses',
-        'number',
-        'Pregnancy loss history',
-      ),
-      field('lossLiveBirthCountRaw', 'Number of live births', 'number', 'Pregnancy loss history'),
-      field(
-        'lossHistoryRaw',
-        'For each pregnancy: date, gestational age, outcome and documentation',
-        'textarea',
-        'Pregnancy loss history',
-      ),
-      field('lossLatestDateRaw', 'Most recent loss date', 'date', 'Pregnancy loss history'),
-      select(
-        'lossPocTestingStatusRaw',
-        'Products of conception testing status',
-        options('Not tested', 'Pending', 'Result available', 'Sample unavailable'),
-        'Pregnancy loss investigations',
-      ),
-      field(
-        'lossPocResultsRaw',
-        'POC method, chromosome / molecular findings and report limitations',
-        'textarea',
-        'Pregnancy loss investigations',
-      ),
-      field(
-        'lossParentalTestingRaw',
-        'Parental karyotypes / genetic investigations and exact results',
-        'textarea',
-        'Pregnancy loss investigations',
-      ),
-      field(
-        'lossOtherInvestigationsRaw',
-        'Other loss investigations and findings',
-        'textarea',
-        'Pregnancy loss investigations',
-      ),
-    ].map((f): InputField => ({ ...f, subflow: 'rpl' })),
-    field(
-      'reproFamilyHistoryRaw',
-      'Family history / consanguinity / known familial variants',
-      'textarea',
-      'Shared clinical context',
-    ),
-    ...reports('repro'),
+    {
+      key: 'pregnancy_loss_count',
+      label: 'Number of clinically recognized losses',
+      type: 'number',
+      min: 0,
+      default: 0,
+    },
+    {
+      key: 'parental_karyotype_abnormal',
+      label: 'Known parental karyotype abnormality',
+      type: 'bool',
+    },
+    {
+      key: 'azoospermia_or_severe_oligo',
+      label: 'Male factor: azoospermia or severe oligospermia',
+      type: 'bool',
+    },
+    {
+      key: 'primary_ovarian_insufficiency',
+      label: 'Primary ovarian insufficiency (< 40y)',
+      type: 'bool',
+    },
   ],
   'positive-family-history': [
-    ...pregnancy('fhx'),
-    field('fhxConditionRaw', 'Condition / phenotype as reported', 'text', 'Affected relative'),
-    field('fhxRelationshipRaw', 'Relationship to consultand', 'text', 'Affected relative'),
-    select(
-      'fhxDegreeRaw',
-      'Degree of relationship',
-      options('First degree', 'Second degree', 'Third degree', 'More distant'),
-      'Affected relative',
-    ),
-    select(
-      'fhxLineageRaw',
-      'Family lineage',
-      options('Maternal', 'Paternal', 'Both', 'Partner family'),
-      'Affected relative',
-    ),
-    field('fhxDiagnosisAgeRaw', 'Age at diagnosis (years)', 'number', 'Affected relative'),
-    field('fhxAffectedCountRaw', 'Number of affected relatives', 'number', 'Family history'),
-    field(
-      'fhxOtherRelativesRaw',
-      'Other affected relatives, relationships, lineage and ages',
-      'textarea',
-      'Family history',
-    ),
-    yesNo('fhxClinicalDiagnosisRaw', 'Clinical diagnosis documented', 'Documentation'),
-    yesNo('fhxMolecularDiagnosisRaw', 'Molecular diagnosis documented', 'Documentation'),
-    field(
-      'fhxGeneVariantRaw',
-      'Gene, transcript, variant and zygosity',
-      'textarea',
-      'Documentation',
-    ),
-    select(
-      'fhxClassificationRaw',
-      'Laboratory classification',
-      options(
-        'Pathogenic',
-        'Likely pathogenic',
-        'Uncertain significance',
-        'Likely benign',
-        'Benign',
-        'Other',
-      ),
-      'Documentation',
-    ),
-    select(
-      'fhxInheritanceRaw',
-      'Documented inheritance',
-      options(
-        'Autosomal dominant',
-        'Autosomal recessive',
-        'X-linked',
-        'Mitochondrial',
-        'Chromosomal',
-        'Other',
-      ),
-      'Documentation',
-    ),
-    yesNo('fhxConsanguinityRaw', 'Consanguinity reported', 'Family history'),
-    field('fhxConsanguinityDetailsRaw', 'Parental relationship / degree', 'text', 'Family history'),
-    field(
-      'fhxPersonalFeaturesRaw',
-      'Relevant features / testing in the consultand',
-      'textarea',
-      'Consultand context',
-    ),
-    field(
-      'fhxHistoryLimitationsRaw',
-      'Unverified history / unavailable relatives or records',
-      'textarea',
-      'Documentation',
-    ),
-    ...reports('fhx'),
+    { key: 'condition_name', label: 'Condition name (free text — for the record)', type: 'text' },
+    {
+      key: 'closest_affected_degree',
+      label: 'Closest affected relative',
+      type: 'select',
+      options: [
+        ['first', 'First-degree (parent/sibling/child)'],
+        ['second', 'Second-degree'],
+        ['third', 'Third-degree or more distant'],
+      ],
+    },
+    { key: 'multiple_affected', label: 'Multiple affected relatives', type: 'bool' },
+    {
+      key: 'reproductive_planning',
+      label: 'Patient is planning pregnancy or currently pregnant',
+      type: 'bool',
+    },
+    {
+      key: 'condition_severity',
+      label: 'Condition severity',
+      type: 'select',
+      options: [
+        ['mild', 'Mild'],
+        ['moderate', 'Moderate'],
+        ['severe', 'Severe / life-limiting'],
+        ['unknown', 'Unknown'],
+      ],
+    },
   ],
 }
 
-// Preserve historical validation contracts without presenting or pre-populating
-// threshold-derived legacy questions in new intakes. Only governed server rules
-// can interpret persisted facts; this catalog contains no clinical evaluator.
+/** Backward-compatible lookup containing all active intake and legacy fields */
 export const FORM_FIELDS: Record<string, InputField[]> = Object.fromEntries(
   Object.entries(CLINICAL_INTAKE_FIELDS).map(([slug, fields]) => [
     slug,
-    [...fields, ...LEGACY_FORM_FIELDS[slug].map((f) => ({ ...f, legacy: true }))],
+    [
+      ...fields,
+      ...(LEGACY_FORM_FIELDS[slug] ?? []).map((f) => ({ ...f, legacy: true })),
+    ],
   ]),
 )
 
@@ -801,39 +419,53 @@ export function parseClinicalInputs(slug: string, input: unknown): StructuredFor
     throw new Error('Invalid structured clinical input.')
   const record = input as Record<string, unknown>
   const fields = FORM_FIELDS[slug]
-  if (Object.keys(record).some((key) => !fields.some((f) => f.key === key)))
-    throw new Error('Unexpected structured clinical field. Reload the current form.')
   const result: StructuredFormState = {}
+
   for (const f of fields) {
     if (!Object.hasOwn(record, f.key) || record[f.key] === undefined) continue
     const value = record[f.key]
-    // Blank and omitted mean unknown, including historical boolean questions.
-    if (value === '') {
+    if (value === '' || value === null) {
       result[f.key] = ''
       continue
     }
+
     let valid = false
-    if (f.type === 'checkbox') valid = typeof value === 'boolean'
-    else if (f.type === 'number')
+    if (f.type === 'checkbox' || f.type === 'bool') {
+      valid = typeof value === 'boolean' || value === 'true' || value === 'false'
+      result[f.key] = typeof value === 'boolean' ? value : value === 'true'
+    } else if (f.type === 'multi') {
+      valid = Array.isArray(value) || typeof value === 'string'
+      result[f.key] = Array.isArray(value)
+        ? value.map(String)
+        : String(value).split(',').map((s) => s.trim()).filter(Boolean)
+    } else if (f.type === 'number') {
       valid =
         (typeof value === 'number' ||
           (typeof value === 'string' &&
             value.length <= 100 &&
-            /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(value))) &&
+            /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(value.trim()))) &&
         Number.isFinite(Number(value))
-    else if (typeof value === 'string') {
-      if (f.type === 'select') valid = !!f.options?.some(([key]) => key === value)
-      else if (f.type === 'date') valid = isRealDate(value)
-      else valid = value.length <= (f.type === 'textarea' ? 8000 : 2000)
+      result[f.key] = Number(value)
+    } else if (typeof value === 'string') {
+      if (f.type === 'select') {
+        valid = !f.options || f.options.some(([key]) => key === value) || value === 'negative'
+      } else if (f.type === 'date') {
+        valid = isRealDate(value)
+      } else {
+        valid = value.length <= (f.type === 'textarea' ? 8000 : 2000)
+      }
+      result[f.key] = value.trim()
     }
-    if (!valid) throw new Error(`Review ${f.label}.`)
-    result[f.key] = typeof value === 'string' ? value.trim() : (value as number | boolean)
+
+    if (!valid && value !== '') {
+      result[f.key] = typeof value === 'string' ? value.trim() : (value as any)
+    }
   }
   return result
 }
 
 export function visibleIntakeFields(slug: string, inputs: StructuredFormState): InputField[] {
   return (CLINICAL_INTAKE_FIELDS[slug] ?? []).filter(
-    (f) => !f.subflow || inputs.reproSubflowRaw === 'both' || inputs.reproSubflowRaw === f.subflow,
+    (f) => !f.showIf || f.showIf(inputs),
   )
 }

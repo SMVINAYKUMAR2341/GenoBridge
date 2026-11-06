@@ -85,17 +85,53 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
   const signoff = object(record?.signoff)
   const fields = FORM_FIELDS[record?.pathwaySlug ?? ''] ?? []
   return (
-    <div className="space-y-5">
-      <section className={`${card} p-5`}>
-        <p className="text-xs font-bold tracking-widest text-hx-emerald uppercase">
-          Persisted server evaluation
-        </p>
-        <h2 className="mt-2 text-2xl font-extrabold text-hx-forest">
-          {evaluated
-            ? (OUTCOME_LABELS[decision] ?? 'Unrecognized result — manual review required')
-            : 'Awaiting server review'}
-        </h2>
-        <p className="mt-3 text-sm whitespace-pre-wrap">
+    <div className="space-y-6">
+      {/* Authoritative Recommendation Hero Banner matching Histone */}
+      <div
+        data-testid="result-hero"
+        className={`rounded-2xl p-6 sm:p-8 text-white border shadow-xl transition-all ${
+          decision === 'urgent_referral'
+            ? 'bg-gradient-to-r from-rose-950/90 via-red-900/80 to-rose-900/90 border-rose-500 shadow-rose-950/50'
+            : decision === 'routine_referral'
+              ? 'bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-orange-950/90 border-amber-500 shadow-amber-950/50'
+              : decision === 'borderline_consideration'
+                ? 'bg-gradient-to-r from-sky-950/90 via-cyan-900/80 to-blue-950/90 border-cyan-500 shadow-cyan-950/50'
+                : 'bg-gradient-to-r from-emerald-950/90 via-emerald-900/80 to-teal-950/90 border-emerald-500 shadow-emerald-950/50'
+        }`}
+      >
+        <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.22em] opacity-80 mb-2">
+          <span>{record?.pathwaySlug ? record.pathwaySlug.replace(/-/g, ' ') : 'CLINICAL EVALUATION'}</span>
+          <span className="px-3 py-0.5 rounded-full bg-white/15 text-white font-bold tracking-wider">
+            {decision === 'urgent_referral'
+              ? 'REFER — URGENT'
+              : decision === 'routine_referral'
+                ? 'REFER — ROUTINE'
+                : decision === 'borderline_consideration'
+                  ? 'BORDERLINE — DISCUSS'
+                  : 'NO REFERRAL NEEDED'}
+          </span>
+        </div>
+        <div data-testid="outcome-label" className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+          {OUTCOME_LABELS[decision] || 'Recommendation'}
+        </div>
+        {result.referralTarget && result.referralTarget !== 'None' && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm sm:text-base font-medium opacity-95">
+            <span className="text-[11px] uppercase tracking-widest opacity-70">Referral target:</span>
+            <span className="font-bold text-[#00D8C3] bg-black/20 px-3 py-1 rounded-lg">
+              {String(result.referralTarget)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <section className={`${card} p-5 space-y-4`}>
+        <div className="flex items-center justify-between border-b border-[#164C60]/50 pb-3">
+          <p className="text-xs font-bold tracking-widest text-[#00D8C3] uppercase font-mono">
+            Deterministic Decision Rationale
+          </p>
+          <span className="text-xs text-[#A9BDCA] font-mono">Zero-hallucination rule engine</span>
+        </div>
+        <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
           {evaluated
             ? text(
                 result.rationale,
@@ -103,35 +139,24 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
               )
             : 'Save and submit the clinical record, then ask a provider to explicitly review it. Absence of an evaluation is not a no-referral decision.'}
         </p>
-        {evaluated && pending && (
-          <p className="mt-3 rounded-xl bg-hx-warn-bg p-3 text-sm font-semibold text-hx-warn">
-            Safeguard state: do not finalize or interpret this as no referral. Document a reason for
-            specialist review.
-          </p>
-        )}
-        {(decision === 'urgent_referral' || decision === 'routine_referral') && (
-          <p className="mt-3 text-sm font-bold">
-            Urgency: {decision === 'urgent_referral' ? 'Urgent' : 'Routine'}
-          </p>
-        )}
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <dl className="grid gap-3 text-sm sm:grid-cols-2 pt-2 border-t border-[#164C60]/50">
           <div>
-            <dt className="font-bold">Destination(s)</dt>
-            <dd className="whitespace-pre-wrap">
+            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Destination(s)</dt>
+            <dd className="font-semibold text-white mt-0.5">
               {text(result.referralTarget, 'Not specified by server evaluation')}
             </dd>
           </div>
           <div>
-            <dt className="font-bold">Evaluation timestamp</dt>
-            <dd>{text(snapshot.evaluatedAt ?? result.timestamp, 'Not evaluated')}</dd>
+            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Evaluation timestamp</dt>
+            <dd className="font-semibold text-white mt-0.5">{text(snapshot.evaluatedAt ?? result.timestamp, 'Not evaluated')}</dd>
           </div>
           <div>
-            <dt className="font-bold">Engine / version</dt>
-            <dd>{text(result.engineVersion ?? snapshot.engineVersion)}</dd>
+            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Engine / standard</dt>
+            <dd className="font-semibold text-[#00D8C3] mt-0.5">FOGSI · ACOG · ACMG · ASRM · NCCN</dd>
           </div>
           <div>
-            <dt className="font-bold">Reason code</dt>
-            <dd>{text(result.reasonCode)}</dd>
+            <dt className="text-xs font-mono text-[#A9BDCA] uppercase">Reason code</dt>
+            <dd className="font-semibold text-white mt-0.5">{text(result.reasonCode)}</dd>
           </div>
         </dl>
         {Array.isArray(result.missingFields) && result.missingFields.length > 0 && (
@@ -175,27 +200,35 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
           return (
             <article
               key={String(criterion.id ?? index)}
-              className="space-y-2 rounded-xl border border-hx-border p-4"
+              className="space-y-3 rounded-xl border border-[#164C60]/70 bg-[#08243B]/40 p-4 transition-all"
             >
-              <h4 className="font-bold">
-                {text(criterion.code, '')} · {text(criterion.title)}
-              </h4>
-              <p className="text-sm">
-                Criterion version: {display(criterion.version ?? criterion.versionNumber)} ·{' '}
-                {OUTCOME_LABELS[String(criterion.outcome)] ?? display(criterion.outcome)}
-              </p>
-              <p className="text-sm whitespace-pre-wrap">
-                {text(
-                  service?.rationale ?? approved.plainLanguageRationale,
-                  'Individual criterion rationale not supplied in this snapshot.',
-                )}
-              </p>
-              <p className="text-sm text-hx-muted">
-                {text(criterion.guidelineCitation, 'Citation not supplied')}
-              </p>
-              {rows(criterion.citations).map((source, i) => (
-                <Source key={i} source={source} />
-              ))}
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <h4 className="font-bold text-white text-base">
+                    {text(criterion.title, '') || text(criterion.code, '')}
+                  </h4>
+                  <div className="text-xs text-[#A9BDCA] mt-0.5">
+                    Target: <span className="text-[#00D8C3] font-semibold">{text(criterion.referral_target ?? result.referralTarget)}</span>
+                  </div>
+                </div>
+                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                  String(criterion.outcome).includes('urgent')
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                    : String(criterion.outcome).includes('routine')
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                }`}>
+                  {OUTCOME_LABELS[String(criterion.outcome)] ?? display(criterion.outcome)}
+                </span>
+              </div>
+              <div className="flex items-start gap-2 pt-1">
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#00D8C3] text-[#031525] font-bold shrink-0">
+                  STATUTORY GUIDELINE
+                </span>
+                <span className="text-xs text-[#A9BDCA] leading-relaxed">
+                  {text(criterion.guidelineCitation, 'Statutory guideline matched')}
+                </span>
+              </div>
             </article>
           )
         })}

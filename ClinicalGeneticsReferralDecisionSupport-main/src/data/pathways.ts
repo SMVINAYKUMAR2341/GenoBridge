@@ -5,6 +5,7 @@ export type FieldDef = InputField & { name: string }
 export type Pathway = {
   slug: PathwaySlug
   title: string
+  short?: string
   description: string
   guidelines: string
   fields: FieldDef[]
@@ -12,45 +13,51 @@ export type Pathway = {
 const catalog: Omit<Pathway, 'fields'>[] = [
   {
     slug: 'hereditary-cancer-risk',
-    title: 'Hereditary Cancer Risk',
+    title: 'Hereditary cancer risk',
+    short: 'CANCER',
     description:
-      'Record personal cancer history, tumour and germline reports, family history and care-planning context.',
-    guidelines: 'Governed cancer genetics criteria',
+      'BRCA1/2, Lynch, HBOC — family/personal cancer history.',
+    guidelines: 'ACOG No. 793 · NCCN v2.2024',
   },
   {
     slug: 'preconception-carrier-screening',
-    title: 'Preconception Carrier Screening',
+    title: 'Preconception carrier screening',
+    short: 'CARRIER',
     description:
-      'Document patient and reproductive partner screening, exact variants, test limitations and reproductive context.',
-    guidelines: 'Governed carrier-screening criteria',
+      'Ethnicity, consanguinity, known carrier status.',
+    guidelines: 'ACOG No. 691 · ACMG Tier 3 · FOGSI',
   },
   {
     slug: 'nipt-results',
-    title: 'NIPT Results',
+    title: 'NIPT results interpretation',
+    short: 'NIPT',
     description:
-      'Record prenatal screening results, no-call details, pregnancy context and diagnostic investigations without inferring risk.',
-    guidelines: 'Governed prenatal screening criteria',
+      'High-risk, discordant, or no-call cfDNA screens.',
+    guidelines: 'ACOG PB 226 · SMFM Consensus',
   },
   {
     slug: 'abnormal-ultrasound-findings',
-    title: 'Abnormal Ultrasound Findings',
+    title: 'Abnormal ultrasound findings',
+    short: 'ULTRASOUND',
     description:
-      'Document exact ultrasound observations, raw measurements, prior screening and diagnostic reports.',
-    guidelines: 'Governed fetal imaging criteria',
+      'Structural anomalies or multiple soft markers.',
+    guidelines: 'ACOG PB 175 · ISUOG Standards',
   },
   {
     slug: 'infertility-recurrent-pregnancy-loss',
-    title: 'Infertility & Recurrent Pregnancy Loss',
+    title: 'Infertility / recurrent pregnancy loss',
+    short: 'RPL',
     description:
-      'Use independent infertility and pregnancy-loss histories, with shared genetic and reproductive context.',
-    guidelines: 'Governed reproductive genetics criteria',
+      'Chromosomal or genetic causes of RPL and infertility.',
+    guidelines: 'ASRM 2024 · ACOG PB 200',
   },
   {
     slug: 'positive-family-history',
-    title: 'Positive Family History',
+    title: 'Positive family history of genetic disorder',
+    short: 'FAMILY HX',
     description:
-      'Record affected relatives, lineage, documented diagnoses and variants, and limitations in available evidence.',
-    guidelines: 'Governed family-history criteria',
+      'Non-cancer heritable conditions surfaced on history-taking.',
+    guidelines: 'FOGSI GCPR · ACMG Guidelines',
   },
 ]
 export const PATHWAYS: Pathway[] = catalog.map((pathway) => ({

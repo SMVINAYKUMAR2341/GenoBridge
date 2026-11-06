@@ -1,7 +1,7 @@
 'use client'
 
-import { inputCls } from '@/components/ui/Primitives'
-import { LEGACY_FORM_FIELDS, visibleIntakeFields, type InputField } from '@/lib/form-fields'
+import React from 'react'
+import { visibleIntakeFields, type InputField } from '@/lib/form-fields'
 import type { PathwaySlug, StructuredFormState } from '@/lib/decision-engine'
 import type { WorkflowIntake } from '@/lib/workflow-store'
 
@@ -20,176 +20,234 @@ export function ClinicalHistory({
   intake: WorkflowIntake
   syntheticReference: string
   errors: Record<string, string>
-  onInput: (key: string, value: string) => void
+  onInput: (key: string, value: any) => void
   onIntake: (value: WorkflowIntake) => void
   onReference: (value: string) => void
 }) {
   const fields = visibleIntakeFields(slug, inputs)
-  const sections = [...new Set(fields.map((field) => field.section ?? 'Clinical details'))]
-  const legacy = LEGACY_FORM_FIELDS[slug].filter((field) => Object.hasOwn(inputs, field.key))
-  function control(field: InputField) {
-    const id = `clinical-${field.key}`
-    const error = errors[`assessmentInputs.${field.key}`] ?? errors[field.key]
-    const props = {
-      id,
-      className: inputCls,
-      value: String(inputs[field.key] ?? ''),
-      onChange: (
-        event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-      ) => onInput(field.key, event.target.value),
-      'aria-invalid': !!error,
-      'aria-describedby': `${id}-help`,
-    }
-    return (
-      <div key={field.key} className={field.type === 'textarea' ? 'sm:col-span-2' : ''}>
-        <label htmlFor={id} className="mb-1.5 block text-sm font-bold text-slate-200">
-          {field.label}
-        </label>
-        {field.type === 'select' ? (
-          <select {...props}>
-            <option value="">Unknown / not recorded</option>
-            {field.options?.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        ) : field.type === 'textarea' ? (
-          <textarea {...props} rows={3} maxLength={8000} />
-        ) : (
-          <input
-            {...props}
-            type={field.type}
-            step={field.type === 'number' ? 'any' : undefined}
-            maxLength={2000}
+
+  return (
+    <div className="space-y-6">
+      {/* OPD Guidance Note */}
+      <div className="rounded-xl border border-[#164C60]/70 bg-[#08243B]/60 p-4 text-xs text-[#A9BDCA] flex items-center justify-between">
+        <span>Fill in only what applies. Fields left blank are treated as negative / not present.</span>
+        <span className="font-mono text-[11px] text-[#00D8C3] font-semibold">2-MIN OPD INTAKE</span>
+      </div>
+
+      {/* Main Intake Form Fields matching Histone */}
+      <div className="space-y-4">
+        {fields.map((field) => (
+          <FieldRenderer
+            key={field.key}
+            field={field}
+            value={inputs[field.key]}
+            error={errors[`assessmentInputs.${field.key}`] ?? errors[field.key]}
+            onChange={(val) => onInput(field.key, val)}
           />
-        )}
-        <div id={`${id}-help`}>
-          {field.hint && <p className="mt-1 text-xs text-slate-400">{field.hint}</p>}
-          {error && (
-            <p role="alert" className="mt-1 text-sm text-red-400">
-              {error}
-            </p>
-          )}
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SwitchToggle({
+  checked,
+  onChange,
+  id,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  id?: string
+}) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#00D8C3] focus:ring-offset-2 focus:ring-offset-[#031525] ${
+        checked ? 'bg-[#00D8C3]' : 'bg-[#164C60]/80 hover:bg-[#164C60]'
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  )
+}
+
+function FieldRenderer({
+  field,
+  value,
+  error,
+  onChange,
+}: {
+  field: InputField
+  value: any
+  error?: string
+  onChange: (val: any) => void
+}) {
+  const id = `f-${field.key}`
+
+  // Boolean Toggle
+  if (field.type === 'bool' || field.type === 'checkbox') {
+    const isChecked = Boolean(value === true || value === 'true')
+    return (
+      <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-[#164C60]/50 bg-[#08243B]/40 hover:border-[#00D8C3]/40 transition-colors">
+        <label htmlFor={id} className="text-sm font-medium text-white cursor-pointer select-none max-w-[80%]">
+          {field.label}
+          {field.hint && <span className="block text-xs text-[#A9BDCA] font-normal mt-0.5">{field.hint}</span>}
+        </label>
+        <SwitchToggle id={id} checked={isChecked} onChange={onChange} />
+      </div>
+    )
+  }
+
+  // Multi-Select Checkboxes (Ancestries, Soft Markers)
+  if (field.type === 'multi') {
+    const currentList: string[] = Array.isArray(value)
+      ? value
+      : typeof value === 'string' && value.trim()
+        ? value.split(',').map((s) => s.trim())
+        : []
+
+    const toggleOption = (optVal: string) => {
+      if (currentList.includes(optVal)) {
+        onChange(currentList.filter((item) => item !== optVal))
+      } else {
+        onChange([...currentList, optVal])
+      }
+    }
+
+    return (
+      <div className="space-y-2 pt-2">
+        <label className="block text-sm font-semibold text-white">
+          {field.label}
+          {field.hint && <span className="block text-xs text-[#A9BDCA] font-normal">{field.hint}</span>}
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {field.options?.map(([optVal, optLabel]) => {
+            const isSelected = currentList.includes(optVal)
+            return (
+              <label
+                key={optVal}
+                onClick={() => toggleOption(optVal)}
+                className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 cursor-pointer text-sm transition-all select-none ${
+                  isSelected
+                    ? 'border-[#00D8C3] bg-[#00D8C3]/10 text-white font-medium shadow-sm shadow-[#00D8C3]/20'
+                    : 'border-[#164C60]/60 bg-[#08243B]/40 text-[#A9BDCA] hover:border-[#164C60] hover:text-white'
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                    isSelected ? 'border-[#00D8C3] bg-[#00D8C3]' : 'border-[#164C60] bg-transparent'
+                  }`}
+                >
+                  {isSelected && (
+                    <svg className="w-3 h-3 text-[#031525]" viewBox="0 0 12 12" fill="none">
+                      <path
+                        d="M2.5 6L4.8 8.5L9.5 3.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <span>{optLabel}</span>
+              </label>
+            )
+          })}
         </div>
       </div>
     )
   }
+
+  // Number input
+  if (field.type === 'number') {
+    return (
+      <div className="space-y-1.5 py-1">
+        <div className="flex justify-between items-center">
+          <label htmlFor={id} className="text-sm font-semibold text-white">
+            {field.label}
+          </label>
+          {field.hint && <span className="text-xs text-[#A9BDCA]">{field.hint}</span>}
+        </div>
+        <input
+          id={id}
+          type="number"
+          step={field.step || 1}
+          min={field.min ?? 0}
+          value={value ?? ''}
+          placeholder="0"
+          onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}
+          className="w-full h-11 px-3.5 rounded-xl border border-[#164C60]/70 bg-[#08243B]/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#00D8C3] focus:border-transparent transition-all text-sm"
+        />
+        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      </div>
+    )
+  }
+
+  // Select dropdown
+  if (field.type === 'select') {
+    return (
+      <div className="space-y-1.5 py-1">
+        <div className="flex justify-between items-center">
+          <label htmlFor={id} className="text-sm font-semibold text-white">
+            {field.label}
+          </label>
+          {field.hint && <span className="text-xs text-[#A9BDCA]">{field.hint}</span>}
+        </div>
+        <select
+          id={id}
+          value={String(value ?? '')}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full h-11 px-3.5 rounded-xl border border-[#164C60]/70 bg-[#08243B] text-white focus:outline-none focus:ring-2 focus:ring-[#00D8C3] focus:border-transparent transition-all text-sm"
+        >
+          <option value="">Select...</option>
+          {field.options?.map(([optVal, optLabel]) => (
+            <option key={optVal} value={optVal}>
+              {optLabel}
+            </option>
+          ))}
+        </select>
+        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      </div>
+    )
+  }
+
+  // Text / Textarea
   return (
-    <div className="space-y-7">
-      <div className="rounded-xl border border-[#0e5c3e] bg-[#033424] p-4 text-sm font-medium text-[#6ee7b7] shadow-sm">
-        Enter source observations, not a referral conclusion. Blank answers remain unknown. No
-        clinical cut-offs are embedded in this form. Use synthetic data only.
+    <div className="space-y-1.5 py-1">
+      <div className="flex justify-between items-center">
+        <label htmlFor={id} className="text-sm font-semibold text-white">
+          {field.label}
+        </label>
+        {field.hint && <span className="text-xs text-[#A9BDCA]">{field.hint}</span>}
       </div>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <label className="grid gap-1.5 text-sm font-bold text-slate-200">
-          Synthetic patient reference
-          <input
-            className={inputCls}
-            value={syntheticReference}
-            onChange={(event) => onReference(event.target.value)}
-            placeholder="SYN-example"
-            maxLength={94}
-            aria-invalid={!!errors.syntheticPatientReference}
-          />
-          <span className="text-xs font-normal text-slate-400">
-            Required for saving. Never enter a real name, MRN or identifier.
-          </span>
-          {errors.syntheticPatientReference && (
-            <span role="alert" className="text-red-400 font-normal">
-              {errors.syntheticPatientReference}
-            </span>
-          )}
-        </label>
-        <label className="grid gap-1.5 text-sm font-bold text-slate-200">
-          Consent to assessment
-          <select
-            className={inputCls}
-            value={
-              intake.consentToAssessment === true
-                ? 'yes'
-                : intake.consentToAssessment === false
-                  ? 'no'
-                  : ''
-            }
-            onChange={(event) =>
-              onIntake({
-                ...intake,
-                consentToAssessment: event.target.value === '' ? '' : event.target.value === 'yes',
-              })
-            }
-            aria-invalid={!!errors['intake.consentToAssessment']}
-          >
-            <option value="">Unknown / not recorded</option>
-            <option value="yes">Consent confirmed</option>
-            <option value="no">Consent not given</option>
-          </select>
-          {errors['intake.consentToAssessment'] && (
-            <span role="alert" className="text-red-400 font-normal">
-              {errors['intake.consentToAssessment']}
-            </span>
-          )}
-        </label>
-        <label className="grid gap-1.5 text-sm font-bold text-slate-200 sm:col-span-2">
-          Presenting concern / reason for assessment
-          <textarea
-            rows={3}
-            className={inputCls}
-            maxLength={4000}
-            value={intake.presentingConcern ?? ''}
-            onChange={(event) => onIntake({ ...intake, presentingConcern: event.target.value })}
-          />
-        </label>
-      </div>
-      {slug === 'infertility-recurrent-pregnancy-loss' && (
-        <p className="text-sm text-slate-400">
-          Select infertility, pregnancy loss, or both to open the independent subflows. Previously
-          entered answers are retained when hidden; select both to review them. The documented
-          assessment focus is included with the saved inputs.
-        </p>
+      {field.type === 'textarea' ? (
+        <textarea
+          id={id}
+          rows={3}
+          value={String(value ?? '')}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-3.5 py-2.5 rounded-xl border border-[#164C60]/70 bg-[#08243B]/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#00D8C3] focus:border-transparent transition-all text-sm"
+        />
+      ) : (
+        <input
+          id={id}
+          type="text"
+          value={String(value ?? '')}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full h-11 px-3.5 rounded-xl border border-[#164C60]/70 bg-[#08243B]/60 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#00D8C3] focus:border-transparent transition-all text-sm"
+        />
       )}
-      {sections.map((section) => (
-        <fieldset key={section} className="rounded-xl border border-[#0e4331] bg-[#021f17]/70 p-5 shadow-sm">
-          <legend className="px-2 font-bold text-[#34d399]">{section}</legend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {fields
-              .filter((field) => (field.section ?? 'Clinical details') === section)
-              .map(control)}
-          </div>
-        </fieldset>
-      ))}
-      {legacy.length > 0 && (
-        <details className="rounded-xl border border-[#0e4331] bg-[#021f17]/50 p-4">
-          <summary className="cursor-pointer font-bold text-slate-200">
-            Historical schema answers — read only
-          </summary>
-          <p className="my-3 text-sm text-slate-400">
-            Retained exactly under their original field meanings. These composite questions are not
-            translated into raw observations or used as a local fallback. Approved server criteria
-            may reference historical keys; return for correction or specialist review when that
-            evidence is insufficient.
-          </p>
-          <dl className="grid gap-3 text-sm">
-            {legacy.map((field) => (
-              <div key={field.key}>
-                <dt className="font-semibold text-slate-200">
-                  {field.label} <span className="font-normal text-slate-400">({field.key})</span>
-                </dt>
-                <dd className="text-[#34d399]">
-                  {inputs[field.key] === '' || inputs[field.key] === undefined
-                    ? 'Unknown / not recorded'
-                    : typeof inputs[field.key] === 'boolean'
-                      ? inputs[field.key]
-                        ? 'Yes'
-                        : 'No'
-                      : (field.options?.find(([key]) => key === inputs[field.key])?.[1] ??
-                        String(inputs[field.key]))}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </details>
-      )}
+      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   )
 }

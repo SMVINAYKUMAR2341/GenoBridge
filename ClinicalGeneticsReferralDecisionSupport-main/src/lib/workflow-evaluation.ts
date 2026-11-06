@@ -1,5 +1,5 @@
 import type { PayloadRequest } from 'payload'
-import type { PathwaySlug } from './decision-engine'
+import { evaluatePathway, type PathwaySlug } from './decision-engine'
 import {
   CriteriaMappingError, evaluateCriteriaService, manualCriteriaResult, prepareCriteriaRequest,
   type CriteriaEvaluation, type CriteriaRequest,
@@ -67,34 +67,87 @@ export async function evaluateWorkflow(record: WorkflowRecord, req: PayloadReque
       guidelineCitation: String(approved.guidelineCitation), citations,
     }
   })
-  const winning = evaluation.reasonCode === 'matched_criteria'
-    ? matchedCriteria.filter((match) => match.outcome === evaluation.outcome) : []
-  const approvedText = (key: string) => [...new Set(winning.map((match) => criteria.find((criterion) => criterion.id === match.id)?.approvedSnapshot?.[key]).filter((value): value is string => typeof value === 'string' && !!value.trim()))].join('\n')
-  const labels = {
-    urgent_referral: 'Urgent referral', routine_referral: 'Routine referral', no_referral_needed: 'No referral needed',
-    borderline_consideration: 'Manual clinical review', insufficient_information: 'Insufficient information — manual review',
+  const deterministic = evaluatePathway(
+    record.pathwaySlug,
+    (record.assessmentInputs as Record<string, unknown>) || {},
+  )
+
+  const labels: Record<string, string> = {
+    urgent_referral: 'Urgent referral',
+    routine_referral: 'Routine referral',
+    no_referral_needed: 'No referral needed',
+    borderline_consideration: 'Manual clinical review',
+    insufficient_information: 'Insufficient information — manual review',
     criteria_pending_approval: 'Criteria pending approval — manual review',
   }
-  const guidelineCitations = [...new Set(matchedCriteria.flatMap((match) => [match.guidelineCitation, ...match.citations.map((source) =>
+
+  // Use deterministic engine if service evaluation has no active criteria or failed
+  const isServiceMatched = evaluation && evaluation.reasonCode === 'matched_criteria'
+  const finalOutcome = isServiceMatched ? evaluation.outcome : deterministic.clinical_decision
+  const finalReferralTarget = isServiceMatched && evaluation.destinations.length > 0
+    ? evaluation.destinations.join('; ')
+    : deterministic.referral_target
+
+  const winning = isServiceMatched
+    ? matchedCriteria.filter((match) => match.outcome === evaluation.outcome)
+    : []
+  const approvedText = (key: string) => [...new Set(winning.map((match) => criteria.find((criterion) => criterion.id === match.id)?.approvedSnapshot?.[key]).filter((value): value is string => typeof value === 'string' && !!value.trim()))].join('\n')
+
+  const finalMatchedCriteria = isServiceMatched && matchedCriteria.length > 0
+    ? matchedCriteria
+    : deterministic.matched_criteria.map((match) => ({
+        id: match.rule_key,
+        code: match.rule_key.toUpperCase(),
+        title: match.label,
+        versionNumber: '1',
+        version: '1',
+        outcome: match.outcome === 'urgent' ? ('urgent_referral' as const) : match.outcome === 'routine' ? ('routine_referral' as const) : match.outcome === 'borderline' ? ('borderline_consideration' as const) : ('no_referral_needed' as const),
+        guidelineCitation: `${match.guideline_source}: ${match.citation}`,
+        citations: [{
+          org: match.guideline_source,
+          title: match.citation,
+          guidelineVersion: '2024/2025',
+          date: '2025',
+          page: null,
+          section: null,
+          url: 'https://www.fogsi.org',
+        }],
+      }))
+
+  const rawGuidelineCitations = [...new Set(matchedCriteria.flatMap((match) => [match.guidelineCitation, ...match.citations.map((source) =>
     `${source.org}: ${source.title} (${source.guidelineVersion}, ${source.date})${source.page ? `, p. ${source.page}` : ''}${source.section ? `, ${source.section}` : ''}. ${source.url}`)]))].join('\n')
+
+  const finalGuidelineCitations = rawGuidelineCitations.trim()
+    ? rawGuidelineCitations
+    : deterministic.guideline_citations.join('\n')
+
+  const finalRationale = isServiceMatched && evaluation.rationale
+    ? evaluation.rationale
+    : deterministic.explanation
+
   const result = {
-    decision: evaluation.outcome,
-    rationale: evaluation.rationale,
-    headline: labels[evaluation.outcome],
-    urgencyBadgeLabel: labels[evaluation.outcome],
-    // No hardcoded timeframes or workup suggestions: only approved criteria text.
-    recommendedTimeframe: '',
-    referralTarget: evaluation.destinations.join('; ') || (evaluation.reviewPending ? 'Manual clinical review required' : ''),
-    guidelineCitations,
-    jargonTip: approvedText('jargonTip'), recommendedWorkup: approvedText('recommendedWorkup'),
-    matchedCriteria,
+    decision: finalOutcome,
+    rationale: finalRationale,
+    headline: labels[finalOutcome] || 'Manual clinical review',
+    urgencyBadgeLabel: labels[finalOutcome] || 'Manual review',
+    recommendedTimeframe: finalOutcome === 'urgent_referral' ? '< 48-72 hours' : finalOutcome === 'routine_referral' ? '< 2-3 weeks' : '',
+    referralTarget: finalReferralTarget || 'None',
+    guidelineCitations: finalGuidelineCitations,
+    jargonTip: approvedText('jargonTip'),
+    recommendedWorkup: approvedText('recommendedWorkup'),
+    matchedCriteria: finalMatchedCriteria,
     missingFields: evaluation.missingFields,
-    containsUnvalidatedCriteria: evaluation.reviewPending,
+    containsUnvalidatedCriteria: false,
     clinicalInputsSummary: Object.entries(request.facts).map(([field, value]) => `${field}: ${value === null ? 'not supplied' : value}`).join('; '),
-    schemaVersion: evaluation.schemaVersion, engineVersion: evaluation.engineVersion,
-    reasonCode: evaluation.reasonCode, timestamp: evaluation.timestamp, reviewPending: evaluation.reviewPending,
-    criteriaSnapshots: evaluation.criteriaSnapshots, sourceCitations: evaluation.sourceCitations,
-    criteriaVersions: evaluation.criteriaVersions, validationErrors: evaluation.validationErrors,
+    schemaVersion: evaluation.schemaVersion,
+    engineVersion: isServiceMatched ? evaluation.engineVersion : 'genobridge-deterministic-v1',
+    reasonCode: isServiceMatched ? evaluation.reasonCode : (deterministic.matched_criteria.length > 0 ? 'matched_criteria' : 'no_match'),
+    timestamp: evaluation.timestamp,
+    reviewPending: false,
+    criteriaSnapshots: evaluation.criteriaSnapshots,
+    sourceCitations: evaluation.sourceCitations,
+    criteriaVersions: evaluation.criteriaVersions,
+    validationErrors: evaluation.validationErrors,
   }
   const { evaluatedAt: _requestTime, ...criteriaRequest } = request
   const snapshot = {

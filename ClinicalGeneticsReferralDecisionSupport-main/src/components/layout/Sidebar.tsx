@@ -34,7 +34,11 @@ export const TOOLS: NavLink[] = [
   { href: '/saved', label: 'Saved Assessments', icon: Bookmark },
   { href: '/knowledge', label: 'Knowledge Base', icon: Layers },
 ]
-const ASSURANCES = ['Guideline aligned (ACOG, NCCN)', 'Transparent & traceable', 'Specialist-reviewed']
+const ASSURANCES = [
+  'Guideline aligned (FOGSI, ACOG, ACMG, NCCN)',
+  'Transparent & traceable',
+  'Specialist-reviewed',
+]
 
 function Item({
   href,
