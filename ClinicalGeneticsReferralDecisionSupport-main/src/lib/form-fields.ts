@@ -211,7 +211,6 @@ export const LEGACY_FORM_FIELDS: Record<string, InputField[]> = {
 
 /**
  * Standardized Point-of-Care OPD Clinical Intake Fields.
- * Exactly matched to Histone-main backend decision engine and clinical screenshots.
  */
 export const CLINICAL_INTAKE_FIELDS: Record<string, InputField[]> = {
   'preconception-carrier-screening': [

@@ -1,6 +1,6 @@
 /**
  * Deterministic clinical decision engine for GenoBridge AI.
- * Fully ported and aligned with Histone-main backend decision engine and statutory
+ * Deterministic clinical genetics decision support engine and statutory
  * FOGSI, ACOG, ACMG, ASRM, and NCCN clinical guidelines.
  *
  * Engineered for zero hallucination: pure rule-based evaluation indexed directly

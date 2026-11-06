@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(googleAuthUrl.toString())
   }
 
-  // If in Emergent Agent OAuth environment (from Histone)
+  // If in Emergent Agent OAuth environment (from GenoBridge)
   if (process.env.EMERGENT_AUTH_URL) {
     const emergentUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(
       `${origin}/auth/callback`

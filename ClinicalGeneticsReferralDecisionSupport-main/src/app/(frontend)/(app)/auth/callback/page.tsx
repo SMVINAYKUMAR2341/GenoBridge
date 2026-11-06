@@ -46,7 +46,7 @@ function AuthCallbackContent() {
   const [customEmail, setCustomEmail] = useState('')
   const processed = useRef(false)
 
-  // 1. Process hash-based OAuth token (from Histone / Emergent SSO)
+  // 1. Process hash-based OAuth token (from GenoBridge / Emergent SSO)
   useEffect(() => {
     if (processed.current) return
     const hash = window.location.hash

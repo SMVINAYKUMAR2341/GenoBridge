@@ -42,7 +42,7 @@ const OUTCOME_COLORS = {
   no_referral: '#34d399',
 }
 
-// Histone-derived Pathway Analytics Data
+// GenoBridge Pathway Analytics Data
 const PATHWAY_METRICS = [
   { pathway: 'Hereditary Cancer', urgent: 14, routine: 8, borderline: 5, no_referral: 18 },
   { pathway: 'Carrier Screen', urgent: 6, routine: 15, borderline: 3, no_referral: 24 },
@@ -170,7 +170,7 @@ export default function AnalyticsPanel() {
         </div>
       </div>
 
-      {/* Visual Analytics Charts (Histone Recharts Integration) */}
+      {/* Visual Analytics Charts (GenoBridge Recharts Integration) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Outcomes by Pathway (Stacked Bar) */}
         <div className="p-6 rounded-3xl bg-[#08243B]/70 border border-[#164C60] space-y-4 shadow-xl">

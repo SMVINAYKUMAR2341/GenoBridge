@@ -95,7 +95,7 @@ export default async function AdminDashboardPage() {
         <AdminVerificationPanel />
       </div>
 
-      {/* Clinical Guideline Criteria & Thresholds Governance (Histone Admin Engine) */}
+      {/* Clinical Guideline Criteria & Thresholds Governance (GenoBridge Admin Engine) */}
       <div className="pt-6 border-t border-[#164C60]/60">
         <ClinicalCriteriaManager />
       </div>

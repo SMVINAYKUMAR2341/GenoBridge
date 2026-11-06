@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     let googleUser: { email: string; name: string; picture?: string } | null = userProfile || null
 
-    // If Histone Emergent OAuth session_id is provided
+    // If GenoBridge Emergent OAuth session_id is provided
     if (session_id) {
       try {
         const emergentRes = await fetch(

@@ -160,7 +160,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
       </PageHeader>
       <StaffSignIn />
 
-      {/* Referral Lifecycle Status Filter Tabs (Histone Style) */}
+      {/* Referral Lifecycle Status Filter Tabs */}
       {view === 'referrals' && (
         <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl bg-[#08243B]/80 border border-[#164C60] p-1.5">
           {(

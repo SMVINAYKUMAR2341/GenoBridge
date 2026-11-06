@@ -114,7 +114,7 @@ function hasCondition(member: PedigreeMember, condition: string): boolean {
   return Boolean(member.affected) && (member.conditions || []).includes(condition)
 }
 
-/** Exact derivation logic from Histone backend/pedigree.py */
+/** Exact derivation logic for clinical genetics pedigree analysis */
 export function deriveFeatures(pedigree: PedigreeData | null) {
   if (!pedigree) return {}
   const members = pedigree.members || []
@@ -166,7 +166,7 @@ export default function PedigreeStudioClient({
   const [pedigree, setPedigree] = useState<PedigreeData>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('genobridge_active_pedigree') || localStorage.getItem('histone_active_pedigree')
+        const saved = localStorage.getItem('genobridge_active_pedigree')
         if (saved) {
           const parsed = JSON.parse(saved)
           return {
@@ -245,7 +245,7 @@ export default function PedigreeStudioClient({
         </div>
       </div>
 
-      {/* Live SVG Pedigree Canvas (Histone Visualization) */}
+      {/* Live SVG Pedigree Canvas (GenoBridge Visualization) */}
       <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-xs">
         <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
           <div className="text-xs font-bold tracking-wider text-slate-900 uppercase">
@@ -551,7 +551,7 @@ export default function PedigreeStudioClient({
   )
 }
 
-/** Live SVG Canvas implementation matching Histone buildLayout */
+/** Live SVG Canvas implementation matching clinical layout */
 function LivePedigreeCanvas({ pedigree }: { pedigree: PedigreeData }) {
   const layout = useMemo(() => {
     const W = 900
