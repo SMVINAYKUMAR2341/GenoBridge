@@ -8,7 +8,7 @@ import { AncForm } from '@/components/anc/AncForm'
 import { getAncRecordById } from '@/lib/anc-store'
 
 export const metadata: Metadata = {
-  title: 'Register Antenatal Patient | Helix ANC Module',
+  title: 'Register Antenatal Patient | GENOBRIDGE ANC Module',
   description: 'Complete obstetric intake and multi-step ANC registration form.',
 }
 

@@ -8,7 +8,7 @@ import './styles.css'
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' })
 
-const defaultTitle = 'Helix | Clinical decision support'
+const defaultTitle = 'GENOBRIDGE | Clinical decision support'
 const title = makeSiteSettings.title ?? defaultTitle
 const description =
   makeSiteSettings.description ??

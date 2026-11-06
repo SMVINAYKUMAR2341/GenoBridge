@@ -1,4 +1,4 @@
-// HELIX ANTENATAL CARE (ANC) COMPREHENSIVE END-TO-END TEST SUITE
+// GENOBRIDGE ANTENATAL CARE (ANC) COMPREHENSIVE END-TO-END TEST SUITE
 // Tests all clinical endpoints, pages, calculations, and role-based workflows
 
 import { execSync } from 'node:child_process'
@@ -30,7 +30,7 @@ async function request(path, options = {}) {
 
 async function run() {
   console.log('\x1b[36m=========================================================\x1b[0m')
-  console.log('\x1b[36mHELIX ANTENATAL CARE (ANC) INTEGRATION & WORKFLOW TESTS\x1b[0m')
+  console.log('\x1b[36mGENOBRIDGE ANTENATAL CARE (ANC) INTEGRATION & WORKFLOW TESTS\x1b[0m')
   console.log('\x1b[36m=========================================================\x1b[0m\n')
 
   // 1. Route Accessibility (Unauthenticated redirect check)
@@ -56,7 +56,7 @@ async function run() {
   // 2. Setup Authenticated Doctor and Nurse Accounts
   console.log('\n\x1b[33m--- 2. Setting Up Verified Clinical Accounts ---\x1b[0m')
   const psqlPath = '"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe"'
-  const psqlEnv = { ...process.env, PGPASSWORD: 'helix_dev_password_2026' }
+  const psqlEnv = { ...process.env, PGPASSWORD: 'genobridge_dev_password_2026' }
 
   const docEmail = `dr_anc_${Date.now()}@apollohospitals.com`
   const nurseEmail = `nurse_anc_${Date.now()}@manipalhospitals.com`
@@ -113,11 +113,11 @@ async function run() {
 
   // Approve Doctor and Nurse via PostgreSQL
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewer_authorized = true, reviewer_qualification = 'Consultant OB-GYN', reviewed_by = 'Medical Council Reviewer', reviewed_at = now() WHERE email = '${docEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewer_authorized = true, reviewer_qualification = 'Consultant OB-GYN', reviewed_by = 'Medical Council Reviewer', reviewed_at = now() WHERE email = '${docEmail}';"`,
     { env: psqlEnv }
   )
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Nursing Council Reviewer', reviewed_at = now() WHERE email = '${nurseEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Nursing Council Reviewer', reviewed_at = now() WHERE email = '${nurseEmail}';"`,
     { env: psqlEnv }
   )
 

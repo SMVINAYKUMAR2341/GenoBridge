@@ -1,4 +1,4 @@
-# HelixHealth — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
+# GenoBridge — Clinical Genetics Referral Decision Support & Antenatal Care (ANC) Platform
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.4.2-black?logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.3.1-61dafb?logo=react)](https://react.dev/)
@@ -9,7 +9,7 @@
 [![Cache Latency](https://img.shields.io/badge/Cache_Latency-<1ms_(0.7ms)-success)](#dual-tier-high-performance-postgresql-cache)
 [![Clinical Guidelines](https://img.shields.io/badge/Guidelines-ACOG_|_ACMG_|_MoHFW-teal)](#clinical-guidelines--ruleset-standards)
 
-**HelixHealth** is an enterprise-grade clinical decision-support and obstetric surveillance system engineered to bridge high-volume antenatal care (ANC) with specialized clinical genetics. It provides deterministic, evidence-based triage, automated pre-eclampsia risk assessment, 3-generation family pedigree modeling, and clinical referral coordination for obstetricians, gynecologists, and healthcare nurses.
+**GenoBridge** is an enterprise-grade clinical decision-support and obstetric surveillance system engineered to bridge high-volume antenatal care (ANC) with specialized clinical genetics. It provides deterministic, evidence-based triage, automated pre-eclampsia risk assessment, 3-generation family pedigree modeling, and clinical referral coordination for obstetricians, gynecologists, and healthcare nurses.
 
 ---
 
@@ -21,9 +21,9 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 | :--- | :--- | :--- | :--- | :--- |
 | **Doctor / Clinician Portal** | **Gynecologist / OB-GYN** | `doctor@hospital.org` | `password123` | Full clinical review authority, clinician confirmation/sign-off on high-risk assessments, genetic referral attestation, pathway triage. |
 | **Nurse Intake Portal** | **Staff Nurse / Medical Assistant** | `nurse@hospital.org` | `password123` | Maternal health registration, ANC visit logging, baseline vitals intake, multiple gestation documentation, progressive draft saving. |
-| **Alternative Provider** | **Consultant OB-GYN** | `jane.smith@helix-test.local` | `password123` | Secondary clinician account for multi-specialist sign-off and retrospective audit review. |
-| **Alternative Nurse** | **ANC Coordinator** | `mary.johnson@helix-test.local` | `password123` | Secondary triage nurse account for high-volume intake testing. |
-| **System Administrator** | **Platform Admin** | `admin@helix-test.local` | `password123` | Master governance dashboard, institutional user verification approval, ruleset versioning lifecycle. |
+| **Alternative Provider** | **Consultant OB-GYN** | `jane.smith@genobridge-test.local` | `password123` | Secondary clinician account for multi-specialist sign-off and retrospective audit review. |
+| **Alternative Nurse** | **ANC Coordinator** | `mary.johnson@genobridge-test.local` | `password123` | Secondary triage nurse account for high-volume intake testing. |
+| **System Administrator** | **Platform Admin** | `admin@genobridge-test.local` | `password123` | Master governance dashboard, institutional user verification approval, ruleset versioning lifecycle. |
 
 ### 🌐 Direct Portal Navigation & Page Redirect Matrix
 
@@ -34,8 +34,8 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 | **Nurse Intake Workspace** | `/nurse/dashboard` | `/login?role=nurse` | `nurse@hospital.org`<br/>`password123` | Maternal triage intake, baseline vitals entry, obstetric timeline, and ANC draft registry. |
 | **MCH Antenatal Care Registry** | `/anc` | Auto-redirects from login | Doctor or Nurse credentials | Real-time obstetric surveillance registry, active patient census, and referral tracker. |
 | **Genetic Assessment Catalog** | `/assessment` | Auto-redirects from login | Doctor or Nurse credentials | 6 evidence-based clinical genetic assessment pathways (Hereditary Cancer, NIPT, Carrier, etc.). |
-| **System Governance Dashboard** | `/admin/dashboard` | `/login?role=admin` | `admin@helix-test.local`<br/>`password123` | Institutional administrator portal for verifying clinician credentials (NMC/INC) and audit logs. |
-| **Payload CMS Master Admin Panel** | `/admin` | Direct Admin Login at `/admin` | `admin@helix-test.local`<br/>`password123` | Direct Payload CMS backend collection manager (Users, Admins, Patients, Assessments, Referrals). |
+| **System Governance Dashboard** | `/admin/dashboard` | `/login?role=admin` | `admin@genobridge-test.local`<br/>`password123` | Institutional administrator portal for verifying clinician credentials (NMC/INC) and audit logs. |
+| **Payload CMS Master Admin Panel** | `/admin` | Direct Admin Login at `/admin` | `admin@genobridge-test.local`<br/>`password123` | Direct Payload CMS backend collection manager (Users, Admins, Patients, Assessments, Referrals). |
 | **Clinician Self-Registration** | `/signup` | Direct Link | *None (Public)* | Institutional onboarding for OB-GYNs (NMC verified) and Staff Nurses (INC verified). |
 
 > [!NOTE]
@@ -180,9 +180,9 @@ flowchart TD
 * **Tier 4 — Direct API & Database Authorization:** API endpoints (`/api/anc`, `/api/patients`) reject unauthenticated requests with HTTP 401/403. Database queries enforce role-scoped data partitions.
 
 ### 2. Dual-Tier High-Performance PostgreSQL Cache (< 1 ms Latency)
-To support **10 million users** without crashing the database and with **$0 cloud cost**, Helix implements an open-source, dual-tier caching engine ([`postgres-cache.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/lib/postgres-cache.ts)):
+To support **10 million users** without crashing the database and with **$0 cloud cost**, GENOBRIDGE implements an open-source, dual-tier caching engine ([`postgres-cache.ts`](ClinicalGeneticsReferralDecisionSupport-main/src/lib/postgres-cache.ts)):
 * **Tier 1 (L1 RAM LRU Cache):** In-memory process cache serving hot authentication tokens, guideline catalogs, and user sessions at **`0.0009 ms` (0.9 µs)** average latency.
-* **Tier 2 (L2 PostgreSQL UNLOGGED Cache):** A dedicated `UNLOGGED` PostgreSQL table (`helix_cache`) that bypasses write-ahead logging (WAL) and reads directly from PostgreSQL shared memory buffers at **`0.726 ms`** latency (14x faster than the 10 ms target).
+* **Tier 2 (L2 PostgreSQL UNLOGGED Cache):** A dedicated `UNLOGGED` PostgreSQL table (`genobridge_cache`) that bypasses write-ahead logging (WAL) and reads directly from PostgreSQL shared memory buffers at **`0.726 ms`** latency (14x faster than the 10 ms target).
 * **Tag-Based Invalidation:** When a record or profile is updated, cache tags (e.g. `user-session-{id}`, `clinical-pathways`) are purged in real-time across both memory and database tiers.
 
 ### 3. Dual-Track Clinical Governance State Machines
@@ -223,15 +223,15 @@ cd GenoBridge/ClinicalGeneticsReferralDecisionSupport-main
 Create a `.env.local` file in the project directory:
 ```env
 # Database Configuration
-DATABASE_URI=postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging
+DATABASE_URI=postgresql://genobridge_app:genobridge_dev_password_2026@localhost:5432/genobridge_staging
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=helix_staging
-POSTGRES_USER=helix_app
-POSTGRES_PASSWORD=helix_dev_password_2026
+POSTGRES_DB=genobridge_staging
+POSTGRES_USER=genobridge_app
+POSTGRES_PASSWORD=genobridge_dev_password_2026
 
 # Payload CMS & Security
-PAYLOAD_SECRET=helix-dev-secret-key-minimum-32-characters-required-for-staging-2026
+PAYLOAD_SECRET=GENOBRIDGE-dev-secret-key-minimum-32-characters-required-for-staging-2026
 PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
@@ -286,22 +286,22 @@ python -m unittest discover backend/tests -v
 
 ## 🚀 Production Deployment Guide
 
-Deploy HelixHealth to production for free in 3 steps:
+Deploy GenoBridge to production for free in 3 steps:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/SMVINAYKUMAR2341/GenoBridge)
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/SMVINAYKUMAR2341/GenoBridge)
 
 1. **Free Database (Neon PostgreSQL):**
-   * Create a free account at [Neon.tech](https://neon.tech) and create a project named helix-db.
+   * Create a free account at [Neon.tech](https://neon.tech) and create a project named GENOBRIDGE-db.
    * Under **Dashboard → Connection Details**, copy the **Pooled connection string**:
      `	ext
-     postgresql://helix_owner:password@ep-xyz-pooler.ap-south-1.aws.neon.tech/helix-db?sslmode=require
+     postgresql://GENOBRIDGE_owner:password@ep-xyz-pooler.ap-south-1.aws.neon.tech/GENOBRIDGE-db?sslmode=require
      `
 2. **Compute Service (Render / Railway):**
    * Click either the **Deploy to Render** or **Deploy on Railway** button above, or connect your repository (SMVINAYKUMAR2341/GenoBridge).
    * Set the 4 environment variables:
      * DATABASE_URI: *(Your Neon PostgreSQL connection string)*
-     * PAYLOAD_SECRET: helix-production-secret-key-32-chars-long-2026
+     * PAYLOAD_SECRET: GENOBRIDGE-production-secret-key-32-chars-long-2026
      * NODE_ENV: production
      * PORT: 3000
 3. **Global Edge & DDoS Proxy (Cloudflare):**

@@ -1,7 +1,7 @@
-# HELIX PostgreSQL Migration Review & Technical Audit
+# GENOBRIDGE PostgreSQL Migration Review & Technical Audit
 
 **Review Date**: 2026-11-04  
-**Project**: Clinical Genetics Referral Decision Support (Helix)  
+**Project**: Clinical Genetics Referral Decision Support (GENOBRIDGE)  
 **Author**: Antigravity Technical Audit  
 **Status**: DRAFT AUDIT REPORT — FOR ENGINEERING REVIEW ONLY  
 
@@ -21,7 +21,7 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
 - **Resolution**: Replaced with `scram-sha-256` in both `postgresql.conf` (`password_encryption = 'scram-sha-256'`) and `pg_hba.conf`.
 
 ### Problem 2: Invalid TLS Configuration & Inconsistent Enforcement
-- **Original Proposed SQL**: `ALTER DATABASE helix SET ssl = 'on';`
+- **Original Proposed SQL**: `ALTER DATABASE genobridge SET ssl = 'on';`
 - **Flaw**: In PostgreSQL, `ssl` is a server-wide GUC parameter that cannot be set per-database. Executing this command produces `ERROR: parameter "ssl" cannot be changed now`. Furthermore, monitoring examples in the design included `DATA_SOURCE_NAME="...sslmode=disable"`, which actively undermined encryption.
 - **Resolution**: Configured TLS exclusively in `postgresql.conf` (`ssl = on`, `ssl_min_protocol_version = 'TLSv1.3'`), enforced `hostssl` in `pg_hba.conf` while explicitly rejecting non-SSL (`hostnossl ... reject`), and mandated client-side `sslmode=verify-full` with root CA certificates.
 
@@ -34,7 +34,7 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
 - **Original Proposed SQL**:
   ```sql
   CREATE POLICY patient_access_policy ON patients
-    FOR ALL TO helix_app
+    FOR ALL TO genobridge_app
     USING (
       EXISTS (SELECT 1 FROM user_patient_access WHERE user_id = current_setting('app.current_user_id')::uuid AND patient_id = patients.id)
       OR current_setting('app.user_role') = 'admin'
@@ -43,27 +43,27 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
 - **Flaws**:
   1. `current_setting('app.current_user_id')` without the `missing_ok = true` parameter throws `ERROR: unrecognized configuration parameter "app.current_user_id"` whenever an unauthenticated query executes.
   2. In PgBouncer **transaction pooling mode** (`pool_mode = transaction`), session-level `SET` commands persist on the physical PostgreSQL connection across transactions. If connection A sets `SET app.current_user_id = 'user-1'`, the next transaction assigned to connection A by PgBouncer will inherit `user-1`'s identity, resulting in catastrophic cross-tenant PHI context leakage.
-  3. `user_patient_access` was a hallucinated table that does not exist in the Helix schema.
+  3. `user_patient_access` was a hallucinated table that does not exist in the GENOBRIDGE schema.
   4. Without `ALTER TABLE patients FORCE ROW LEVEL SECURITY`, table owners bypass RLS entirely.
 - **Resolution**:
   - Context variables must be set **transaction-locally** using `SET LOCAL app.current_user_id = ...` inside explicit transaction blocks (`BEGIN ... COMMIT`).
   - Added `missing_ok = true`: `current_setting('app.current_user_id', true)`.
   - Enabled `FORCE ROW LEVEL SECURITY`.
-  - Application user `helix_app` is made a non-owner, with DDL managed by `helix_migrator`.
+  - Application user `genobridge_app` is made a non-owner, with DDL managed by `genobridge_migrator`.
 
 ### Problem 6: Unrestricted Reporting Access Exposing Patient PHI
 - **Original Proposed SQL**:
   ```sql
-  CREATE POLICY patient_readonly_policy ON patients FOR SELECT TO helix_readonly USING (true);
-  GRANT SELECT ON ALL TABLES IN SCHEMA public TO helix_readonly;
+  CREATE POLICY patient_readonly_policy ON patients FOR SELECT TO genobridge_readonly USING (true);
+  GRANT SELECT ON ALL TABLES IN SCHEMA public TO genobridge_readonly;
   ```
 - **Flaw**: Blanket `SELECT` on `patients` granted the reporting user unrestricted access to all raw PHI (patient full names, MRNs, dates of birth, gestational ages, and intake notes). This violated the HIPAA Minimum Necessary standard.
-- **Resolution**: Revoked all access on `patients`, `clinical_workflows`, and `audit_logs` from `helix_readonly`. Implemented an isolated `reporting` schema containing de-identified, aggregated security-definer views (e.g. `reporting.vw_referral_pathway_summary`).
+- **Resolution**: Revoked all access on `patients`, `clinical_workflows`, and `audit_logs` from `genobridge_readonly`. Implemented an isolated `reporting` schema containing de-identified, aggregated security-definer views (e.g. `reporting.vw_referral_pathway_summary`).
 
 ### Problem 7: Admin Privileges Contradicting Least-Privilege
 - **Original Proposed Policy**: `current_setting('app.user_role') = 'admin'` granted blanket read/delete access across all clinical collections.
-- **Flaw**: In Helix's clinical governance model, administrators are staff coordinators, not clinical providers. They are restricted to viewing de-identified metrics (`commandFor(req)?.kind === 'metrics'`) and are explicitly denied permissions to read raw clinical workflows or delete patient records. Furthermore, `helix_app` had full `UPDATE` and `DELETE` privileges on `audit_logs`.
-- **Resolution**: Revoked `UPDATE` and `DELETE` on `audit_logs` from `helix_app` at the database level. Preserved application-level access control where patient records are immutable and administrative access to workflows is restricted to de-identified aggregates.
+- **Flaw**: In GENOBRIDGE's clinical governance model, administrators are staff coordinators, not clinical providers. They are restricted to viewing de-identified metrics (`commandFor(req)?.kind === 'metrics'`) and are explicitly denied permissions to read raw clinical workflows or delete patient records. Furthermore, `genobridge_app` had full `UPDATE` and `DELETE` privileges on `audit_logs`.
+- **Resolution**: Revoked `UPDATE` and `DELETE` on `audit_logs` from `genobridge_app` at the database level. Preserved application-level access control where patient records are immutable and administrative access to workflows is restricted to de-identified aggregates.
 
 ### Problem 8: Incomplete & Broken Payload Audit Hook
 - **Original Proposed Code**:
@@ -78,8 +78,8 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
   1. `req` was not destructured in the argument list (`({ data })`), causing a fatal `ReferenceError: req is not defined` at runtime.
   2. Payload 4 uses Web-standard `PayloadRequest` objects (`req.headers.get(...)`), not Express objects (`req.ip`, `req.headers[...]`).
   3. The proposal specified `create: () => true`, which would allow untrusted client API calls to forge audit records.
-  4. The proposed schema substituted dummy fields (`resourceType`, `resourceId`, `changes`) that broke Helix's real audit collection (`eventCode`, `actorName`, `actorRole`, `actionType`, `resourceRef`, `details`).
-- **Resolution**: Documented the correct `extractClientMetadata` helper using standard Web Request headers (`x-forwarded-for`, `x-real-ip`, `user-agent`) and preserved Helix's server-authored audit model where audit logging is enforced via `appendClinicalAudit` and guarded by `commandFor(req)?.kind === 'audit'`.
+  4. The proposed schema substituted dummy fields (`resourceType`, `resourceId`, `changes`) that broke GENOBRIDGE's real audit collection (`eventCode`, `actorName`, `actorRole`, `actionType`, `resourceRef`, `details`).
+- **Resolution**: Documented the correct `extractClientMetadata` helper using standard Web Request headers (`x-forwarded-for`, `x-real-ip`, `user-agent`) and preserved GENOBRIDGE's server-authored audit model where audit logging is enforced via `appendClinicalAudit` and guarded by `commandFor(req)?.kind === 'audit'`.
 
 ### Problem 9: Unverified pgAudit Availability
 - **Original Proposed SQL**: `CREATE EXTENSION IF NOT EXISTS pgaudit; ALTER SYSTEM SET pgaudit.log = 'ddl, role, write';`
@@ -92,7 +92,7 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
 - **Resolution**: **Zero PHI in Redis Policy**. Redis usage is strictly restricted to ephemeral rate-limiting counters, cryptographically hashed session tokens, and public/de-identified active criteria rule definitions (`criteria:${pathwaySlug}:v${version}`) with automated invalidation hooks. All patient workflows and clinical intake data must be fetched fresh from PostgreSQL with ACID guarantees.
 
 ### Problem 11: Hardcoded Secrets & Default Fallbacks
-- **Original Flaw**: Example configurations embedded literal credentials (`dev-password`, `STRONG_PASSWORD`, `helix-dev-secret-key...`).
+- **Original Flaw**: Example configurations embedded literal credentials (`dev-password`, `STRONG_PASSWORD`, `GENOBRIDGE-dev-secret-key...`).
 - **Resolution**: Enforced strict environment variable injection (`DATABASE_URI`, `PAYLOAD_SECRET`, `CRITERIA_SERVICE_API_KEY`). Configured runtime preflight checks to abort initialization if secrets are missing or fail minimum entropy requirements.
 
 ### Problem 12: Payload & PostgreSQL Adapter Version Compatibility
@@ -108,7 +108,7 @@ A systematic audit of the initial `POSTGRES_MIGRATION_DESIGN.md` identified 15 s
 - **Resolution**: Formulated a resource-derived tuning matrix based on dedicated RAM percentages (25% `shared_buffers`, 50–75% `effective_cache_size`, memory-budgeted `work_mem`, and right-sized connection limits aligned with PgBouncer).
 
 ### Problem 15: Preservation of Existing Clinical Workflows & Governance
-- **Original Flaw**: The original design attempted to rewrite collections using generic patterns, which threatened to erase Helix's append-only workflow model, `revisionKey` concurrency boundary, and cryptographic digest verification.
+- **Original Flaw**: The original design attempted to rewrite collections using generic patterns, which threatened to erase GENOBRIDGE's append-only workflow model, `revisionKey` concurrency boundary, and cryptographic digest verification.
 - **Resolution**: Preserved all existing collection configurations, capability security tokens (`WeakMap`), workflow evaluation pipelines, and Python criteria service contracts.
 
 ---
@@ -122,7 +122,7 @@ The corrected architecture enforces a strict separation of concerns:
 3. **Application Tier**: Next.js 16.4.2 + Payload 4.0.0-beta.4 executing stateless server actions and enforcing clinical capability tokens.
 4. **Evaluation Service**: FastAPI stateless microservice executing deterministic Python criteria evaluation over internal localhost/private network.
 5. **Caching Tier**: Redis 7.2 restricted strictly to rate-limiting, session lookup tokens, and static criteria metadata. Zero PHI persisted.
-6. **Reporting Tier**: Security-definer views in a dedicated `reporting` schema providing aggregated, de-identified metrics to `helix_readonly`.
+6. **Reporting Tier**: Security-definer views in a dedicated `reporting` schema providing aggregated, de-identified metrics to `genobridge_readonly`.
 
 ---
 
@@ -202,24 +202,24 @@ During the technical review and validation phase, the following exact commands w
 ### 4. Migration Generation & Database Testing
 ```powershell
 # Created isolated test database
-& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -c "CREATE DATABASE helix_test_migration;"
+& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -c "CREATE DATABASE GENOBRIDGE_test_migration;"
 
 # Generated initial migration using Payload CLI with react-server condition
 $env:NODE_OPTIONS="--conditions=react-server --no-deprecation"
-$env:DATABASE_URI="postgresql://postgres@localhost:5432/helix_test_migration"
+$env:DATABASE_URI="postgresql://postgres@localhost:5432/GENOBRIDGE_test_migration"
 .\node_modules\.bin\payload.cmd migrate:create initial
 
 # Applied migration to test database
 .\node_modules\.bin\payload.cmd migrate
 
-# Verified 63 relations created in helix_test_migration
-& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -d helix_test_migration -c "\dt"
+# Verified 63 relations created in GENOBRIDGE_test_migration
+& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -d GENOBRIDGE_test_migration -c "\dt"
 ```
 
 ### 5. Synthetic Data & Foreign Key Verification
 ```powershell
 # Inserted synthetic records across users, patients, and clinical_workflows
-& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -d helix_test_migration -c "
+& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -d GENOBRIDGE_test_migration -c "
 INSERT INTO users (id, name, email, role, enabled, created_at, updated_at)
 VALUES ('a0000000-0000-0000-0000-000000000001', 'Dr. Synthetic Provider', 'provider.synthetic@example.com', 'provider', true, now(), now());
 
@@ -236,7 +236,7 @@ JOIN users u ON w.actor_id = u.id;
 "
 
 # Dropped isolated test database after testing
-& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -c "DROP DATABASE helix_test_migration;"
+& "D:\PostgreSQL\16\bin\psql.exe" -U postgres -c "DROP DATABASE GENOBRIDGE_test_migration;"
 ```
 
 ### 6. Full Suite Verification
@@ -257,9 +257,9 @@ python -m unittest discover backend/tests -v
 | **Python Backend Tests** | `python -m unittest discover backend/tests -v` | All 39 criteria & HTTP boundary tests | **PASS** (39/39) | Duration: 5.407s. All 6 pathways, boundary validations, security headers verified. |
 | **TypeScript Typecheck** | `tsc.cmd --noEmit` | Whole project (`src/**/*.ts`) | **PASS** (0 errors) | Verified clean compilation against newly generated `payload-types.ts`. |
 | **Payload Migration Generation** | `payload migrate:create initial` | Drizzle schema generation | **PASS** | Successfully generated `src/migrations/20261104_175039_initial.ts` (1,475 lines). |
-| **PostgreSQL DDL Application** | `payload migrate` | `helix_test_migration` | **PASS** | Successfully created 63 tables, enums, and foreign key constraints in 40.6s. |
+| **PostgreSQL DDL Application** | `payload migrate` | `GENOBRIDGE_test_migration` | **PASS** | Successfully created 63 tables, enums, and foreign key constraints in 40.6s. |
 | **UUID Foreign Key Integrity** | SQL synthetic insert & join query | `users`, `patients`, `clinical_workflows` | **PASS** | Validated UUID keys, unique `revisionKey`, and multi-table join integrity. |
-| **Clean Schema Reversion** | `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` | `helix_test_migration` | **PASS** | Cascade teardown executed cleanly without locking or orphan artifacts. |
+| **Clean Schema Reversion** | `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` | `GENOBRIDGE_test_migration` | **PASS** | Cascade teardown executed cleanly without locking or orphan artifacts. |
 
 ---
 

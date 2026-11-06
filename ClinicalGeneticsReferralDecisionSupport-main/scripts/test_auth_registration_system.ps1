@@ -1,4 +1,4 @@
-# HELIX CLINICAL GENETICS — AUTHENTICATION & REGISTRATION TEST SUITE
+# GENOBRIDGE CLINICAL GENETICS — AUTHENTICATION & REGISTRATION TEST SUITE
 # Tests all requirements for Gynecologist and Nurse registration, verification, and role-based access
 
 $baseUrl = "http://localhost:3000"
@@ -15,7 +15,7 @@ function Record-Test($name, $passed, $details) {
 }
 
 Write-Host "=========================================================" -ForegroundColor Cyan
-Write-Host "STARTING HELIX AUTHENTICATION & REGISTRATION TEST SUITE" -ForegroundColor Cyan
+Write-Host "STARTING GENOBRIDGE AUTHENTICATION & REGISTRATION TEST SUITE" -ForegroundColor Cyan
 Write-Host "=========================================================" -ForegroundColor Cyan
 
 # 1. Page Accessibility Tests
@@ -227,7 +227,7 @@ try {
 
 # 10. Provision an Admin Account to test Verification Interface
 # We insert or verify a system admin account directly in PostgreSQL
-$adminEmail = "clinical_governance_admin@helixgenetics.in"
+$adminEmail = "clinical_governance_admin@genobridge.in"
 $adminPassword = "SuperAdminPassword2026!"
 Write-Host "Verifying / Provisioning Authorized Administrator Account..." -ForegroundColor Yellow
 
@@ -243,7 +243,7 @@ BEGIN
 END
 `$\$;
 "@
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U helix_app -d helix_staging -c $checkAdminSql
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U genobridge_app -d genobridge_staging -c $checkAdminSql
 
 # Let's set password for admin via Payload forgotten/reset or direct password test
 # Or let's test admin login with existing staging user or appAuth
@@ -293,7 +293,7 @@ SET verification_status = 'APPROVED',
     reviewed_at = now()
 WHERE email = '$uniqueDoctorEmail';
 "@
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U helix_app -d helix_staging -c $approveDoctorSql
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U genobridge_app -d genobridge_staging -c $approveDoctorSql
 
 # Now sign in as the approved doctor
 try {
@@ -318,7 +318,7 @@ SET verification_status = 'APPROVED',
     reviewed_at = now()
 WHERE email = '$uniqueNurseEmail';
 "@
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U helix_app -d helix_staging -c $approveNurseSql
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U genobridge_app -d genobridge_staging -c $approveNurseSql
 
 # Now sign in as the approved nurse
 try {
@@ -367,7 +367,7 @@ SET verification_status = 'REJECTED',
     reviewed_at = now()
 WHERE email = '$rejectedApplicantEmail';
 "@
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U helix_app -d helix_staging -c $rejectSql
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U genobridge_app -d genobridge_staging -c $rejectSql
 
 # Attempt login with rejected account
 try {
@@ -390,7 +390,7 @@ SET verification_status = 'SUSPENDED',
     enabled = false
 WHERE email = '$rejectedApplicantEmail';
 "@
-& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U helix_app -d helix_staging -c $suspendSql
+& "C:\Program Files\PostgreSQL\16\bin\psql.exe" -U genobridge_app -d genobridge_staging -c $suspendSql
 
 try {
     $resp = Invoke-RestMethod -Uri "$baseUrl/api/auth/login" -Method POST -Body $rejectedLoginPayload -ContentType "application/json" -SkipHttpErrorCheck -StatusCodeVariable "code"

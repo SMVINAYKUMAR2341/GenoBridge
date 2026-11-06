@@ -1,4 +1,4 @@
-# Authentication Testing Script for Helix PostgreSQL Verification
+# Authentication Testing Script for GENOBRIDGE PostgreSQL Verification
 # Tests signup, login, logout, password reset, role restrictions, and session management
 
 $baseUrl = "http://localhost:3000"
@@ -52,7 +52,7 @@ function Test-AuthEndpoint {
 }
 
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "HELIX AUTHENTICATION VERIFICATION TESTS" -ForegroundColor Cyan
+Write-Host "GENOBRIDGE AUTHENTICATION VERIFICATION TESTS" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
 # Test 1: Signup - Valid nurse user
@@ -61,7 +61,7 @@ $testResults += Test-AuthEndpoint -TestName "Test 1" `
     -Endpoint "/api/auth/signup" `
     -Body @{
         name = "Test Nurse User"
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
         clinicalQualification = "Registered Nurse, OB-GYN Specialty"
         role = "nurse"
@@ -75,7 +75,7 @@ $testResults += Test-AuthEndpoint -TestName "Test 2" `
     -Endpoint "/api/auth/signup" `
     -Body @{
         name = "Duplicate Test"
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
         clinicalQualification = "Nurse"
         role = "nurse"
@@ -89,7 +89,7 @@ $testResults += Test-AuthEndpoint -TestName "Test 3" `
     -Endpoint "/api/auth/signup" `
     -Body @{
         name = "Malicious User"
-        email = "malicious@helix-verification.local"
+        email = "malicious@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
         clinicalQualification = "Hacker"
         role = "admin"
@@ -102,7 +102,7 @@ Write-Host "Test 4: Login with Disabled Account..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 4" `
     -Endpoint "/api/auth/login" `
     -Body @{
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
     } `
     -ExpectedStatus 403 `
@@ -110,9 +110,9 @@ $testResults += Test-AuthEndpoint -TestName "Test 4" `
 
 # Test 5: Enable the test user in database (simulate admin approval)
 Write-Host "Test 5: Simulating admin approval..." -ForegroundColor Yellow
-$env:PGPASSWORD = 'helix_dev_password_2026'
-$updateQuery = "UPDATE users SET enabled = true WHERE email = 'test.nurse@helix-verification.local';"
-& "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $updateQuery | Out-Null
+$env:PGPASSWORD = 'genobridge_dev_password_2026'
+$updateQuery = "UPDATE users SET enabled = true WHERE email = 'test.nurse@GENOBRIDGE-verification.local';"
+& "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $updateQuery | Out-Null
 Write-Host "  User enabled in database" -ForegroundColor Green
 
 # Test 6: Login - Valid credentials
@@ -120,7 +120,7 @@ Write-Host "Test 6: Valid Login..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 6" `
     -Endpoint "/api/auth/login" `
     -Body @{
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
     } `
     -ExpectedStatus 200 `
@@ -131,7 +131,7 @@ Write-Host "Test 7: Invalid Password Login..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 7" `
     -Endpoint "/api/auth/login" `
     -Body @{
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
         password = "WrongPassword123!"
     } `
     -ExpectedStatus 401 `
@@ -142,7 +142,7 @@ Write-Host "Test 8: Non-Existent User Login..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 8" `
     -Endpoint "/api/auth/login" `
     -Body @{
-        email = "nonexistent@helix-verification.local"
+        email = "nonexistent@GENOBRIDGE-verification.local"
         password = "SecurePassword123!"
     } `
     -ExpectedStatus 401 `
@@ -153,7 +153,7 @@ Write-Host "Test 9: Forgot Password Request..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 9" `
     -Endpoint "/api/auth/forgot-password" `
     -Body @{
-        email = "test.nurse@helix-verification.local"
+        email = "test.nurse@GENOBRIDGE-verification.local"
     } `
     -ExpectedStatus 200 `
     -Description "Request password reset link"
@@ -171,7 +171,7 @@ $testResults += Test-AuthEndpoint -TestName "Test 11" `
     -Endpoint "/api/auth/signup" `
     -Body @{
         name = "Dr. Test Provider"
-        email = "test.provider@helix-verification.local"
+        email = "test.provider@GENOBRIDGE-verification.local"
         password = "ProviderPass123!"
         clinicalQualification = "Board Certified OB-GYN"
         role = "provider"
@@ -180,15 +180,15 @@ $testResults += Test-AuthEndpoint -TestName "Test 11" `
     -Description "Create provider account"
 
 # Enable provider user
-$updateQuery2 = "UPDATE users SET enabled = true WHERE email = 'test.provider@helix-verification.local';"
-& "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $updateQuery2 | Out-Null
+$updateQuery2 = "UPDATE users SET enabled = true WHERE email = 'test.provider@GENOBRIDGE-verification.local';"
+& "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $updateQuery2 | Out-Null
 
 # Test 12: Provider login
 Write-Host "Test 12: Provider Login..." -ForegroundColor Yellow
 $testResults += Test-AuthEndpoint -TestName "Test 12" `
     -Endpoint "/api/auth/login" `
     -Body @{
-        email = "test.provider@helix-verification.local"
+        email = "test.provider@GENOBRIDGE-verification.local"
         password = "ProviderPass123!"
     } `
     -ExpectedStatus 200 `

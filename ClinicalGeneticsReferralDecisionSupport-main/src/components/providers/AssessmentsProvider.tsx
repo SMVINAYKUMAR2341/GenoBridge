@@ -92,15 +92,15 @@ export default function AssessmentsProvider({ children }: { children: ReactNode 
   const [patientId, setPatient] = useState('OB-001')
   useEffect(() => {
     try {
-      setSaved(JSON.parse(localStorage.getItem('helix-sim-assessments') || '[]'))
-      setPatient(localStorage.getItem('helix-sim-patient') || 'OB-001')
+      setSaved(JSON.parse(localStorage.getItem('GENOBRIDGE-sim-assessments') || '[]'))
+      setPatient(localStorage.getItem('GENOBRIDGE-sim-patient') || 'OB-001')
     } catch {
       /* ignore corrupt simulated storage */
     }
   }, [])
   const persist = (next: SavedAssessment[]) => {
     setSaved(next)
-    localStorage.setItem('helix-sim-assessments', JSON.stringify(next))
+    localStorage.setItem('GENOBRIDGE-sim-assessments', JSON.stringify(next))
   }
   const add = useCallback(
     (a: Omit<SavedAssessment, 'id' | 'date'>) =>
@@ -113,7 +113,7 @@ export default function AssessmentsProvider({ children }: { children: ReactNode 
   const remove = useCallback((id: string) => persist(saved.filter((s) => s.id !== id)), [saved])
   const setPatientId = (id: string) => {
     setPatient(id)
-    localStorage.setItem('helix-sim-patient', id)
+    localStorage.setItem('GENOBRIDGE-sim-patient', id)
   }
   const value = useMemo(
     () => ({

@@ -30,14 +30,14 @@ async function main() {
     }),
   }).then(r => r.json()).then(console.log).catch(console.error);
 
-  console.log('--- Registering admin@helix-test.local ---');
+  console.log('--- Registering admin@genobridge-test.local ---');
   await fetch('http://localhost:3000/api/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       firstName: 'System',
       lastName: 'Administrator',
-      email: 'admin@helix-test.local',
+      email: 'admin@genobridge-test.local',
       phone: '+91 9999999999',
       password: 'password123',
       confirmPassword: 'password123',
@@ -60,23 +60,23 @@ async function main() {
         enabled = true, 
         reviewed_by = 'Medical Governance Board', 
         reviewed_at = NOW() 
-    WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org', 'admin@helix-test.local');
+    WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org', 'admin@genobridge-test.local');
   `);
   console.log('Approved users count:', res.rowCount);
 
-  // Set admin role for admin@helix-test.local in users table
-  await pool.query("UPDATE users SET role = 'admin' WHERE email = 'admin@helix-test.local';");
+  // Set admin role for admin@genobridge-test.local in users table
+  await pool.query("UPDATE users SET role = 'admin' WHERE email = 'admin@genobridge-test.local';");
 
-  // Copy doctor password hash & salt into admins table for admin@helix-test.local
-  const adminUser = await pool.query("SELECT salt, hash FROM users WHERE email = 'admin@helix-test.local'");
+  // Copy doctor password hash & salt into admins table for admin@genobridge-test.local
+  const adminUser = await pool.query("SELECT salt, hash FROM users WHERE email = 'admin@genobridge-test.local'");
   if (adminUser.rows.length > 0) {
     const { salt, hash } = adminUser.rows[0];
     await pool.query(`
       INSERT INTO admins (id, email, salt, hash, created_at, updated_at)
-      VALUES (gen_random_uuid(), 'admin@helix-test.local', $1, $2, NOW(), NOW())
+      VALUES (gen_random_uuid(), 'admin@genobridge-test.local', $1, $2, NOW(), NOW())
       ON CONFLICT (email) DO UPDATE SET salt = EXCLUDED.salt, hash = EXCLUDED.hash, updated_at = NOW();
     `, [salt, hash]);
-    console.log('Admin account admin@helix-test.local synchronized in admins table!');
+    console.log('Admin account admin@genobridge-test.local synchronized in admins table!');
   }
 
   // Verify registered accounts

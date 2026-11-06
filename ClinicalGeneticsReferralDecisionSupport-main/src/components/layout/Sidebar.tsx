@@ -15,7 +15,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react'
-import { HelixLogo, SidebarWave } from '@/components/ui/Graphics'
+import { GenoBridgeLogo, SidebarWave } from '@/components/ui/Graphics'
 import { ChartBars } from '@/components/ui/Icons'
 
 type NavLink = { href: string; label: string; icon: LucideIcon }
@@ -75,10 +75,10 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
         />
         <div className="relative mb-[52px] flex items-start justify-between pl-[10px]">
           <Link href="/" onClick={onClose} className="flex items-center gap-[15px]">
-            <HelixLogo />
+            <GenoBridgeLogo />
             <span>
               <span className="flex items-end text-[30px] leading-none font-extrabold tracking-[-0.02em] text-white">
-                Helix
+                GENOBRIDGE
                 <span className="mb-[5px] ml-[6px] h-[7px] w-[7px] rounded-full bg-[#22d34a] shadow-[0_0_8px_rgb(34_211_74/0.8)]" />
               </span>
               <span className="mt-[10px] block text-[13.5px] font-medium text-white/90">

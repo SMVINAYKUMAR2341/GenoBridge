@@ -7,7 +7,7 @@ import { ShieldCheck } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Set New Password | Helix Clinical Genetics',
+  title: 'Set New Password | GENOBRIDGE Clinical Genetics',
   description: 'Create a new secure password for your clinical workspace',
 }
 

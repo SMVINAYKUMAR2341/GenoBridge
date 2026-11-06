@@ -2,7 +2,7 @@ import pg from 'pg'
 const { Pool } = pg
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URI || 'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging'
+  connectionString: process.env.DATABASE_URI || 'postgresql://genobridge_app:genobridge_dev_password_2026@localhost:5432/genobridge_staging'
 })
 
 async function run() {

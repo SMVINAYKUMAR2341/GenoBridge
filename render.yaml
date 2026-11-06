@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: helixhealth
+    name: GenoBridge
     runtime: docker
     dockerfilePath: Dockerfile
     plan: free

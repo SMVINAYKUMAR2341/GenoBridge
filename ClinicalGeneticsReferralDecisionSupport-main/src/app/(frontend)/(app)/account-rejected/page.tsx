@@ -98,7 +98,7 @@ export default function AccountRejectedPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <a
-            href="mailto:governance@helixgenetics.in?subject=Helix%20Clinical%20Account%20Re-verification%20Appeal"
+            href="mailto:governance@genobridge.in?subject=GENOBRIDGE%20Clinical%20Account%20Re-verification%20Appeal"
             className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-5 rounded-full text-xs font-semibold bg-[#00D8C3] text-slate-950 hover:bg-[#22C9EE] shadow-md shadow-[#00D8C3]/20 transition-all cursor-pointer"
           >
             <Mail className="w-3.5 h-3.5" />

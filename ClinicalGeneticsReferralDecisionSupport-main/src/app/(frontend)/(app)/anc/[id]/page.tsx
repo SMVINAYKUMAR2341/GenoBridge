@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: AncRecordPageProps): Promise<
   const { id } = await params
   const record = await getAncRecordById(id)
   return {
-    title: record ? `${record.booking.name} — ANC Record | Helix` : 'Antenatal Patient Record | Helix',
+    title: record ? `${record.booking.name} — ANC Record | GenoBridge` : 'Antenatal Patient Record | GenoBridge',
     description: 'Detailed maternal and child protection record, timeline, and clinical evaluation.',
   }
 }

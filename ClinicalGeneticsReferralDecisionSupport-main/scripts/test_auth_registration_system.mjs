@@ -1,5 +1,5 @@
 /**
- * HELIX CLINICAL GENETICS — AUTHENTICATION & ROLE-BASED REGISTRATION TEST SUITE
+ * GENOBRIDGE CLINICAL GENETICS — AUTHENTICATION & ROLE-BASED REGISTRATION TEST SUITE
  * Tests public professional registration, verification workflows, role-based login,
  * security protections, and role matching.
  */
@@ -39,7 +39,7 @@ async function request(endpoint, options = {}) {
 
 async function run() {
   console.log('\x1b[36m=========================================================\x1b[0m')
-  console.log('\x1b[36mSTARTING HELIX ROLE-BASED AUTH & REGISTRATION TEST SUITE\x1b[0m')
+  console.log('\x1b[36mSTARTING GENOBRIDGE ROLE-BASED AUTH & REGISTRATION TEST SUITE\x1b[0m')
   console.log('\x1b[36m=========================================================\x1b[0m\n')
 
   // 1. Verify Page Routes HTTP 200
@@ -317,10 +317,10 @@ async function run() {
   // 13. Professional Verification: Admin Approves Gynecologist Account
   const { execSync } = await import('node:child_process')
   const psqlPath = '"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe"'
-  const psqlEnv = { ...process.env, PGPASSWORD: 'helix_dev_password_2026' }
+  const psqlEnv = { ...process.env, PGPASSWORD: 'genobridge_dev_password_2026' }
 
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewer_authorized = true, reviewer_qualification = 'Consultant OB-GYN (MMC)', reviewed_by = 'Medical Governance Board', reviewed_at = now() WHERE email = '${uniqueDoctorEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewer_authorized = true, reviewer_qualification = 'Consultant OB-GYN (MMC)', reviewed_by = 'Medical Governance Board', reviewed_at = now() WHERE email = '${uniqueDoctorEmail}';"`,
     { env: psqlEnv }
   )
   await new Promise((r) => setTimeout(r, 400))
@@ -366,7 +366,7 @@ async function run() {
 
   // 16. Professional Verification: Admin Approves Nurse Account
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Nursing Governance Board', reviewed_at = now() WHERE email = '${uniqueNurseEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Nursing Governance Board', reviewed_at = now() WHERE email = '${uniqueNurseEmail}';"`,
     { env: psqlEnv }
   )
   await new Promise((r) => setTimeout(r, 400))
@@ -435,7 +435,7 @@ async function run() {
   })
 
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'REJECTED', enabled = false, rejection_reason = 'Registration number not found in official Delhi Medical Council registry.' WHERE email = '${rejectedEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'REJECTED', enabled = false, rejection_reason = 'Registration number not found in official Delhi Medical Council registry.' WHERE email = '${rejectedEmail}';"`,
     { env: psqlEnv }
   )
   await new Promise((r) => setTimeout(r, 400))
@@ -461,7 +461,7 @@ async function run() {
 
   // 20. Login Scenario E: Suspended Account Prohibited
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'SUSPENDED', enabled = false WHERE email = '${rejectedEmail}';"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'SUSPENDED', enabled = false WHERE email = '${rejectedEmail}';"`,
     { env: psqlEnv }
   )
   await new Promise((r) => setTimeout(r, 400))

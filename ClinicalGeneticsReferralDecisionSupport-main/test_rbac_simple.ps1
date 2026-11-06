@@ -1,4 +1,4 @@
-# Role-Based Access Control (RBAC) Testing Script for Helix
+# Role-Based Access Control (RBAC) Testing Script for GENOBRIDGE
 # Tests Admin, Gynecologist/OB-GYN, and Nurse/MA role permissions at API level
 
 $baseUrl = "http://localhost:3000"
@@ -6,12 +6,12 @@ $testResults = @()
 
 # Create test users with different roles
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "HELIX RBAC VERIFICATION TESTS" -ForegroundColor Cyan
+Write-Host "GENOBRIDGE RBAC VERIFICATION TESTS" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
 # Setup: Create users with different roles in database
 Write-Host "Setting up test users..." -ForegroundColor Yellow
-$env:PGPASSWORD = 'helix_dev_password_2026'
+$env:PGPASSWORD = 'genobridge_dev_password_2026'
 
 # Create nurse user
 $nurseSetup = @"
@@ -27,7 +27,7 @@ VALUES (
 ON CONFLICT (email) DO UPDATE SET enabled = true
 RETURNING id, name, email, role;
 "@
-$nurseResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $nurseSetup 2>&1
+$nurseResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $nurseSetup 2>&1
 
 # Create provider user (gynecologist)
 $providerSetup = @"
@@ -44,7 +44,7 @@ VALUES (
 ON CONFLICT (email) DO UPDATE SET enabled = true, reviewer_authorized = true
 RETURNING id, name, email, role;
 "@
-$providerResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $providerSetup 2>&1
+$providerResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $providerSetup 2>&1
 
 # Create admin-role user (different from admins collection)
 $adminUserSetup = @"
@@ -60,7 +60,7 @@ VALUES (
 ON CONFLICT (email) DO UPDATE SET enabled = true
 RETURNING id, name, email, role;
 "@
-$adminUserResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $adminUserSetup 2>&1
+$adminUserResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $adminUserSetup 2>&1
 
 Write-Host "  Test users created" -ForegroundColor Green
 
@@ -79,7 +79,7 @@ VALUES (
 ON CONFLICT DO NOTHING
 RETURNING id, full_name, mrn;
 "@
-$patientResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $patientSetup 2>&1
+$patientResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $patientSetup 2>&1
 Write-Host "  Test patient created" -ForegroundColor Green
 
 Write-Host "`n========================================" -ForegroundColor Cyan
@@ -118,7 +118,7 @@ SELECT
         ELSE 'FAIL'
     END as status;
 "@
-$adminAccessResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $adminCanManageQuery -t 2>&1
+$adminAccessResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $adminCanManageQuery -t 2>&1
 $testResults += @{
     TestName = "Test 3"
     Role = "Admin"
@@ -139,7 +139,7 @@ SELECT
 FROM users 
 WHERE role = 'nurse' AND email = 'nurse@rbac-test.local';
 "@
-$nurseAuthResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $nurseCriteriaQuery -t 2>&1
+$nurseAuthResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $nurseCriteriaQuery -t 2>&1
 $testResults += @{
     TestName = "Test 4"
     Role = "Nurse"
@@ -159,7 +159,7 @@ SELECT
 FROM users 
 WHERE role = 'provider' AND email = 'provider@rbac-test.local';
 "@
-$providerAuthResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $providerAuthQuery -t 2>&1
+$providerAuthResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $providerAuthQuery -t 2>&1
 $testResults += @{
     TestName = "Test 5"
     Role = "Provider"
@@ -180,7 +180,7 @@ SELECT
 FROM users 
 WHERE role = 'admin' AND email = 'adminuser@rbac-test.local';
 "@
-$adminClinicalResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $adminClinicalQuery -t 2>&1
+$adminClinicalResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $adminClinicalQuery -t 2>&1
 $testResults += @{
     TestName = "Test 6"
     Role = "Admin"
@@ -203,7 +203,7 @@ SELECT
         ELSE 'FAIL'
     END as status;
 "@
-$workflowRoleResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $workflowRoleQuery -t 2>&1
+$workflowRoleResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $workflowRoleQuery -t 2>&1
 $testResults += @{
     TestName = "Test 7"
     Role = "All"
@@ -256,7 +256,7 @@ FROM clinical_workflows cw
 JOIN users u ON cw.actor_id = u.id
 WHERE u.role = 'nurse' AND cw.state = 'DRAFT';
 "@
-$nurseDraftResult = & "D:\PostgreSQL\16\bin\psql.exe" -U helix_app -h localhost -p 5432 -d helix_staging -c $nurseDraftQuery -t 2>&1
+$nurseDraftResult = & "D:\PostgreSQL\16\bin\psql.exe" -U genobridge_app -h localhost -p 5432 -d genobridge_staging -c $nurseDraftQuery -t 2>&1
 $testResults += @{
     TestName = "Test 8"
     Role = "Nurse"

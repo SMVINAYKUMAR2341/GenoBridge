@@ -1,14 +1,14 @@
 -- Test CRUD operations with synthetic data
--- Testing Helix application with PostgreSQL
+-- Testing GENOBRIDGE application with PostgreSQL
 
 -- Test 1: Create a test admin user
 INSERT INTO admins (email, login_attempts) 
-VALUES ('admin@helix-test.local', 0)
+VALUES ('admin@genobridge-test.local', 0)
 RETURNING id, email, created_at;
 
 -- Test 2: Create a test clinical user
 INSERT INTO users (full_name, email, role, active) 
-VALUES ('Dr. Jane Smith', 'jane.smith@helix-test.local', 'provider', true)
+VALUES ('Dr. Jane Smith', 'jane.smith@genobridge-test.local', 'provider', true)
 RETURNING id, full_name, email, role, created_at;
 
 -- Test 3: Create a test patient

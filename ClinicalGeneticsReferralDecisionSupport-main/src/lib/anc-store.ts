@@ -11,19 +11,19 @@ import {
 } from './anc-model'
 
 /**
- * HELIX ANTENATAL CARE — SECURE JSON PERSISTENCE & REPOSITORY LAYER
+ * GENOBRIDGE ANTENATAL CARE — SECURE JSON PERSISTENCE & REPOSITORY LAYER
  *
  * Implements:
- * 1. Safe JSON-file storage inside `.helix_data`
+ * 1. Safe JSON-file storage inside `.genobridge_data`
  * 2. Strict write serialization via mutex to prevent concurrency conflicts
  * 3. Atomic file writes (.tmp + rename) to protect against interrupted writes
- * 4. Automatic snapshot backups in `.helix_data/backups/`
- * 5. Immutable audit trails in `.helix_data/audit_logs.json`
+ * 4. Automatic snapshot backups in `.genobridge_data/backups/`
+ * 5. Immutable audit trails in `.genobridge_data/audit_logs.json`
  * 6. Full CRUD, search, draft saving, and soft-archival
  * 7. Zero sample/hardcoded records
  */
 
-export const DATA_DIR = path.resolve(process.cwd(), '.helix_data')
+export const DATA_DIR = path.resolve(process.cwd(), '.genobridge_data')
 export const ANC_FILE = path.join(DATA_DIR, 'anc_records.json')
 export const AUDIT_FILE = path.join(DATA_DIR, 'audit_logs.json')
 export const REPORTS_META_FILE = path.join(DATA_DIR, 'reports_metadata.json')

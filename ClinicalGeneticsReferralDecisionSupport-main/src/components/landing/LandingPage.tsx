@@ -47,7 +47,7 @@ export default function LandingPage() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-lg tracking-tight text-[#d4e4fa] group-hover:text-[#4fdbc8] transition-colors">
-                  HELIX
+                  GENOBRIDGE
                 </span>
                 <span className="font-mono text-[10px] text-[#7bd0ff] uppercase tracking-widest leading-none">
                   Genomics OB/GYN
@@ -187,14 +187,14 @@ export default function LandingPage() {
               <div className="flex flex-col gap-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-base sm:text-lg font-semibold text-[#d4e4fa]">
-                    Explore HELIX in a Controlled Demonstration Environment
+                    Explore GENOBRIDGE in a Controlled Demonstration Environment
                   </h2>
                   <span className="px-2 py-0.5 rounded-full bg-[#273647] text-[#7bd0ff] font-mono text-[11px] font-semibold">
                     Synthetic Data Only
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-[#bbcac6] max-w-4xl">
-                  HELIX currently uses synthetic patient data to demonstrate clinical assessment, referral evaluation, workflow management, governance, and structured reporting. This environment is provisioned exclusively for operational evaluation and does not process live production Protected Health Information (PHI).
+                  GENOBRIDGE currently uses synthetic patient data to demonstrate clinical assessment, referral evaluation, workflow management, governance, and structured reporting. This environment is provisioned exclusively for operational evaluation and does not process live production Protected Health Information (PHI).
                 </p>
               </div>
             </div>
@@ -535,7 +535,7 @@ export default function LandingPage() {
               </div>
               <div className="pt-1 text-[#bbcac6] text-xs flex items-center gap-2">
                 <Info className="w-4 h-4 text-[#7bd0ff] flex-shrink-0" />
-                <span>Clinical Reminder: HELIX does not independently diagnose patients or replace credentialed clinical judgment.</span>
+                <span>Clinical Reminder: GENOBRIDGE does not independently diagnose patients or replace credentialed clinical judgment.</span>
               </div>
             </div>
           </div>
@@ -702,7 +702,7 @@ export default function LandingPage() {
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[#d4e4fa]">Guideline-Informed Clinical Decision Support</h2>
               <p className="text-sm sm:text-base text-[#bbcac6] max-w-3xl">
-                HELIX organizes clinical information and supports structured referral assessment using configurable clinical criteria calibrated against recognized professional society statements.
+                GENOBRIDGE organizes clinical information and supports structured referral assessment using configurable clinical criteria calibrated against recognized professional society statements.
               </p>
             </div>
 
@@ -855,7 +855,7 @@ export default function LandingPage() {
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[#d4e4fa]">Privacy and Security at the Core</h2>
               <p className="text-sm sm:text-base text-[#bbcac6] max-w-2xl">
-                HELIX is designed with privacy, controlled access, data integrity, and clinical accountability as foundational architectural priorities.
+                GENOBRIDGE is designed with privacy, controlled access, data integrity, and clinical accountability as foundational architectural priorities.
               </p>
             </div>
 
@@ -940,7 +940,7 @@ export default function LandingPage() {
                       <Microscope className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm sm:text-base font-bold tracking-tight">HELIX GENOMICS DECISION SUPPORT</span>
+                      <span className="text-sm sm:text-base font-bold tracking-tight">GENOBRIDGE GENOMICS DECISION SUPPORT</span>
                       <span className="font-mono text-xs text-[#bbcac6]">REFERRAL SUMMARY &amp; RISK STRATIFICATION REPORT</span>
                     </div>
                   </div>
@@ -1059,7 +1059,7 @@ export default function LandingPage() {
                 <div className="w-7 h-7 rounded bg-[#1c2b3c] flex items-center justify-center text-[#4fdbc8]">
                   <Microscope className="w-4 h-4" />
                 </div>
-                <span className="font-bold text-lg text-[#d4e4fa]">HELIX</span>
+                <span className="font-bold text-lg text-[#d4e4fa]">GENOBRIDGE</span>
               </div>
               <p className="text-xs text-[#bbcac6] max-w-md leading-relaxed">
                 Next-generation clinical genetics decision support platform purpose-engineered for OB/GYN clinicians, maternal-fetal medicine specialists, and hereditary cancer risk triage.
@@ -1095,7 +1095,7 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-6 border-t border-[#1c2b3c] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono">
-            <div>© 2026 HELIX Genomics Inc. All rights reserved. • Synthetic Demo Data Mode Active</div>
+            <div>© 2026 GENOBRIDGE Genomics Inc. All rights reserved. • Synthetic Demo Data Mode Active</div>
             <div className="flex items-center gap-6">
               <a href="#governance" className="hover:text-[#4fdbc8] transition-colors">Privacy Policy</a>
               <a href="#governance" className="hover:text-[#4fdbc8] transition-colors">Terms of Clinical Use</a>

@@ -1,7 +1,7 @@
-﻿# HELIX — Implementation Audit Report
+# GENOBRIDGE — Implementation Audit Report
 
 **Date**: November 4, 2026  
-**System**: Helix Clinical Genetics Referral Decision Support  
+**System**: GENOBRIDGE Clinical Genetics Referral Decision Support  
 **Repository**: ClinicalGeneticsReferralDecisionSupport-main  
 **Audit Scope**: Complete repository audit, implementation status, integration verification, and production readiness assessment
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Helix is a **clinical genetics referral decision support system** designed for OB/GYN practices. The system evaluates patient clinical history, family history (pedigree), and routine antenatal care (ANC) data against approved clinical criteria to generate evidence-based referral recommendations.
+GENOBRIDGE is a **clinical genetics referral decision support system** designed for OB/GYN practices. The system evaluates patient clinical history, family history (pedigree), and routine antenatal care (ANC) data against approved clinical criteria to generate evidence-based referral recommendations.
 
 ### Key Findings
 

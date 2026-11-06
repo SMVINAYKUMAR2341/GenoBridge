@@ -1,14 +1,14 @@
-﻿version: '3.9'
+version: '3.9'
 
 services:
   # PostgreSQL 16 - Primary Database
   postgres:
     image: postgres:16-alpine
-    container_name: helix-postgres
+    container_name: GENOBRIDGE-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: helix
-      POSTGRES_USER: helix_app
+      POSTGRES_DB: GENOBRIDGE
+      POSTGRES_USER: genobridge_app
       POSTGRES_PASSWORD: dev-password-change-in-production
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -18,7 +18,7 @@ services:
     ports:
       - "5432:5432"  # Remove in production
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U helix_app -d helix"]
+      test: ["CMD-SHELL", "pg_isready -U genobridge_app -d GENOBRIDGE"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,14 +26,14 @@ services:
   # PgBouncer - Connection Pooling
   pgbouncer:
     image: pgbouncer/pgbouncer:1.21
-    container_name: helix-pgbouncer
+    container_name: GENOBRIDGE-pgbouncer
     restart: unless-stopped
     environment:
       DATABASES_HOST: postgres
       DATABASES_PORT: 5432
-      DATABASES_USER: helix_app
+      DATABASES_USER: genobridge_app
       DATABASES_PASSWORD: dev-password-change-in-production
-      DATABASES_DBNAME: helix
+      DATABASES_DBNAME: GENOBRIDGE
       PGBOUNCER_POOL_MODE: transaction
       PGBOUNCER_MAX_CLIENT_CONN: 1000
       PGBOUNCER_DEFAULT_POOL_SIZE: 25
@@ -48,7 +48,7 @@ services:
   # Redis - Cache and Session Storage
   redis:
     image: redis:7-alpine
-    container_name: helix-redis
+    container_name: GENOBRIDGE-redis
     restart: unless-stopped
     command: redis-server --requirepass dev-redis-password --maxmemory 512mb --maxmemory-policy allkeys-lru
     volumes:
@@ -68,12 +68,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: helix-nextjs
+    container_name: GENOBRIDGE-nextjs
     restart: unless-stopped
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URI: postgresql://helix_app:dev-password-change-in-production@pgbouncer:6432/helix
+      DATABASE_URI: postgresql://genobridge_app:dev-password-change-in-production@pgbouncer:6432/GENOBRIDGE
       PAYLOAD_SECRET: dev-secret-minimum-32-characters-required-here
       REDIS_URL: redis://:dev-redis-password@redis:6379/0
       CRITERIA_SERVICE_URL: http://fastapi:8000
@@ -98,7 +98,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: helix-fastapi
+    container_name: GENOBRIDGE-fastapi
     restart: unless-stopped
     environment:
       CRITERIA_SERVICE_API_KEY: dev-criteria-api-key-min-32-chars

@@ -1,4 +1,4 @@
-# HELIX PostgreSQL Architecture Migration — Corrected Design Specification
+# GENOBRIDGE PostgreSQL Architecture Migration — Corrected Design Specification
 
 **Version**: 2.0 (Audited & Corrected)  
 **Date**: 2026-11-04  
@@ -9,7 +9,7 @@
 
 ## 1. EXECUTIVE SUMMARY
 
-The objective of this design is migrating Helix from the hosted Figma Content API to a fully self-hosted PostgreSQL 16 database architecture while preserving all clinical decision-support logic, immutable workflow auditing, and capability-based access controls.
+The objective of this design is migrating GENOBRIDGE from the hosted Figma Content API to a fully self-hosted PostgreSQL 16 database architecture while preserving all clinical decision-support logic, immutable workflow auditing, and capability-based access controls.
 
 ### Core Architectural Principles
 1. **Zero Unencrypted PHI**: All database and cache communication requires TLS 1.3 encryption. Unencrypted Redis draft caching of patient data is strictly prohibited.
@@ -114,7 +114,7 @@ ssl_ciphers = 'HIGH:!aNULL:!kEDH'
 
 Clients connecting to PostgreSQL must enforce strict certificate verification:
 ```
-DATABASE_URI=postgresql://helix_app:${DATABASE_PASSWORD}@pgbouncer:6432/helix?sslmode=verify-full&sslrootcert=/etc/ssl/certs/helix-ca.crt
+DATABASE_URI=postgresql://genobridge_app:${DATABASE_PASSWORD}@pgbouncer:6432/genobridge?sslmode=verify-full&sslrootcert=/etc/ssl/certs/genobridge-ca.crt
 ```
 
 ---
@@ -125,49 +125,49 @@ Database privileges are segregated across separate administrative, runtime, back
 
 ```sql
 -- 1. Schema Owner / Migration Role (Runs DDL only)
-CREATE USER helix_migrator WITH PASSWORD '{{MIGRATOR_SECRET}}';
-GRANT CONNECT ON DATABASE helix TO helix_migrator;
-GRANT ALL ON SCHEMA public TO helix_migrator;
+CREATE USER genobridge_migrator WITH PASSWORD '{{MIGRATOR_SECRET}}';
+GRANT CONNECT ON DATABASE genobridge TO genobridge_migrator;
+GRANT ALL ON SCHEMA public TO genobridge_migrator;
 
 -- 2. Runtime Application User (Runs DML, NO DDL)
-CREATE USER helix_app WITH PASSWORD '{{APP_SECRET}}';
-GRANT CONNECT ON DATABASE helix TO helix_app;
-GRANT USAGE ON SCHEMA public TO helix_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO helix_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO helix_app;
+CREATE USER genobridge_app WITH PASSWORD '{{APP_SECRET}}';
+GRANT CONNECT ON DATABASE genobridge TO genobridge_app;
+GRANT USAGE ON SCHEMA public TO genobridge_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO genobridge_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO genobridge_app;
 
 -- Revoke dangerous permissions from public and application users
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-REVOKE CREATE ON SCHEMA public FROM helix_app;
+REVOKE CREATE ON SCHEMA public FROM genobridge_app;
 
 -- Immutable audit logs: App user may INSERT and SELECT, but NEVER UPDATE or DELETE
-REVOKE UPDATE, DELETE ON TABLE audit_logs FROM helix_app;
-REVOKE UPDATE, DELETE ON TABLE _audit_logs_v FROM helix_app;
+REVOKE UPDATE, DELETE ON TABLE audit_logs FROM genobridge_app;
+REVOKE UPDATE, DELETE ON TABLE _audit_logs_v FROM genobridge_app;
 
 -- 3. Dedicated Backup User (No DDL, read-only dump)
-CREATE USER helix_backup WITH PASSWORD '{{BACKUP_SECRET}}';
-GRANT CONNECT ON DATABASE helix TO helix_backup;
-GRANT USAGE ON SCHEMA public TO helix_backup;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO helix_backup;
+CREATE USER genobridge_backup WITH PASSWORD '{{BACKUP_SECRET}}';
+GRANT CONNECT ON DATABASE genobridge TO genobridge_backup;
+GRANT USAGE ON SCHEMA public TO genobridge_backup;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO genobridge_backup;
 
 -- 4. Restricted Reporting User (NO access to raw PHI tables)
-CREATE USER helix_readonly WITH PASSWORD '{{REPORTING_SECRET}}';
-GRANT CONNECT ON DATABASE helix TO helix_readonly;
-GRANT USAGE ON SCHEMA public TO helix_readonly;
+CREATE USER genobridge_readonly WITH PASSWORD '{{REPORTING_SECRET}}';
+GRANT CONNECT ON DATABASE genobridge TO genobridge_readonly;
+GRANT USAGE ON SCHEMA public TO genobridge_readonly;
 
 -- Explicitly revoke access to sensitive patient and audit records
-REVOKE ALL ON TABLE patients, clinical_workflows, audit_logs, _patients_v, _clinical_workflows_v, _audit_logs_v FROM helix_readonly;
+REVOKE ALL ON TABLE patients, clinical_workflows, audit_logs, _patients_v, _clinical_workflows_v, _audit_logs_v FROM genobridge_readonly;
 ```
 
 ---
 
 ### 3.3 Restricted Reporting Views (De-Identified Metrics Only)
 
-To prevent PHI leakage through reporting tools, `helix_readonly` is only granted access to de-identified, aggregated security-definer views:
+To prevent PHI leakage through reporting tools, `genobridge_readonly` is only granted access to de-identified, aggregated security-definer views:
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS reporting;
-GRANT USAGE ON SCHEMA reporting TO helix_readonly;
+GRANT USAGE ON SCHEMA reporting TO genobridge_readonly;
 
 -- Aggregated pathway and decision summary without patient identifiers
 CREATE OR REPLACE VIEW reporting.vw_referral_pathway_summary AS
@@ -190,7 +190,7 @@ FROM public.patients
 WHERE pregnancy_status IS NOT NULL
 GROUP BY pregnancy_status, width_bucket(gestational_age_weeks, 0, 42, 7);
 
-GRANT SELECT ON ALL TABLES IN SCHEMA reporting TO helix_readonly;
+GRANT SELECT ON ALL TABLES IN SCHEMA reporting TO genobridge_readonly;
 ```
 
 ---
@@ -225,7 +225,7 @@ ALTER TABLE clinical_workflows FORCE ROW LEVEL SECURITY;
 -- Policy: Only clinical staff (provider/nurse) can view patient records
 CREATE POLICY patient_clinical_staff_policy ON patients
   FOR SELECT
-  TO helix_app
+  TO genobridge_app
   USING (
     current_setting('app.user_role', true) IN ('provider', 'nurse')
   );
@@ -233,7 +233,7 @@ CREATE POLICY patient_clinical_staff_policy ON patients
 -- Policy: Patient records are immutable via direct SQL; inserts only by authorized staff
 CREATE POLICY patient_insert_policy ON patients
   FOR INSERT
-  TO helix_app
+  TO genobridge_app
   WITH CHECK (
     current_setting('app.user_role', true) IN ('provider', 'nurse')
   );
@@ -241,7 +241,7 @@ CREATE POLICY patient_insert_policy ON patients
 -- Deletions are forbidden at database level
 CREATE POLICY patient_deny_delete_policy ON patients
   FOR DELETE
-  TO helix_app
+  TO genobridge_app
   USING (false);
 ```
 
@@ -404,7 +404,7 @@ Do not apply generic static values without measuring hardware resources. Derive 
 - [ ] Configure SCRAM-SHA-256 and TLS certificates on staging PostgreSQL.
 
 ### Week 2: Security & RLS Integration
-- [ ] Implement database roles (`helix_migrator`, `helix_app`, `helix_backup`, `helix_readonly`).
+- [ ] Implement database roles (`genobridge_migrator`, `genobridge_app`, `genobridge_backup`, `genobridge_readonly`).
 - [ ] Set up transaction-local session middleware in Next.js/Payload for `SET LOCAL app.current_user_id`.
 - [ ] Establish reporting views schema (`reporting.vw_*`).
 - [ ] Deploy PgBouncer in transaction mode with `server_reset_query = DISCARD ALL`.
@@ -418,7 +418,7 @@ Do not apply generic static values without measuring hardware resources. Derive 
 - [ ] Run automated Python backend test suite (all 39 tests passing).
 
 ### Week 4: Deployment & Cutover
-- [ ] Execute production migration via `helix_migrator`.
+- [ ] Execute production migration via `genobridge_migrator`.
 - [ ] Validate service health endpoints and criteria evaluation bridge.
 - [ ] Run post-cutover data consistency audit.
 - [ ] Archive legacy endpoints.

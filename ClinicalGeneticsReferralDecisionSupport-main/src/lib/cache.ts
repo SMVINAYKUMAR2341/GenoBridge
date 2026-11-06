@@ -1,7 +1,7 @@
 import { revalidateTag } from 'next/cache'
-import { helixCache } from './postgres-cache'
+import { genoBridgeCache } from './postgres-cache'
 
-export { helixCache }
+export { genoBridgeCache }
 
 export const CACHE_TAGS = {
   pathways: 'clinical-pathways',
@@ -15,7 +15,7 @@ export const CACHE_TAGS = {
 
 export function invalidateClinicalCache(tags: string[], _paths: string[] = ['/']) {
   // 1. Invalidate PostgreSQL & RAM multi-tier cache
-  helixCache.invalidateTags(tags).catch(() => {})
+  genoBridgeCache.invalidateTags(tags).catch(() => {})
 
   // 2. Invalidate Next.js edge tags
   try {

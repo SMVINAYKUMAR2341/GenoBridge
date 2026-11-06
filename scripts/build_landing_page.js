@@ -21,15 +21,15 @@ if (scriptStartIdx !== -1) {
 
 // 3. Update Hero Image: Remove card box / border and let 3D glowing DNA float seamlessly
 // Match the right hero visual column
-const heroImgBoxRegex = /<!-- Right Hero Visual Column \(DNA Helix Render\) -->[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/section>/i;
+const heroImgBoxRegex = /<!-- Right Hero Visual Column \(DNA GENOBRIDGE Render\) -->[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/section>/i;
 
-const replacementHero = `<!-- Right Hero Visual Column (DNA Helix Render) -->
+const replacementHero = `<!-- Right Hero Visual Column (DNA GENOBRIDGE Render) -->
         <div class="lg:col-span-6 relative flex items-center justify-center lg:justify-end">
           <div class="relative w-full max-w-[580px] flex items-center justify-center">
             <!-- Subtle cyan backlight behind DNA -->
             <div class="absolute -inset-4 bg-gradient-to-r from-[#00D8C3]/20 via-[#22C9EE]/15 to-transparent rounded-full blur-3xl pointer-events-none"></div>
             <img 
-              alt="Photorealistic glowing 3D DNA double-helix genomics data visualization" 
+              alt="Photorealistic glowing 3D DNA double-GENOBRIDGE genomics data visualization" 
               class="relative w-full h-auto object-contain [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_98%)] filter drop-shadow-[0_0_45px_rgba(0,216,195,0.35)] transform hover:scale-105 transition-transform duration-700 ease-out" 
               loading="eager" 
               src="images/dna-hero.png" 

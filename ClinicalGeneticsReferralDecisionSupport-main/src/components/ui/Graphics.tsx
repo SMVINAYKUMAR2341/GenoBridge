@@ -23,7 +23,7 @@ function mix(a: string, b: string, t: number) {
 
 /* Brand mark ------------------------------------------------------------ */
 
-export function HelixLogo({ size = 46 }: { size?: number }) {
+export function GenoBridgeLogo({ size = 46 }: { size?: number }) {
   const id = svgId(useId())
   const wave = (phase: number) =>
     Array.from({ length: 41 }, (_, i) => {
@@ -76,7 +76,7 @@ export function HelixLogo({ size = 46 }: { size?: number }) {
   )
 }
 
-/* Shaded double helix ------------------------------------------------------ */
+/* Shaded double GENOBRIDGE ------------------------------------------------------ */
 
 type Tone = 'emerald' | 'mint' | 'orchid'
 const TONES: Record<
@@ -109,7 +109,7 @@ const TONES: Record<
   },
 }
 
-type HelixProps = {
+type GenoBridgeProps = {
   length: number
   radius: number
   period: number
@@ -128,12 +128,12 @@ type HelixProps = {
 }
 
 /**
- * A right-handed double helix drawn along a horizontal axis, then placed with
+ * A right-handed double GENOBRIDGE drawn along a horizontal axis, then placed with
  * `x`, `y` and `angle`. Strand segments facing the viewer are drawn above the
  * base pairs and shaded brighter; receding segments sit behind them and fade
  * toward the background, which gives a soft, glossy 3D read without filters.
  */
-export function Helix3D({
+export function GenoBridge3D({
   length,
   radius,
   period,
@@ -148,7 +148,7 @@ export function Helix3D({
   fadeStart = 0.2,
   fadeEnd = 0.15,
   opacity = 1,
-}: HelixProps) {
+}: GenoBridgeProps) {
   const id = svgId(useId())
   const c = TONES[tone]
   const k = (2 * Math.PI) / period
@@ -343,7 +343,7 @@ export function HeroArt({ className = '' }: { className?: string }) {
       <path d="M470 300C600 268 700 250 820 200" stroke={`url(#${id}-edge)`} strokeOpacity=".7" />
       <ellipse cx="470" cy="62" rx="150" ry="80" fill={`url(#${id}-light)`} />
       <g className="hx-float">
-        <Helix3D
+        <GenoBridge3D
           length={720}
           radius={47}
           period={418}
@@ -372,7 +372,7 @@ export function HeroArt({ className = '' }: { className?: string }) {
 
 /* Pathway card illustrations ----------------------------------------------- */
 
-function CardHelix({
+function CardGenoBridge({
   tone,
   glow,
   angle,
@@ -393,7 +393,7 @@ function CardHelix({
         </radialGradient>
       </defs>
       <ellipse cx="112" cy="116" rx="72" ry="58" fill={`url(#${id}-glow)`} />
-      <Helix3D
+      <GenoBridge3D
         length={260}
         radius={24}
         period={170}
@@ -591,7 +591,7 @@ export function CardArt({ index }: { index: number }) {
   switch (index % 6) {
     case 0:
       return (
-        <CardHelix
+        <CardGenoBridge
           tone="mint"
           glow="#4ade80"
           angle={-50}
@@ -602,7 +602,7 @@ export function CardArt({ index }: { index: number }) {
       return <MoleculeArt className={`${base} top-[4px] right-[16px] h-[96px] w-[106px]`} />
     case 2:
       return (
-        <CardHelix
+        <CardGenoBridge
           tone="orchid"
           glow="#e879f9"
           angle={-41}

@@ -1,8 +1,8 @@
-import { helixCache } from './postgres-cache.mjs'
+import { genoBridgeCache } from './postgres-cache.mjs'
 
 async function runBenchmark() {
   console.log('================================================================')
-  console.log('🚀 HELIX HIGH-SCALE POSTGRESQL & RAM MULTI-TIER CACHE BENCHMARK')
+  console.log('🚀 GENOBRIDGE HIGH-SCALE POSTGRESQL & RAM MULTI-TIER CACHE BENCHMARK')
   console.log('================================================================\n')
 
   const testKey = 'benchmark:clinical-session:v1'
@@ -17,13 +17,13 @@ async function runBenchmark() {
 
   // 1. Initial Set
   console.log('1. Priming L1 & L2 Cache with synthetic authenticated session...')
-  await helixCache.set(testKey, testPayload, 300, ['test-session'])
+  await genoBridgeCache.set(testKey, testPayload, 300, ['test-session'])
 
   // 2. Measure L1 RAM Cache Latency (1,000 iterations)
   console.log('2. Running 1,000 L1 RAM Cache Reads...')
   const l1Start = performance.now()
   for (let i = 0; i < 1000; i++) {
-    await helixCache.get(testKey)
+    await genoBridgeCache.get(testKey)
   }
   const l1Total = performance.now() - l1Start
   const l1Avg = l1Total / 1000
@@ -35,14 +35,14 @@ async function runBenchmark() {
   // We simulate cross-process cache hit by querying L2 directly
   const { Pool } = await import('pg')
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URI || 'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging',
+    connectionString: process.env.DATABASE_URI || 'postgresql://genobridge_app:genobridge_dev_password_2026@localhost:5432/genobridge_staging',
     max: 10,
   })
   const client = await pool.connect()
 
   const l2Start = performance.now()
   for (let i = 0; i < 100; i++) {
-    await client.query('SELECT value FROM helix_cache WHERE key = $1 AND expires_at > NOW()', [testKey])
+    await client.query('SELECT value FROM genobridge_cache WHERE key = $1 AND expires_at > NOW()', [testKey])
   }
   const l2Total = performance.now() - l2Start
   const l2Avg = l2Total / 100
@@ -53,7 +53,7 @@ async function runBenchmark() {
   console.log('\n4. Simulating 100 Concurrent Parallel Users...')
   const concurrentStart = performance.now()
   const parallelPromises = Array.from({ length: 100 }, async (_, idx) => {
-    return helixCache.get(testKey)
+    return genoBridgeCache.get(testKey)
   })
   const results = await Promise.all(parallelPromises)
   const concurrentTotal = performance.now() - concurrentStart
@@ -63,8 +63,8 @@ async function runBenchmark() {
 
   // 5. Verify Tag Invalidation
   console.log('\n5. Testing Instant Tag Invalidation...')
-  await helixCache.invalidateTags(['test-session'])
-  const afterInvalidate = await helixCache.get(testKey)
+  await genoBridgeCache.invalidateTags(['test-session'])
+  const afterInvalidate = await genoBridgeCache.get(testKey)
   console.log(`   -> Cache Entry After Invalidate: ${afterInvalidate === null ? 'NULL (Successfully purged!)' : 'STALE (Failed)'}`)
 
   client.release()

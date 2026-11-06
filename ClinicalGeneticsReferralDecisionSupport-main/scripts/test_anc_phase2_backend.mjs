@@ -1,4 +1,4 @@
-// HELIX ANTENATAL CARE (ANC) PHASE 2 — BACKEND & JSON PERSISTENCE VERIFICATION
+// GENOBRIDGE ANTENATAL CARE (ANC) PHASE 2 — BACKEND & JSON PERSISTENCE VERIFICATION
 // Tests JSON persistence, atomic writes, backup snapshots, audit logging,
 // draft saving, multi-visit logging, PDF report generation, and archival.
 
@@ -41,20 +41,20 @@ async function request(urlPath, options = {}) {
 
 async function run() {
   console.log('\x1b[36m=================================================================\x1b[0m')
-  console.log('\x1b[36mHELIX ANC PHASE 2: JSON STORAGE, PERSISTENCE & REPORT ENGINE TEST\x1b[0m')
+  console.log('\x1b[36mGENOBRIDGE ANC PHASE 2: JSON STORAGE, PERSISTENCE & REPORT ENGINE TEST\x1b[0m')
   console.log('\x1b[36m=================================================================\x1b[0m\n')
 
   // --- 1. Verify Storage Directories and Removal of Seed Data ---
   console.log('\x1b[33m--- 1. Storage Inspection & Hardcoded Data Elimination ---\x1b[0m')
-  const dataDir = path.resolve('.helix_data')
+  const dataDir = path.resolve('.genobridge_data')
   const ancFile = path.join(dataDir, 'anc_records.json')
   const auditFile = path.join(dataDir, 'audit_logs.json')
   const reportsDir = path.join(dataDir, 'reports')
   const backupsDir = path.join(dataDir, 'backups')
 
-  recordTest('Storage directory exists', fs.existsSync(dataDir), `.helix_data present`)
-  recordTest('Backups directory exists', fs.existsSync(backupsDir), `.helix_data/backups present`)
-  recordTest('Reports directory exists', fs.existsSync(reportsDir), `.helix_data/reports present`)
+  recordTest('Storage directory exists', fs.existsSync(dataDir), `.genobridge_data present`)
+  recordTest('Backups directory exists', fs.existsSync(backupsDir), `.genobridge_data/backups present`)
+  recordTest('Reports directory exists', fs.existsSync(reportsDir), `.genobridge_data/reports present`)
 
   let initialRecords = []
   if (fs.existsSync(ancFile)) {
@@ -77,7 +77,7 @@ async function run() {
   // --- 2. Setup Authenticated Clinical Nurse Session ---
   console.log('\n\x1b[33m--- 2. Setting Up Verified Clinical Nurse Session ---\x1b[0m')
   const psqlPath = '"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe"'
-  const psqlEnv = { ...process.env, PGPASSWORD: 'helix_dev_password_2026' }
+  const psqlEnv = { ...process.env, PGPASSWORD: 'genobridge_dev_password_2026' }
 
   const nurseEmail = `nurse_p2_${Date.now()}@manipalhospitals.com`
   const password = 'ClinicalPassword2026!'
@@ -106,7 +106,7 @@ async function run() {
 
   // Activate in database
   execSync(
-    `${psqlPath} -h localhost -U postgres -d helix_staging -c "UPDATE \\"users\\" SET \\"emailVerified\\" = true, \\"verificationStatus\\" = 'APPROVED', \\"enabled\\" = true WHERE \\"email\\" = '${nurseEmail}';"`,
+    `${psqlPath} -h localhost -U postgres -d genobridge_staging -c "UPDATE \\"users\\" SET \\"emailVerified\\" = true, \\"verificationStatus\\" = 'APPROVED', \\"enabled\\" = true WHERE \\"email\\" = '${nurseEmail}';"`,
     { env: psqlEnv, stdio: 'pipe' },
   )
 
@@ -328,11 +328,11 @@ async function run() {
     `Identifier: ${patientId}, PatientID: ${savedPatient?.booking?.patientId}`,
   )
 
-  // Verify direct file persistence in .helix_data/anc_records.json
+  // Verify direct file persistence in .genobridge_data/anc_records.json
   const fileContent = JSON.parse(fs.readFileSync(ancFile, 'utf8'))
   const persistedInFile = fileContent.find((r) => r.booking.identifier === patientId)
   recordTest(
-    'Record physically persisted to .helix_data/anc_records.json',
+    'Record physically persisted to .genobridge_data/anc_records.json',
     Boolean(persistedInFile && persistedInFile.booking.name === 'Meera Patel'),
     `Found record ${persistedInFile?.booking?.identifier} in storage with status: ${persistedInFile?.status}`,
   )
@@ -557,7 +557,7 @@ async function run() {
   const pdfExists = fs.existsSync(physicalPdfPath)
   const pdfSize = pdfExists ? fs.statSync(physicalPdfPath).size : 0
   recordTest(
-    'Report PDF physically saved in .helix_data/reports/',
+    'Report PDF physically saved in .genobridge_data/reports/',
     pdfExists && pdfSize > 500,
     `File size: ${pdfSize} bytes on disk`,
   )

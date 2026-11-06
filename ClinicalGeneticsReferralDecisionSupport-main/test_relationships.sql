@@ -15,7 +15,7 @@ RETURNING id, full_name, mrn;
 
 -- Get the patient ID and user ID we just created
 SELECT id as patient_id FROM patients WHERE mrn = 'MRN-TEST-002' \gset
-SELECT id as provider_id FROM users WHERE email = 'jane.smith@helix-test.local' \gset
+SELECT id as provider_id FROM users WHERE email = 'jane.smith@genobridge-test.local' \gset
 
 -- Create a clinical workflow linked to patient and provider
 INSERT INTO clinical_workflows (

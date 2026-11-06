@@ -198,7 +198,7 @@ export function SignUp() {
             {/* Header: Fully visible at top with comfortable spacing */}
             <div className="space-y-1.5 pb-1">
               <h1 className="text-2xl sm:text-[32px] font-extrabold tracking-tight text-[#061c31] leading-tight">
-                Create Your Helix Account
+                Create Your GENOBRIDGE Account
               </h1>
               <p className="text-xs sm:text-[13px] text-slate-500 font-normal leading-relaxed">
                 Register as a healthcare professional to access structured clinical assessment and genetic referral workflows.

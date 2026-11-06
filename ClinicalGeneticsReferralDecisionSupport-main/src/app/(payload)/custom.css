@@ -1,14 +1,14 @@
-/* Helix Custom Payload Admin Styles */
+/* GENOBRIDGE Custom Payload Admin Styles */
 
 :root {
-  --helix-primary: #2563eb;
-  --helix-secondary: #7c3aed;
-  --helix-success: #059669;
-  --helix-warning: #d97706;
-  --helix-danger: #dc2626;
+  --GENOBRIDGE-primary: #2563eb;
+  --GENOBRIDGE-secondary: #7c3aed;
+  --GENOBRIDGE-success: #059669;
+  --GENOBRIDGE-warning: #d97706;
+  --GENOBRIDGE-danger: #dc2626;
 }
 
-/* Custom styling for Helix clinical application */
+/* Custom styling for GENOBRIDGE clinical application */
 .payload-admin {
   font-family: system-ui, -apple-system, sans-serif;
 }

@@ -7,7 +7,7 @@ import { appAuth } from '@/lib/app-auth'
 import { AncDashboard } from '@/components/anc/AncDashboard'
 
 export const metadata: Metadata = {
-  title: 'Antenatal Care (ANC) Registry | Helix Clinical Decision Support',
+  title: 'Antenatal Care (ANC) Registry | GENOBRIDGE Clinical Decision Support',
   description: 'MoHFW and ACOG compliant antenatal care registry, obstetric risk screening, and monitoring workspace.',
 }
 

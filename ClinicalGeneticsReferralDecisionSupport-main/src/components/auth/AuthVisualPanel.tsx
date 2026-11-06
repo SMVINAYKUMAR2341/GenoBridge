@@ -22,7 +22,7 @@ export function AuthVisualPanel({ className = '' }: { className?: string }) {
       </div>
 
       {/* =========================================================================
-          2. HELIXHEALTH LOGO & BRAND HEADER
+          2. GenoBridge LOGO & BRAND HEADER
           ========================================================================= */}
       <div className="relative z-10 flex items-center gap-3">
         <div className="w-11 h-11 rounded-xl bg-[#06243d] border border-[#165675] flex items-center justify-center text-[#00D8C3] shadow-lg shadow-[#00D8C3]/20">
@@ -43,7 +43,7 @@ export function AuthVisualPanel({ className = '' }: { className?: string }) {
         </div>
         <div>
           <div className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center">
-            Helix<span className="text-[#00D8C3]">Health</span>
+            GENOBRIDGE<span className="text-[#00D8C3]">Health</span>
           </div>
           <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#8aaec3]">
             Clinical Genetics Decision Support

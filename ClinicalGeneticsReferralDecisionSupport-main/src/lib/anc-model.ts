@@ -1,7 +1,7 @@
 import type { ParseResult } from '../components/clinical/pedigree-model'
 
 // ============================================================================
-// HELIX ANTENATAL CARE (ANC) COMPREHENSIVE CLINICAL DATA MODEL
+// GENOBRIDGE ANTENATAL CARE (ANC) COMPREHENSIVE CLINICAL DATA MODEL
 // Aligned with ACOG, WHO, and Indian Ministry of Health & Family Welfare (MoHFW)
 // ============================================================================
 

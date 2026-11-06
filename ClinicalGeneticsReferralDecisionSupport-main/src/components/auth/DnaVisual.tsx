@@ -31,7 +31,7 @@ export default function DnaVisual() {
       </svg>
 
       {/* 
-        3. Seamless Full-Bleed 3D DNA Helix (NO Square Box, NO Border!)
+        3. Seamless Full-Bleed 3D DNA GENOBRIDGE (NO Square Box, NO Border!)
         Uses radial gradient mask so edges blend 100% invisibly into the dark navy background
       */}
       <div

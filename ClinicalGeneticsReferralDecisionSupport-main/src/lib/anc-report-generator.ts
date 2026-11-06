@@ -9,14 +9,14 @@ import {
 } from './anc-store'
 
 /**
- * HELIX ANTENATAL CARE — PURE TYPESCRIPT A4 PDF REPORT ENGINE
+ * GENOBRIDGE ANTENATAL CARE — PURE TYPESCRIPT A4 PDF REPORT ENGINE
  *
  * Generates hospital-grade, multi-page A4 clinical PDF documents without external binary dependencies.
  * Follows strict medical documentation standards:
  * - Real saved data only — zero sample or fake values
  * - Missing values are explicitly flagged as "Not recorded"
  * - Automatic multi-page pagination with running clinical headers
- * - Secure local storage in `.helix_data/reports/` with JSON metadata registry
+ * - Secure local storage in `.genobridge_data/reports/` with JSON metadata registry
  */
 
 export interface ReportMetadata {
@@ -69,7 +69,7 @@ class PdfDoc {
   }
 
   private drawRunningHeader(): void {
-    this.drawText('HELIX CLINICAL GENETICS & ANTENATAL CARE — CONFIDENTIAL MEDICAL RECORD', 40, 810, 8, 'Helvetica-Bold', [0.3, 0.4, 0.5])
+    this.drawText('GENOBRIDGE CLINICAL GENETICS & ANTENATAL CARE — CONFIDENTIAL MEDICAL RECORD', 40, 810, 8, 'Helvetica-Bold', [0.3, 0.4, 0.5])
     this.drawLine(40, 804, 555, 804, 0.5, [0.8, 0.85, 0.9])
     this.cursorY = 785
   }
@@ -151,7 +151,7 @@ class PdfDoc {
     const finalPageStreams: string[] = []
     for (let i = 0; i < totalPages; i++) {
       let pageStream = this.pages[i]
-      const footerText = `Page ${i + 1} of ${totalPages} — Helix Health EMR System | Generated: ${new Date().toISOString().slice(0, 10)}`
+      const footerText = `Page ${i + 1} of ${totalPages} — GenoBridge EMR System | Generated: ${new Date().toISOString().slice(0, 10)}`
       const safeFooter = footerText.replace(/\(/g, '\\(').replace(/\)/g, '\\)')
       pageStream += `\nBT /F1 8 Tf 0.45 0.50 0.55 rg 40 35 Td (${safeFooter}) Tj ET`
       pageStream += `\n0.85 0.88 0.92 RG 0.5 w 40 46 m 555 46 l S`
@@ -219,7 +219,7 @@ export async function generateAncReportPdf(
 
   // 1. HOSPITAL HEADER
   doc.drawRect(40, doc.cursorY - 50, 515, 60, [0.03, 0.15, 0.25], undefined, 0)
-  doc.drawText('HELIX HEALTHCARE & MATERNAL HEALTH NETWORK', 55, doc.cursorY - 14, 13, 'Helvetica-Bold', [1, 1, 1])
+  doc.drawText('GenoBridgeCARE & MATERNAL HEALTH NETWORK', 55, doc.cursorY - 14, 13, 'Helvetica-Bold', [1, 1, 1])
   doc.drawText('Department of Obstetrics, Gynecology & Clinical Genetics', 55, doc.cursorY - 28, 9, 'Helvetica', [0.85, 0.95, 0.95])
   doc.drawText('COMPREHENSIVE ANTENATAL CARE (ANC) RECORD REPORT', 55, doc.cursorY - 42, 9, 'Helvetica-Bold', [0, 0.85, 0.76])
   doc.drawText(`Date: ${new Date().toISOString().slice(0, 10)}`, 450, doc.cursorY - 14, 9, 'Helvetica', [0.9, 0.95, 0.95])

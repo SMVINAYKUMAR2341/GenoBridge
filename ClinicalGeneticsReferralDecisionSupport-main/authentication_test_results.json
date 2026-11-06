@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "ActualStatus":  201,
         "Details":  "{\"success\":true,\"message\":\"Account created successfully. Awaiting administrator approval.\",\"userId\":\"9b085e86-bbd2-4c8c-99df-177e1d03ee07\"}",
@@ -37,7 +37,7 @@
     },
     {
         "ActualStatus":  200,
-        "Details":  "{\"success\":true,\"user\":{\"id\":\"9b085e86-bbd2-4c8c-99df-177e1d03ee07\",\"name\":\"Test Nurse User\",\"email\":\"test.nurse@helix-verification.local\",\"role\":\"nurse\"}}",
+        "Details":  "{\"success\":true,\"user\":{\"id\":\"9b085e86-bbd2-4c8c-99df-177e1d03ee07\",\"name\":\"Test Nurse User\",\"email\":\"test.nurse@GENOBRIDGE-verification.local\",\"role\":\"nurse\"}}",
         "ExpectedStatus":  200,
         "Description":  "Successful login with valid credentials",
         "Status":  "PASS",
@@ -91,7 +91,7 @@
     },
     {
         "ActualStatus":  200,
-        "Details":  "{\"success\":true,\"user\":{\"id\":\"5be9cb96-98c0-4fc9-aa4a-73fdd6361016\",\"name\":\"Dr. Test Provider\",\"email\":\"test.provider@helix-verification.local\",\"role\":\"provider\"}}",
+        "Details":  "{\"success\":true,\"user\":{\"id\":\"5be9cb96-98c0-4fc9-aa4a-73fdd6361016\",\"name\":\"Dr. Test Provider\",\"email\":\"test.provider@GENOBRIDGE-verification.local\",\"role\":\"provider\"}}",
         "ExpectedStatus":  200,
         "Description":  "Provider successful login",
         "Status":  "PASS",

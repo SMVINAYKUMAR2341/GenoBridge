@@ -2,12 +2,12 @@ import { execSync } from 'node:child_process'
 
 async function seed() {
   const psqlPath = '"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe"'
-  const psqlEnv = { ...process.env, PGPASSWORD: 'helix_dev_password_2026' }
+  const psqlEnv = { ...process.env, PGPASSWORD: 'genobridge_dev_password_2026' }
 
   // 1. Delete if exist to ensure fresh password123 hash
   try {
     execSync(
-      `${psqlPath} -U helix_app -d helix_staging -c "DELETE FROM users WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org');"`,
+      `${psqlPath} -U genobridge_app -d genobridge_staging -c "DELETE FROM users WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org');"`,
       { env: psqlEnv }
     )
   } catch (err) {
@@ -67,7 +67,7 @@ async function seed() {
 
   // 4. Update status to APPROVED in PostgreSQL
   execSync(
-    `${psqlPath} -U helix_app -d helix_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Medical Governance Board', reviewed_at = now() WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org');"`,
+    `${psqlPath} -U genobridge_app -d genobridge_staging -c "UPDATE users SET verification_status = 'APPROVED', enabled = true, reviewed_by = 'Medical Governance Board', reviewed_at = now() WHERE email IN ('nurse@hospital.org', 'doctor@hospital.org');"`,
     { env: psqlEnv }
   )
 

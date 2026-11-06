@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Doctor Dashboard | Helix Clinical Genetics',
+  title: 'Doctor Dashboard | GENOBRIDGE Clinical Genetics',
   description: 'Gynecologist & OB-GYN Decision Support Workspace',
 }
 

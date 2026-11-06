@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { getPayloadClient } from './payload'
-import { helixCache, CACHE_TAGS, invalidateClinicalCache } from './cache'
+import { genoBridgeCache, CACHE_TAGS, invalidateClinicalCache } from './cache'
 import type { User } from '../payload-types'
 
 export function createAppAuth(collection: 'users') {
@@ -14,7 +14,7 @@ export function createAppAuth(collection: 'users') {
       // L1 RAM (0.01 ms) -> L2 PostgreSQL UNLOGGED cache (< 1 ms)
       const tokenSig = token.slice(-32)
       const cacheKey = `auth:session:${tokenSig}`
-      const cached = await helixCache.get<User>(cacheKey)
+      const cached = await genoBridgeCache.get<User>(cacheKey)
       if (cached) {
         return cached
       }
@@ -27,7 +27,7 @@ export function createAppAuth(collection: 'users') {
         if (user?.collection === collection) {
           const authenticatedUser = user as unknown as User
           // Cache verified session for 180 seconds across L1 RAM and L2 PostgreSQL unlogged table
-          await helixCache.set(
+          await genoBridgeCache.set(
             cacheKey,
             authenticatedUser,
             180,
@@ -78,7 +78,7 @@ export function createAppAuth(collection: 'users') {
       const tokenSig = result.token.slice(-32)
       const cacheKey = `auth:session:${tokenSig}`
       const authenticatedUser = result.user as unknown as User
-      await helixCache.set(cacheKey, authenticatedUser, 180, [
+      await genoBridgeCache.set(cacheKey, authenticatedUser, 180, [
         CACHE_TAGS.userSession(authenticatedUser.id),
       ])
 
@@ -93,7 +93,7 @@ export function createAppAuth(collection: 'users') {
       const token = cookieStore.get('app-session')?.value || cookieStore.get('payload-token')?.value
       if (token) {
         const tokenSig = token.slice(-32)
-        await helixCache.delete(`auth:session:${tokenSig}`)
+        await genoBridgeCache.delete(`auth:session:${tokenSig}`)
       }
       cookieStore.delete('app-session')
       cookieStore.delete('payload-token')

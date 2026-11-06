@@ -1,8 +1,8 @@
-# HELIX — GYNECOLOGIST & NURSE REGISTRATION AND AUTHENTICATION ARCHITECTURE REPORT
+# GENOBRIDGE — GYNECOLOGIST & NURSE REGISTRATION AND AUTHENTICATION ARCHITECTURE REPORT
 
 ## Executive Summary
 
-This report documents the implementation and verification of the clinical registration, professional verification, and role-based authentication system for **Helix**, a clinical genetics referral decision-support platform designed for Indian healthcare institutions.
+This report documents the implementation and verification of the clinical registration, professional verification, and role-based authentication system for **GENOBRIDGE**, a clinical genetics referral decision-support platform designed for Indian healthcare institutions.
 
 The implementation strictly restricts public registration to two verified healthcare categories:
 1. **Gynecologist / OB-GYN**
@@ -14,7 +14,7 @@ System administrator accounts cannot be created through public self-service regi
 
 ## 1. Required Pages and Routes Implemented
 
-All authentication and credentialing routes have been developed in Next.js using the **Helix visual design system** (midnight navy `#031525` / `#08243B`, bioluminescent teal `#00D8C3`, muted cyan `#22C9EE`, frosted glass cards `#102B43`, and mathematical B-DNA visual panels):
+All authentication and credentialing routes have been developed in Next.js using the **GENOBRIDGE visual design system** (midnight navy `#031525` / `#08243B`, bioluminescent teal `#00D8C3`, muted cyan `#22C9EE`, frosted glass cards `#102B43`, and mathematical B-DNA visual panels):
 
 | Route | Purpose | File Path | Status |
 |---|---|---|---|
@@ -39,8 +39,8 @@ In accordance with specifications, the reusable authentication interface has bee
 
 ### Visual and Structural Invariants Preserved
 - **Split-Screen Layout**: Left column houses clean, accessible form controls; right column renders a dedicated clinical visual panel.
-- **Helix Brand Identity**: Midnight navy background with frosted glass input wrappers, border illumination on focus, and high-contrast clinical typography.
-- **Restrained 3D B-DNA Visual**: Right-hand panel features an animated mathematical double helix with base-pair rungs, teal/cyan nucleotide nodes, subtle pulse effects, and clinical branding:
+- **GENOBRIDGE Brand Identity**: Midnight navy background with frosted glass input wrappers, border illumination on focus, and high-contrast clinical typography.
+- **Restrained 3D B-DNA Visual**: Right-hand panel features an animated mathematical double GENOBRIDGE with base-pair rungs, teal/cyan nucleotide nodes, subtle pulse effects, and clinical branding:
   > *"Clinical Clarity. Connected Genetics."*
   > *"Structured clinical assessment and genetic referral decision support for healthcare professionals."*
 - **Form UX**: Glass-style inputs with icons (`Mail`, `Lock`, `Phone`, `Award`, `Building`), password visibility toggles, disabled states, accessible labels, and smooth state transitions.

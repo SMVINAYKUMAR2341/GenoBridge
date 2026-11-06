@@ -190,7 +190,7 @@ export default function AccountPendingPage() {
 
         <div className="text-center pt-2 border-t border-slate-200">
           <a
-            href="mailto:governance@helixgenetics.in?subject=Helix%20Account%20Verification%20Inquiry"
+            href="mailto:governance@genobridge.in?subject=GENOBRIDGE%20Account%20Verification%20Inquiry"
             className="text-xs text-slate-500 hover:text-teal-700 underline"
           >
             Need expedited verification? Contact Clinical Governance

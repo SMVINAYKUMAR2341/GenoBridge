@@ -7,8 +7,8 @@ import { AuthCardShell } from '@/components/auth/AuthCardShell'
 import { KeyRound } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Reset Password | Helix Clinical Genetics',
-  description: 'Reset your Helix healthcare professional account password',
+  title: 'Reset Password | GENOBRIDGE Clinical Genetics',
+  description: 'Reset your GenoBridgecare professional account password',
 }
 
 export default function ForgotPasswordPage() {

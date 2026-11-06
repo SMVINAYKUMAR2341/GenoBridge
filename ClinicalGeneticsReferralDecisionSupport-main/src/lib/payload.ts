@@ -12,7 +12,7 @@ export async function getPayloadClient() {
   const payloadConfig = await config
   // Keep the clinical app instance distinct from the CMS instance initialized
   // before app-auth collections are registered during development.
-  return getPayload({ config: payloadConfig, key: 'helix-clinical-app' })
+  return getPayload({ config: payloadConfig, key: 'GENOBRIDGE-clinical-app' })
 }
 
 /**

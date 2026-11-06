@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   HELIX — Landing Page Interactive Script
+   GENOBRIDGE — Landing Page Interactive Script
    DNA Canvas Animation · Scroll Choreography · Navigation
    ══════════════════════════════════════════════════════════════ */
 
@@ -7,7 +7,7 @@
   'use strict';
 
   /* ─────────────────────────────────────────────────────────
-     1. DNA DOUBLE HELIX — Canvas Rendering
+     1. DNA DOUBLE GENOBRIDGE — Canvas Rendering
      ───────────────────────────────────────────────────────── */
   const canvas = document.getElementById('dna-canvas');
   if (!canvas) return;
@@ -16,7 +16,7 @@
   // B-DNA geometry constants
   const RISE_PER_BP  = 3.4;       // Å per base pair (scaled)
   const TWIST_ANGLE  = (2 * Math.PI) / 10; // 36° per bp (B-DNA = 10 bp/turn)
-  const HELIX_RADIUS = 80;        // pixel radius of each strand
+  const GENOBRIDGE_RADIUS = 80;        // pixel radius of each strand
   const NUM_PAIRS    = 28;        // visible base pairs
   const BP_SPACING   = 22;        // vertical pixel spacing between bps
 
@@ -66,10 +66,10 @@
     };
   }
 
-  /* ─── Helix section-based choreography ─── */
+  /* ─── GENOBRIDGE section-based choreography ─── */
   function getHelixParams(t) {
     // t = scrollProgress [0, 1]
-    // Smoothly interpolate helix position, scale, rotation, opacity
+    // Smoothly interpolate GENOBRIDGE position, scale, rotation, opacity
 
     // Horizontal center bias: start right (hero), drift center, end center
     const xBias = 0.62 - t * 0.15;
@@ -108,7 +108,7 @@
     for (let i = 0; i < NUM_PAIRS; i++) {
       const verticalOffset = (i - NUM_PAIRS / 2) * BP_SPACING * params.scale;
       const angle = i * TWIST_ANGLE + totalRotation;
-      const r = HELIX_RADIUS * params.scale;
+      const r = GENOBRIDGE_RADIUS * params.scale;
 
       // 3D projection with tilt
       const cos_a = Math.cos(angle);
@@ -217,7 +217,7 @@
       for (let i = 0; i < NUM_PAIRS; i++) {
         const verticalOffset = (i - NUM_PAIRS / 2) * BP_SPACING * params.scale;
         const angle = i * TWIST_ANGLE + totalRotation + phaseOffset;
-        const r = HELIX_RADIUS * params.scale;
+        const r = GENOBRIDGE_RADIUS * params.scale;
         const cos_tilt = Math.cos(params.tilt);
 
         const x = centerX + Math.cos(angle) * r;

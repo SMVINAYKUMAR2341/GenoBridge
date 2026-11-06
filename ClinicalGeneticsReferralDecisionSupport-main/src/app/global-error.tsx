@@ -11,7 +11,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body style={{ backgroundColor: '#021627', color: '#fff', fontFamily: 'sans-serif', padding: '2rem', textAlign: 'center' }}>
-        <h2>HelixHealth System Notice</h2>
+        <h2>GenoBridge System Notice</h2>
         <p style={{ color: '#8aaec3' }}>An unexpected system state was encountered.</p>
         <button
           onClick={() => reset()}

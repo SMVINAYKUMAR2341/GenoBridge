@@ -6,7 +6,7 @@ DECLARE
   v_provider_id uuid;
 BEGIN
   SELECT id INTO v_patient_id FROM patients WHERE mrn = 'MRN-TEST-002';
-  SELECT id INTO v_provider_id FROM users WHERE email = 'jane.smith@helix-test.local';
+  SELECT id INTO v_provider_id FROM users WHERE email = 'jane.smith@genobridge-test.local';
   
   INSERT INTO clinical_workflows (
     workflow_key,

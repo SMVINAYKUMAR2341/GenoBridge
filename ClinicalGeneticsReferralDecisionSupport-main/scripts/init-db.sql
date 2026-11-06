@@ -1,4 +1,4 @@
-﻿-- Helix PostgreSQL Initialization Script
+-- GENOBRIDGE PostgreSQL Initialization Script
 -- This script runs once when the database is first created
 
 -- Create required extensions
@@ -9,28 +9,28 @@ CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 DO
 \$\$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'helix_app') THEN
-    CREATE ROLE helix_app WITH LOGIN PASSWORD 'dev-password';
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'genobridge_app') THEN
+    CREATE ROLE genobridge_app WITH LOGIN PASSWORD 'dev-password';
   END IF;
 END
 \$\$;
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE helix TO helix_app;
-GRANT ALL PRIVILEGES ON SCHEMA public TO helix_app;
+GRANT ALL PRIVILEGES ON DATABASE genobridge TO genobridge_app;
+GRANT ALL PRIVILEGES ON SCHEMA public TO genobridge_app;
 
 -- Create read-only user for reporting
 DO
 \$\$
 BEGIN
-  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'helix_readonly') THEN
-    CREATE ROLE helix_readonly WITH LOGIN PASSWORD 'readonly-password';
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'genobridge_readonly') THEN
+    CREATE ROLE genobridge_readonly WITH LOGIN PASSWORD 'readonly-password';
   END IF;
 END
 \$\$;
 
-GRANT CONNECT ON DATABASE helix TO helix_readonly;
-GRANT USAGE ON SCHEMA public TO helix_readonly;
+GRANT CONNECT ON DATABASE genobridge TO genobridge_readonly;
+GRANT USAGE ON SCHEMA public TO genobridge_readonly;
 
 -- Note: Tables will be created by Payload CMS migrations
 -- This script only sets up users and extensions
@@ -38,4 +38,4 @@ GRANT USAGE ON SCHEMA public TO helix_readonly;
 -- Enable row-level security for future use
 -- (Payload will create the actual tables)
 
-COMMENT ON DATABASE helix IS 'Helix Clinical Genetics Referral Decision Support System';
+COMMENT ON DATABASE genobridge IS 'GENOBRIDGE Clinical Genetics Referral Decision Support System';

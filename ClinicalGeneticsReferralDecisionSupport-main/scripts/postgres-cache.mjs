@@ -64,7 +64,7 @@ let pgPoolInstance = null;
 function getPgCachePool() {
     if (!pgPoolInstance) {
         const connStr = process.env.DATABASE_URI ||
-            'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging';
+            'postgresql://genobridge_app:genobridge_dev_password_2026@localhost:5432/genobridge_staging';
         pgPoolInstance = new Pool({
             connectionString: connStr,
             max: 30, // Optimized for high concurrent worker pools
@@ -77,7 +77,7 @@ function getPgCachePool() {
 // ---------------------------------------------------------------------------
 // 3. Multi-Tier Cache Engine
 // ---------------------------------------------------------------------------
-export class HelixMultiTierCache {
+export class GenoBridgeMultiTierCache {
     l1 = new L1MemoryCache();
     initialized = false;
     async ensureInitialized() {
@@ -86,7 +86,7 @@ export class HelixMultiTierCache {
         try {
             const pool = getPgCachePool();
             await pool.query(`
-        CREATE UNLOGGED TABLE IF NOT EXISTS helix_cache (
+        CREATE UNLOGGED TABLE IF NOT EXISTS genobridge_cache (
           key VARCHAR(255) PRIMARY KEY,
           value JSONB NOT NULL,
           tags TEXT[] NOT NULL DEFAULT '{}',
@@ -94,8 +94,8 @@ export class HelixMultiTierCache {
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           hit_count BIGINT NOT NULL DEFAULT 0
         );
-        CREATE INDEX IF NOT EXISTS idx_helix_cache_expires_at ON helix_cache (expires_at);
-        CREATE INDEX IF NOT EXISTS idx_helix_cache_tags ON helix_cache USING GIN (tags);
+        CREATE INDEX IF NOT EXISTS idx_genobridge_cache_expires_at ON genobridge_cache (expires_at);
+        CREATE INDEX IF NOT EXISTS idx_genobridge_cache_tags ON genobridge_cache USING GIN (tags);
       `);
             this.initialized = true;
         }
@@ -118,14 +118,14 @@ export class HelixMultiTierCache {
         try {
             await this.ensureInitialized();
             const pool = getPgCachePool();
-            const res = await pool.query('SELECT value, EXTRACT(EPOCH FROM (expires_at - NOW())) * 1000 AS remaining_ms FROM helix_cache WHERE key = $1 AND expires_at > NOW()', [key]);
+            const res = await pool.query('SELECT value, EXTRACT(EPOCH FROM (expires_at - NOW())) * 1000 AS remaining_ms FROM genobridge_cache WHERE key = $1 AND expires_at > NOW()', [key]);
             if (res.rows.length > 0) {
                 const val = res.rows[0].value;
                 const remainingMs = Math.max(1000, Math.floor(Number(res.rows[0].remaining_ms || 60000)));
                 // Backfill into L1 so subsequent requests from this worker take 0.01 ms
                 this.l1.set(key, val, remainingMs);
                 // Increment hit counter asynchronously without awaiting
-                pool.query('UPDATE helix_cache SET hit_count = hit_count + 1 WHERE key = $1', [key]).catch(() => { });
+                pool.query('UPDATE genobridge_cache SET hit_count = hit_count + 1 WHERE key = $1', [key]).catch(() => { });
                 return val;
             }
         }
@@ -145,7 +145,7 @@ export class HelixMultiTierCache {
         try {
             await this.ensureInitialized();
             const pool = getPgCachePool();
-            await pool.query(`INSERT INTO helix_cache (key, value, tags, expires_at)
+            await pool.query(`INSERT INTO genobridge_cache (key, value, tags, expires_at)
          VALUES ($1, $2, $3, NOW() + ($4 || ' seconds')::INTERVAL)
          ON CONFLICT (key) DO UPDATE
          SET value = EXCLUDED.value, tags = EXCLUDED.tags, expires_at = EXCLUDED.expires_at`, [key, JSON.stringify(value), tags, ttlSeconds]);
@@ -161,7 +161,7 @@ export class HelixMultiTierCache {
         this.l1.delete(key);
         try {
             const pool = getPgCachePool();
-            await pool.query('DELETE FROM helix_cache WHERE key = $1', [key]);
+            await pool.query('DELETE FROM genobridge_cache WHERE key = $1', [key]);
         }
         catch { }
     }
@@ -177,7 +177,7 @@ export class HelixMultiTierCache {
         try {
             await this.ensureInitialized();
             const pool = getPgCachePool();
-            await pool.query('DELETE FROM helix_cache WHERE tags && $1', [tags]);
+            await pool.query('DELETE FROM genobridge_cache WHERE tags && $1', [tags]);
         }
         catch { }
     }
@@ -196,4 +196,4 @@ export class HelixMultiTierCache {
         return fresh;
     }
 }
-export const helixCache = new HelixMultiTierCache();
+export const genoBridgeCache = new GenoBridgeMultiTierCache();

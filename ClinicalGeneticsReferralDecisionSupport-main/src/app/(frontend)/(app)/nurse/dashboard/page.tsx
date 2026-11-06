@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Nurse Dashboard | Helix Clinical Genetics',
+  title: 'Nurse Dashboard | GENOBRIDGE Clinical Genetics',
   description: 'Nurse & Medical Assistant Intake and Pedigree Workspace',
 }
 
@@ -88,7 +88,7 @@ export default async function NurseDashboardPage() {
         <div className="text-xs space-y-1">
           <div className="font-semibold text-amber-200">Clinical Governance Role Boundary</div>
           <div className="text-[#A9BDCA] leading-relaxed">
-            In accordance with Helix clinical safety rules, your account is authorized to register patients, capture multi-generation pedigree trees, record ANC risk indicators, and create draft assessments. Final approval and diagnostic referral generation must be completed by an authorized Gynecologist.
+            In accordance with GENOBRIDGE clinical safety rules, your account is authorized to register patients, capture multi-generation pedigree trees, record ANC risk indicators, and create draft assessments. Final approval and diagnostic referral generation must be completed by an authorized Gynecologist.
           </div>
         </div>
       </div>

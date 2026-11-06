@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Administrator Dashboard | Helix Clinical Governance',
+  title: 'Administrator Dashboard | GENOBRIDGE Clinical Governance',
   description: 'Clinical Account Verification & Governance Management',
 }
 
@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
       <div className="p-4 rounded-2xl bg-[#08243B]/60 border border-[#164C60] flex items-start gap-3 text-xs text-[#A9BDCA]">
         <ShieldAlert className="w-4 h-4 text-[#00D8C3] shrink-0 mt-0.5" />
         <p>
-          <strong className="text-white">Least-Privilege Notice:</strong> In accordance with Helix clinical governance invariants, administrator privileges include account provisioning, credential verification, and audit review, but do not automatically grant authorization to sign clinical genetic assessments or patient referral letters.
+          <strong className="text-white">Least-Privilege Notice:</strong> In accordance with GENOBRIDGE clinical governance invariants, administrator privileges include account provisioning, credential verification, and audit review, but do not automatically grant authorization to sign clinical genetic assessments or patient referral letters.
         </p>
       </div>
 

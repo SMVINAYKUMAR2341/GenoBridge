@@ -7,7 +7,7 @@ import { appAuth } from '@/lib/app-auth'
 import { AssessmentCatalogClient } from '@/components/assessment/AssessmentCatalogClient'
 
 export const metadata: Metadata = {
-  title: 'Clinical Pathways | Helix Decision Support',
+  title: 'Clinical Pathways | GENOBRIDGE Decision Support',
   description: 'Evidence-informed clinical genetic pathways and referral decision support.',
 }
 

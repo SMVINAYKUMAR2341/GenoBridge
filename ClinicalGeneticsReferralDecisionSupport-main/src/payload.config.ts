@@ -40,7 +40,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI || 'postgresql://helix_app:helix_dev_password_2026@localhost:5432/helix_staging',
+      connectionString: process.env.DATABASE_URI || 'postgresql://genobridge_app:genobridge_dev_password_2026@localhost:5432/genobridge_staging',
       max: 50,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
@@ -48,7 +48,7 @@ export default buildConfig({
     },
     idType: 'uuid',
   }),
-  secret: process.env.PAYLOAD_SECRET || 'helix-dev-secret-key-change-in-production-min-32-chars',
+  secret: process.env.PAYLOAD_SECRET || 'GENOBRIDGE-dev-secret-key-change-in-production-min-32-chars',
   i18n: {
     fallbackLanguage: 'en',
     supportedLanguages: { en: adminLanguage },
