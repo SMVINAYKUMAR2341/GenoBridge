@@ -696,70 +696,149 @@ export default function LandingPage() {
         {/* GUIDELINE-INFORMED CLINICAL DECISION SUPPORT */}
         <section className="w-full px-4 sm:px-6 lg:px-8 py-16" id="guidelines">
           <div className="max-w-7xl mx-auto flex flex-col gap-8">
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-xs text-[#4fdbc8] uppercase tracking-wider font-semibold">
-                Referenced Literature
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#d4e4fa]">Guideline-Informed Clinical Decision Support</h2>
-              <p className="text-sm sm:text-base text-[#bbcac6] max-w-3xl">
-                GENOBRIDGE organizes clinical information and supports structured referral assessment using configurable clinical criteria calibrated against recognized professional society statements.
+            <div className="flex flex-col gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1c2b3c] border border-[#4fdbc8]/30 text-[#4fdbc8] text-xs font-mono font-semibold w-fit">
+                <span>STATUTORY EVIDENCE BASE · FOGSI · ACOG · ACMG · ASRM · NCCN</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#d4e4fa]">
+                Published Clinical Guidelines &amp; Direct Statutory Index
+              </h2>
+              <p className="text-sm sm:text-base text-[#bbcac6] max-w-3xl leading-relaxed">
+                GENOBRIDGE eliminates clinical guesswork and diagnostic delays by indexing point-of-care patient inputs directly against published professional society guidelines. Every triage alert provides verifiable document citations, page numbers, and clinical rationale.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-6 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs text-[#7bd0ff]">ACOG Committee Opinion No. 793</span>
-                  <h3 className="text-lg font-semibold text-[#d4e4fa]">Hereditary Cancer Risk</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* Card 1: FOGSI Indian Antenatal & Consanguinity Guidelines */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      FOGSI GCPR 2024
+                    </span>
+                    <span className="text-[10px] font-mono text-[#4fdbc8] uppercase font-bold">Indian MCH</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    FOGSI Routine ANC &amp; Consanguinity
+                  </h3>
                   <p className="text-xs text-[#bbcac6] leading-relaxed">
-                    Hereditary Cancer Syndromes and Risk Assessment. Establishes thresholds for pedigree evaluation, early onset criteria, and multi-gene panel referrals.
+                    Federation of Obstetric and Gynaecological Societies of India Good Clinical Practice Recommendations. Prescribes standard 3-generation family pedigree charting, consanguineous union risk stratification, and preconception hemoglobinopathy screening in crowded OPDs.
                   </p>
                 </div>
-                <div className="pt-4 font-mono text-xs text-[#4fdbc8]">NCCN Criteria Alignment</div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">FOGSI GCPR Section 4.2</span>
+                  <span className="text-[#7bd0ff] font-medium">Consanguinity &amp; Thalassemia</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs text-[#7bd0ff]">ACOG Committee Opinion No. 691</span>
-                  <h3 className="text-lg font-semibold text-[#d4e4fa]">Carrier Screening</h3>
+              {/* Card 2: ACOG No. 691 & ACMG Carrier Screening */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      ACOG No. 691 / ACMG Tier 3
+                    </span>
+                    <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold">Carrier Triage</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    Preconception Carrier Screening
+                  </h3>
                   <p className="text-xs text-[#bbcac6] leading-relaxed">
-                    Carrier Screening for Genetic Conditions. Details pan-ethnic cystic fibrosis, SMA, hemoglobinopathy triage, and expanded carrier screening partner testing.
+                    Carrier Screening for Genetic Conditions. Establishes pan-ethnic screening protocols for Cystic Fibrosis (CFTR), Spinal Muscular Atrophy (SMN1), Thalassemia (HBB), and Fragile X, mandating immediate partner testing upon positive carrier identification.
                   </p>
                 </div>
-                <div className="pt-4 font-mono text-xs text-[#4fdbc8]">ACMG Technical Standards</div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">ACOG Bull. 691 · ACMG 2023</span>
+                  <span className="text-[#7bd0ff] font-medium">Autosomal Recessive</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs text-[#7bd0ff]">ACOG Practice Advisory (Jan 2026)</span>
-                  <h3 className="text-lg font-semibold text-[#d4e4fa]">NIPT and Prenatal Screening</h3>
+              {/* Card 3: ACOG PB 226 & SMFM NIPT Screening */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      ACOG PB 226 / SMFM
+                    </span>
+                    <span className="text-[10px] font-mono text-pink-400 uppercase font-bold">cfDNA Triage</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    NIPT &amp; Fetal Chromosomal Screening
+                  </h3>
                   <p className="text-xs text-[#bbcac6] leading-relaxed">
-                    Screening for Fetal Chromosomal Abnormalities, endorsing updated SMFM guidance on cell-free DNA, discordant findings, and ultrasound correlation.
+                    Screening for Fetal Chromosomal Abnormalities. Standardizes triage for Trisomy 21, 18, 13, sex-chromosome aneuploidies, low fetal fraction (&lt;4.0%), redraw timing, and indications for diagnostic amniocentesis versus repeat cell-free DNA sampling.
                   </p>
                 </div>
-                <div className="pt-4 font-mono text-xs text-[#4fdbc8]">SMFM Consensus Endorsed</div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">ACOG PB 226 · SMFM 2026</span>
+                  <span className="text-[#7bd0ff] font-medium">Aneuploidy &amp; Fetal Fraction</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] shadow-sm flex flex-col justify-between">
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs text-[#7bd0ff]">ACOG Practice Bulletin No. 175</span>
-                  <h3 className="text-lg font-semibold text-[#d4e4fa]">Ultrasound Findings</h3>
+              {/* Card 4: ACOG PB 175 & ISUOG Ultrasound Findings */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      ACOG PB 175 / ISUOG
+                    </span>
+                    <span className="text-[10px] font-mono text-blue-400 uppercase font-bold">Ultrasound Red Flags</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    Abnormal Fetal Structural Ultrasound
+                  </h3>
                   <p className="text-xs text-[#bbcac6] leading-relaxed">
-                    Ultrasound in Pregnancy. Informs indications for diagnostic testing (chorionic villus sampling and amniocentesis with chromosomal microarray) upon anomalous findings.
+                    Ultrasound in Pregnancy. Informs urgent indications for diagnostic testing (CVS / Amniocentesis with Chromosomal Microarray) upon detecting thickened nuchal translucency (NT ≥ 3.5mm), cystic hygroma, VSD, or multi-system congenital anomalies.
                   </p>
                 </div>
-                <div className="pt-4 font-mono text-xs text-[#4fdbc8]">Microarray Indication Rules</div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">ACOG Bull. 175 · ISUOG NT</span>
+                  <span className="text-[#7bd0ff] font-medium">Chromosomal Microarray (CMA)</span>
+                </div>
               </div>
 
-              <div className="p-6 rounded-xl bg-[#0d1c2d] border border-[#1c2b3c] shadow-sm flex flex-col justify-between lg:col-span-2">
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-xs text-[#7bd0ff]">ACOG Committee Statement (Feb 2026)</span>
-                  <h3 className="text-lg font-semibold text-[#d4e4fa]">Ethical Considerations</h3>
+              {/* Card 5: ASRM 2024 & ACOG PB 200 Recurrent Pregnancy Loss */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      ASRM 2024 / ACOG PB 200
+                    </span>
+                    <span className="text-[10px] font-mono text-amber-400 uppercase font-bold">RPL &amp; Fertility</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    Infertility &amp; Recurrent Loss (RPL)
+                  </h3>
                   <p className="text-xs text-[#bbcac6] leading-relaxed">
-                    Ethical Considerations for Genetic Testing and Counseling in Obstetrics and Gynecology. Emphasizes patient autonomy, structured pre-test education, non-directive counseling, and management of variants of uncertain significance (VUS).
+                    Evaluation and Treatment of Recurrent Pregnancy Loss. Defines clinical criteria for couples experiencing ≥2 spontaneous pregnancy losses, mandating parental peripheral blood karyotyping for balanced reciprocal or Robertsonian translocations.
                   </p>
                 </div>
-                <div className="pt-4 font-mono text-xs text-[#4fdbc8]">Informed Consent &amp; Autonomy Principles</div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">ASRM Guideline · ESHRE</span>
+                  <span className="text-[#7bd0ff] font-medium">Parental Karyotype Triage</span>
+                </div>
+              </div>
+
+              {/* Card 6: ACOG No. 793 & NCCN v2.2024 Hereditary Cancer */}
+              <div className="p-6 rounded-2xl bg-[#0d1c2d] border border-[#1c2b3c] hover:border-[#4fdbc8]/50 transition-all shadow-sm flex flex-col justify-between group">
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] font-semibold text-[#7bd0ff] px-2.5 py-0.5 rounded bg-[#102b43] border border-[#164c60]">
+                      ACOG No. 793 / NCCN v2.2024
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold">Oncogenetics</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#4fdbc8] transition-colors">
+                    Hereditary Cancer &amp; Multi-Gene Panels
+                  </h3>
+                  <p className="text-xs text-[#bbcac6] leading-relaxed">
+                    Hereditary Cancer Syndromes and Risk Assessment. Establishes pedigree thresholds for BRCA1/2, Lynch syndrome (MLH1, MSH2, MSH6, PMS2), early-onset breast (&lt;50y), epithelial ovarian, and colorectal malignancies in obstetrics and gynecology.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-[#1c2b3c]/80 flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#4fdbc8]">ACOG Opinion 793 · NCCN</span>
+                  <span className="text-[#7bd0ff] font-medium">BRCA1/2 &amp; Lynch Triage</span>
+                </div>
               </div>
             </div>
           </div>

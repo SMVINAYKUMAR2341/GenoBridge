@@ -16,12 +16,13 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { GenoBridgeLogo, SidebarWave } from '@/components/ui/Graphics'
-import { ChartBars } from '@/components/ui/Icons'
+import { ChartBars, FamilyTree } from '@/components/ui/Icons'
 
 type NavLink = { href: string; label: string; icon: LucideIcon }
 
 export const NAV: NavLink[] = [
   { href: '/assessment', label: 'New Assessment', icon: House },
+  { href: '/pedigree', label: 'Pedigree Studio', icon: FamilyTree },
   { href: '/anc', label: 'Antenatal Care (ANC)', icon: Baby },
   { href: '/history', label: 'Patient History', icon: User },
   { href: '/referrals', label: 'Referral Overview', icon: ArrowLeftRight },

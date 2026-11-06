@@ -1,9 +1,10 @@
 'use client'
 
-import { Download, ShieldCheck } from 'lucide-react'
+import { Download, ShieldCheck, FileCode2 } from 'lucide-react'
 import { btnGhost, card } from '@/components/ui/Primitives'
 import { FORM_FIELDS } from '@/lib/form-fields'
 import type { WorkflowRecord } from '@/lib/workflow-store'
+import { buildFhirGenomicsBundle, downloadFhirBundleJson } from '@/lib/fhir-genomics-bundle'
 
 export const OUTCOME_LABELS: Record<string, string> = {
   urgent_referral: 'Urgent referral',
@@ -269,12 +270,36 @@ export function WorkflowResult({ record }: { record: WorkflowRecord | null }) {
           </p>
         )}
         {record?.state === 'FINALIZED' && (
-          <a className={btnGhost} href={`/api/referrals/${encodeURIComponent(record.workflowKey)}`}>
-            <Download size={16} />{' '}
-            {decision === 'no_referral_needed'
-              ? 'Download finalized no-referral report'
-              : 'Download finalized report'}
-          </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <a className={btnGhost} href={`/api/referrals/${encodeURIComponent(record.workflowKey)}`}>
+              <Download size={16} />{' '}
+              {decision === 'no_referral_needed'
+                ? 'Download finalized no-referral report'
+                : 'Download finalized report'}
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                const bundle = buildFhirGenomicsBundle(null, {
+                  pathwayTitle: record.pathwaySlug.replaceAll('-', ' '),
+                  decisionLabel: OUTCOME_LABELS[decision] || decision.replaceAll('_', ' '),
+                  rationale: text(result.rationale, 'Clinical criteria evaluated against published guidelines.'),
+                  guidelineCitations: sources.map((s) => `${text(object(s.source).org)} · ${text(object(s.source).title)} (${text(object(s.source).guidelineVersion)})`),
+                  practitionerName: text(signoff.name, 'Reviewing Clinician'),
+                  councilNumber: text(signoff.actor, 'NMC-REGISTERED'),
+                })
+                downloadFhirBundleJson(
+                  bundle,
+                  `genobridge-fhir-r4-${record.workflowKey.slice(0, 10)}.json`
+                )
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#033424] text-[#00e5ce] border border-[#0e5c3e] hover:bg-[#064e3b] transition-all"
+              title="Download standardized HL7 FHIR Genomics R4 Bundle (ABDM / Ayushman Bharat Digital Mission compliant)"
+            >
+              <FileCode2 size={15} />
+              <span>Export HL7 FHIR (ABDM)</span>
+            </button>
+          </div>
         )}
         <details className="border-t border-hx-border pt-3">
           <summary className="cursor-pointer font-semibold">

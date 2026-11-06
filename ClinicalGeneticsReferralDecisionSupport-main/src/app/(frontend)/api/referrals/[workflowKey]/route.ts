@@ -4,6 +4,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { workflowStore, payloadWorkflowUser, type WorkflowUser } from '@/lib/workflow-store'
 import { isProvider, workflowContext } from '@/lib/workflow-security'
 import { assertReferralExport, generateReferralPdf } from '@/lib/referral-pdf'
+import { buildFhirGenomicsBundle } from '@/lib/fhir-genomics-bundle'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,6 +36,43 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     const workflow = found.docs[0]
     if (!workflow || workflow.workflowKey !== workflowKey) return failure(404)
     try { assertReferralExport(workflow) } catch { return failure(409) }
+
+    const url = new URL(_request.url)
+    const isFhir = url.searchParams.get('format') === 'fhir'
+
+    if (isFhir) {
+      const evaluationSnapshot = (workflow.evaluationSnapshot as any) || {}
+      const result = evaluationSnapshot.result || {}
+      const fhirBundle = buildFhirGenomicsBundle(null, {
+        pathwayTitle: workflow.pathwaySlug?.replaceAll('-', ' ') || 'Genetics Referral',
+        decisionLabel: workflow.decision?.replaceAll('_', ' ') || 'Genetic Referral',
+        rationale: result.rationale || 'Clinical evaluation meets guideline criteria.',
+        practitionerName: user.name || 'Referring Gynecologist',
+        hospitalName: 'GENOBRIDGE Healthcare Network (ABDM Facility)',
+      })
+
+      const jsonStr = JSON.stringify(fhirBundle, null, 2)
+      await store.create({
+        collection: 'audit-logs', overrideAccess: false, user,
+        context: workflowContext(payloadWorkflowUser(user), { kind: 'audit', key: workflowKey }),
+        data: {
+          eventCode: randomUUID(), actorName: user.name, actorRole: 'OB/GYN Provider',
+          actionType: 'REFERRAL_GENERATED', resourceRef: workflow.id,
+          details: 'Standardized HL7 FHIR Genomics R4 Bundle (ABDM) generated; revision ' + workflow.revision + '.',
+          encryptionVerified: false,
+        },
+      })
+
+      return new Response(jsonStr, {
+        status: 200,
+        headers: {
+          ...headers,
+          'Content-Type': 'application/fhir+json; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="genobridge-hl7-fhir-genomics-abdm.json"',
+        },
+      })
+    }
+
     const bytes = generateReferralPdf(workflow)
     // Fail closed: never return the document if its generation cannot be audited.
     await store.create({

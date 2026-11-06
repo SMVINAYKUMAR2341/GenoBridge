@@ -19,7 +19,10 @@ import {
   Sparkles,
   Baby,
   AlertTriangle,
+  GitFork,
 } from 'lucide-react'
+import PathwayScenarioHub from '@/components/dashboard/PathwayScenarioHub'
+import PublishedGuidelinesIndex from '@/components/clinical/PublishedGuidelinesIndex'
 
 export const metadata: Metadata = {
   title: 'Doctor Dashboard | GENOBRIDGE Clinical Genetics',
@@ -164,70 +167,11 @@ export default async function DoctorDashboardPage() {
         </div>
       </div>
 
-      {/* Clinical Pathways Quick Access */}
-      <div className="space-y-4">
-        <h2 className="text-base font-bold uppercase tracking-wider text-[#00D8C3]">
-          Active Clinical Genetic Pathways
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Link
-            href="/assessment/hereditary-cancer"
-            className="p-5 rounded-2xl bg-[#08243B]/70 border border-[#164C60] hover:border-[#00D8C3] hover:shadow-lg hover:shadow-[#00D8C3]/10 transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-mono font-bold text-[#00D8C3]">PATHWAY 01</span>
-              <h3 className="text-base font-bold text-white group-hover:text-[#00D8C3] transition-colors">
-                Hereditary Cancer Risk (BRCA1/2 &amp; Lynch)
-              </h3>
-              <p className="text-xs text-[#A9BDCA] leading-relaxed">
-                NCCN / ACMG multi-generational family history triage for breast, ovarian, and colorectal cancer risk.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center justify-between text-xs font-semibold text-[#00D8C3]">
-              <span>Launch Assessment</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
+      {/* Statutory Guidelines & Direct Professional Index (FOGSI / ACOG / ACMG / ASRM / NCCN) */}
+      <PublishedGuidelinesIndex />
 
-          <Link
-            href="/assessment/preconception-carrier"
-            className="p-5 rounded-2xl bg-[#08243B]/70 border border-[#164C60] hover:border-[#00D8C3] hover:shadow-lg hover:shadow-[#00D8C3]/10 transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-mono font-bold text-[#00D8C3]">PATHWAY 02</span>
-              <h3 className="text-base font-bold text-white group-hover:text-[#00D8C3] transition-colors">
-                Preconception &amp; Carrier Screening
-              </h3>
-              <p className="text-xs text-[#A9BDCA] leading-relaxed">
-                ACOG committee opinion screening for hemoglobinopathies, spinal muscular atrophy, and cystic fibrosis.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center justify-between text-xs font-semibold text-[#00D8C3]">
-              <span>Launch Assessment</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/assessment/nipt-discordance"
-            className="p-5 rounded-2xl bg-[#08243B]/70 border border-[#164C60] hover:border-[#00D8C3] hover:shadow-lg hover:shadow-[#00D8C3]/10 transition-all group flex flex-col justify-between"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-mono font-bold text-[#00D8C3]">PATHWAY 03</span>
-              <h3 className="text-base font-bold text-white group-hover:text-[#00D8C3] transition-colors">
-                Atypical NIPT / cfDNA Results
-              </h3>
-              <p className="text-xs text-[#A9BDCA] leading-relaxed">
-                Diagnostic counseling guidance for high-risk cell-free DNA aneuploidy calls and discordant ultrasound findings.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center justify-between text-xs font-semibold text-[#00D8C3]">
-              <span>Launch Assessment</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </div>
-      </div>
+      {/* Clinical Pathways Hub (6 Evidence-Based Scenarios) */}
+      <PathwayScenarioHub />
 
       {/* Clinical Review Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

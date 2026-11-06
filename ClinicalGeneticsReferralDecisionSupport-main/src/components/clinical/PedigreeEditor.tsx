@@ -12,6 +12,7 @@ import {
   type PedigreePerson,
 } from './pedigree-model'
 import { downloadSvg, printClinicalDocument } from './document-print'
+import { buildFhirGenomicsBundle, downloadFhirBundleJson } from '@/lib/fhir-genomics-bundle'
 
 export interface PedigreeEditorProps {
   /** Supplying value makes this controlled. Without onChange it is read-only. */
@@ -161,6 +162,25 @@ export function PedigreeEditor({
           disabled={!parsed.success}
         >
           Print / Save as PDF…
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#033424] text-[#00e5ce] border border-[#0e5c3e] hover:bg-[#064e3b] transition-all disabled:opacity-40"
+          onClick={() => {
+            const hasConsanguinity = model.families.some((f) => f.consanguineous)
+            const bundle = buildFhirGenomicsBundle(model, {
+              pathwayTitle: model.title || 'Three-generation Family Pedigree',
+              decisionLabel: hasConsanguinity ? 'Urgent Genetics Referral (Consanguinity)' : 'Clinical Genetics Pedigree Evaluation',
+              findings: {
+                consanguinity: hasConsanguinity,
+              },
+            })
+            downloadFhirBundleJson(bundle, `${(model.title || 'pedigree').toLowerCase().replace(/\s+/g, '-')}-fhir-r4-abdm.json`)
+          }}
+          disabled={!parsed.success}
+          title="Export HL7 FHIR Genomics R4 Bundle (ABDM / Ayushman Bharat Digital Mission compliant)"
+        >
+          Export HL7 FHIR (ABDM)
         </button>
       </div>
       <p id={description} className="text-sm text-hx-muted">
