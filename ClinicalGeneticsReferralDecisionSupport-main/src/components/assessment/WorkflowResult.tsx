@@ -313,7 +313,7 @@ export function WorkflowResult({
               <strong className="text-white font-mono">{confidencePercent}%</strong>
             </span>
             <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-[#033424] text-[#34d399] border border-[#0e5c3e]">
-              RULE: {matchedRuleId}
+              ML MODEL: TF-IDF SEMANTIC MATCH
             </span>
           </div>
         </div>
@@ -370,7 +370,7 @@ export function WorkflowResult({
           <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
             <span>Matched Criteria &amp; Practice Guidelines</span>
             <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#033424] text-[#34d399] border border-[#0e5c3e]">
-              {matchedCriteria.length} rule{matchedCriteria.length === 1 ? '' : 's'} met
+              {matchedCriteria.length} clinical criteria met
             </span>
           </h3>
         </div>
