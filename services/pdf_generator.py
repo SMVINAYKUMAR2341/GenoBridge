@@ -239,7 +239,26 @@ def generate_clinical_pdf(
     - <b>Diagnostic ICD-10 Codes:</b> {icd_desc}
     """
     story.append(Paragraph(rationale_text, body_style))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
+
+    # Patient Guidance Summary
+    patient_summary = evaluation.get("patient_summary_en")
+    if patient_summary:
+        story.append(Paragraph("Patient Guidance Summary (Assistive Patient Memo)", section_heading))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.black, spaceAfter=5))
+        clean_lines = []
+        for line in patient_summary.split("\n"):
+            line_str = clean_ascii_text(line).strip()
+            if not line_str or "Patient Guidance Note" in line_str or "Doctor Review" in line_str:
+                continue
+            if line_str.startswith("**") and line_str.endswith("**"):
+                clean_lines.append(f"<b>{line_str.strip('*')}</b>")
+            else:
+                formatted = line_str.replace("**", "<b>").replace("</b>*", "</b>")
+                clean_lines.append(formatted)
+        summary_html = "<br/>".join(clean_lines[:7])
+        story.append(Paragraph(summary_html, body_style))
+        story.append(Spacer(1, 8))
 
     # 5. Doctor Review Attestation & Signature Block
     signoff_text = f"""

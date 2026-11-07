@@ -223,7 +223,46 @@ export async function POST(request: Request) {
       curY -= 2
     }
 
-    curY -= 10
+    curY -= 6
+
+    // Section: Patient Guidance Summary (Memo for Patient & Family)
+    const rawPatientMemo = String(evaluation.patient_summary_en || '')
+    if (rawPatientMemo) {
+      textOps.push('BT', '/F2 9.5 Tf', `40 ${curY} Td`, `(${escapePdf('Patient Guidance Summary (Assistive Patient Memo)')}) Tj`, 'ET')
+      curY -= 4
+      textOps.push('0.5 w', `40 ${curY} m 572 ${curY} l S`)
+      curY -= 11
+
+      const memoLines = rawPatientMemo
+        .split(/\r?\n/)
+        .map((l) => l.replace(/^[#\s*]+|[#\s*]+$/g, '').trim())
+        .filter(
+          (l) =>
+            l.length > 0 &&
+            !l.toLowerCase().includes('patient guidance note') &&
+            !l.toLowerCase().includes('doctor review')
+        )
+        .slice(0, 6)
+
+      for (const m of memoLines) {
+        const isHeaderLine = m.endsWith(':')
+        const wrapped = wrapLines(m, 96)
+        for (let i = 0; i < wrapped.length; i++) {
+          const prefix = isHeaderLine ? '' : (i === 0 ? '- ' : '  ')
+          textOps.push(
+            'BT',
+            isHeaderLine ? '/F2 7.5 Tf' : '/F1 7.5 Tf',
+            `45 ${curY} Td`,
+            `(${escapePdf(prefix + wrapped[i])}) Tj`,
+            'ET'
+          )
+          curY -= 9.5
+        }
+      }
+      curY -= 6
+    }
+
+    curY -= 4
 
     // Section: Attending Doctor Sign-Off & Attestation Block
     textOps.push('0.75 w', `40 ${curY - 50} 532 50 re S`)

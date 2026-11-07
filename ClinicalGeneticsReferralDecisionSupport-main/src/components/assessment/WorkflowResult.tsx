@@ -20,6 +20,12 @@ import {
   X,
   UserCheck,
   Edit3,
+  Eye,
+  CheckSquare,
+  HelpCircle,
+  HeartHandshake,
+  Stethoscope,
+  FolderOpen,
 } from 'lucide-react'
 import type { WorkflowRecord } from '@/lib/workflow-store'
 import type { DecisionResult, StandardTier } from '@/lib/decision-engine'
@@ -32,6 +38,145 @@ export const OUTCOME_LABELS: Record<string, string> = {
   borderline_consideration: 'Priority specialist review (Within 1–2 weeks)',
   insufficient_information: 'Insufficient data — parameters missing',
   criteria_pending_approval: 'Criteria pending approval — manual review',
+}
+
+interface ParsedGuidanceSection {
+  headerTitle: string
+  reasonTitle: string
+  reasonBody: string
+  bringTitle: string
+  bringItems: string[]
+  questionsTitle: string
+  questions: string[]
+  expectTitle: string
+  expectBody: string
+}
+
+function parsePatientGuidance(raw: string, lang: 'en' | 'hi'): ParsedGuidanceSection {
+  const isHi = lang === 'hi'
+  const parsed: ParsedGuidanceSection = {
+    headerTitle: isHi ? 'रोगी सूचना एवं मार्गदर्शन पत्र' : 'Patient Guidance Note',
+    reasonTitle: isHi ? 'विशेषज्ञ परामर्श का कारण' : 'Why this referral is suggested',
+    reasonBody: '',
+    bringTitle: isHi ? 'परामर्श में क्या साथ लाएं' : 'What to bring to your consultation',
+    bringItems: [],
+    questionsTitle: isHi ? 'परामर्शदाता से पूछे जाने वाले मुख्य प्रश्न' : 'Questions you can ask your specialist',
+    questions: [],
+    expectTitle: isHi ? 'परामर्श सत्र में क्या होगा' : 'What to expect during the visit',
+    expectBody: '',
+  }
+
+  if (!raw || typeof raw !== 'string') return parsed
+
+  const lines = raw.split(/\r?\n/)
+  let currentSection = 'header'
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+
+    // Detect section titles
+    if (trimmed.includes('Patient Guidance Note') || trimmed.includes('रोगी सूचना')) {
+      const cleanH = trimmed.replace(/^[#\s*]+|[#\s*]+$/g, '').replace(/\(.*\)/, '').trim()
+      if (cleanH) parsed.headerTitle = cleanH
+      continue
+    }
+    if (
+      trimmed.toLowerCase().includes('why this referral') ||
+      trimmed.toLowerCase().includes('reason for referral') ||
+      trimmed.includes('परामर्श का कारण')
+    ) {
+      currentSection = 'reason'
+      parsed.reasonTitle = trimmed.replace(/[*#:_]/g, '').trim()
+      continue
+    }
+    if (
+      trimmed.toLowerCase().includes('what to bring') ||
+      trimmed.toLowerCase().includes('checklist') ||
+      trimmed.includes('क्या साथ लाएं')
+    ) {
+      currentSection = 'bring'
+      parsed.bringTitle = trimmed.replace(/[*#:_]/g, '').trim()
+      continue
+    }
+    if (
+      trimmed.toLowerCase().includes('questions you can ask') ||
+      trimmed.toLowerCase().includes('questions to ask') ||
+      trimmed.includes('पूछे जाने वाले')
+    ) {
+      currentSection = 'questions'
+      parsed.questionsTitle = trimmed.replace(/[*#:_]/g, '').trim()
+      continue
+    }
+    if (
+      trimmed.toLowerCase().includes('what to expect') ||
+      trimmed.toLowerCase().includes('during the visit') ||
+      trimmed.includes('क्या होगा')
+    ) {
+      currentSection = 'expect'
+      parsed.expectTitle = trimmed.replace(/[*#:_]/g, '').trim()
+      continue
+    }
+
+    // Strip leading markdown bullets/numbers/asterisks
+    const cleanLine = trimmed
+      .replace(/^[*#\s]+/, '')
+      .replace(/^[-*•\d.]+\s*/, '')
+      .replace(/[*_]/g, '')
+      .trim()
+
+    if (currentSection === 'reason') {
+      parsed.reasonBody = parsed.reasonBody ? `${parsed.reasonBody} ${cleanLine}` : cleanLine
+    } else if (currentSection === 'bring') {
+      if (cleanLine) parsed.bringItems.push(cleanLine)
+    } else if (currentSection === 'questions') {
+      if (cleanLine) parsed.questions.push(cleanLine)
+    } else if (currentSection === 'expect') {
+      parsed.expectBody = parsed.expectBody ? `${parsed.expectBody} ${cleanLine}` : cleanLine
+    } else {
+      parsed.reasonBody = parsed.reasonBody ? `${parsed.reasonBody} ${cleanLine}` : cleanLine
+    }
+  }
+
+  // Fallbacks if absent
+  if (!parsed.reasonBody) {
+    parsed.reasonBody = isHi
+      ? 'आपके चिकित्सक ने क्लिनिकल दिशा-निर्देशों के आधार पर विशेषज्ञ परामर्श की अनुशंसा की है।'
+      : 'Your clinician has recommended a specialist consultation based on verified clinical guidelines.'
+  }
+  if (parsed.bringItems.length === 0) {
+    parsed.bringItems = isHi
+      ? [
+          'पूर्व के सभी अल्ट्रासाउंड स्कैन, रक्त जांच और प्रयोगशाला रिपोर्ट',
+          'पारिवारिक स्वास्थ्य इतिहास विवरण (रक्त संबंधियों में हुई बीमारियां)',
+          'अपने प्रश्नों की सूची और वर्तमान में ली जा रही दवाओं के विवरण',
+        ]
+      : [
+          'All prior blood test reports, ultrasound scan images, and laboratory summaries',
+          'Family health background details (any illnesses or test reports in blood relatives)',
+          'A written list of your questions and any current medications',
+        ]
+  }
+  if (parsed.questions.length === 0) {
+    parsed.questions = isHi
+      ? [
+          'इस परामर्श का मेरे या मेरे परिवार के स्वास्थ्य के लिए क्या महत्व है?',
+          'आगे कौन-सी जांचें उपलब्ध हैं और उनके क्या लाभ व सीमाएं हैं?',
+          'परिवार के भविष्य के स्वास्थ्य हेतु हम क्या कदम उठा सकते हैं?',
+        ]
+      : [
+          'What does this guideline referral mean for me or my pregnancy?',
+          'What further tests are available, and what are their benefits and limitations?',
+          'What steps can we take to protect our family’s health?',
+        ]
+  }
+  if (!parsed.expectBody) {
+    parsed.expectBody = isHi
+      ? 'आनुवंशिक विशेषज्ञ (जेनेटिक काउंसलर) पूरी गोपनीयता और संवेदनशीलता के साथ आपकी स्वास्थ्य पृष्ठभूमि को समझेंगे और सभी विकल्पों को स्पष्ट करेंगे।'
+      : 'The genetics specialist will review your personal and family medical history in a friendly, confidential setting to guide your decisions.'
+  }
+
+  return parsed
 }
 
 interface Props {
@@ -67,12 +212,13 @@ export function WorkflowResult({
   const [langTab, setLangTab] = useState<'en' | 'hi'>('en')
   const [editableSummaryEn, setEditableSummaryEn] = useState(
     decision?.patient_summary_en ||
-      'Your doctor has recommended a specialist clinical genetics consultation based on verified clinical guidelines. This is an assistive referral navigation step to review family health records and discuss testing choices.'
+    'Your doctor has recommended a specialist clinical genetics consultation based on verified clinical guidelines. This is an assistive referral navigation step to review family health records and discuss testing choices.'
   )
   const [editableSummaryHi, setEditableSummaryHi] = useState(
     decision?.patient_summary_hi ||
-      'आपके चिकित्सक ने क्लिनिकल दिशा-निर्देशों के आधार पर विशेषज्ञ जेनेटिक परामर्श की अनुशंसा की है। यह किसी बीमारी का अंतिम निदान नहीं है, बल्कि स्वास्थ्य रिकॉर्ड की समीक्षा और उपयुक्त जांच विकल्पों पर मार्गदर्शन हेतु एक परामर्श है।'
+    'आपके चिकित्सक ने क्लिनिकल दिशा-निर्देशों के आधार पर विशेषज्ञ जेनेटिक परामर्श की अनुशंसा की है। यह किसी बीमारी का अंतिम निदान नहीं है, बल्कि स्वास्थ्य रिकॉर्ड की समीक्षा और उपयुक्त जांच विकल्पों पर मार्गदर्शन हेतु एक परामर्श है।'
   )
+  const [isEditingPatientNote, setIsEditingPatientNote] = useState(false)
 
   // Extract server evaluation if present
   const snapshot = (record?.evaluationSnapshot as Record<string, unknown>) || {}
@@ -132,13 +278,13 @@ export function WorkflowResult({
       decision?.guideline_citations && decision.guideline_citations.length > 0
         ? decision.guideline_citations
         : [
-            'ACOG Practice Bulletin No. 691 / ACMG Tier 3 — Preconception Carrier Screening',
-            'ACOG Practice Bulletin No. 226 / SMFM — Screening for Fetal Chromosomal Abnormalities',
-            'ACOG Practice Bulletin No. 175 — Ultrasound Examination in Pregnancy',
-            'ASRM Practice Committee 2024 — Evaluation of Recurrent Pregnancy Loss',
-            'FOGSI Good Clinical Practice Recommendations in Antenatal Genetics',
-            'NCCN Clinical Practice Guidelines in Oncology — Genetic/Familial High-Risk Assessment',
-          ]
+          'ACOG Practice Bulletin No. 691 / ACMG Tier 3 — Preconception Carrier Screening',
+          'ACOG Practice Bulletin No. 226 / SMFM — Screening for Fetal Chromosomal Abnormalities',
+          'ACOG Practice Bulletin No. 175 — Ultrasound Examination in Pregnancy',
+          'ASRM Practice Committee 2024 — Evaluation of Recurrent Pregnancy Loss',
+          'FOGSI Good Clinical Practice Recommendations in Antenatal Genetics',
+          'NCCN Clinical Practice Guidelines in Oncology — Genetic/Familial High-Risk Assessment',
+        ]
     )
   )
 
@@ -288,15 +434,14 @@ export function WorkflowResult({
 
       {/* 3. Authoritative Clinical Referral Decision Hero Banner */}
       <div
-        className={`rounded-2xl p-6 sm:p-8 text-white shadow-xl border ${
-          isUrgent
-            ? 'bg-gradient-to-r from-[#881337] via-[#9f1239] to-[#be123c] border-rose-500/50'
-            : isPriority
-              ? 'bg-gradient-to-r from-[#7c2d12] via-[#9a3412] to-[#c2410c] border-orange-500/50'
-              : isRoutine
-                ? 'bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#b45309] border-amber-500/50'
-                : 'bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#059669] border-emerald-500/50'
-        }`}
+        className={`rounded-2xl p-6 sm:p-8 text-white shadow-xl border ${isUrgent
+          ? 'bg-gradient-to-r from-[#881337] via-[#9f1239] to-[#be123c] border-rose-500/50'
+          : isPriority
+            ? 'bg-gradient-to-r from-[#7c2d12] via-[#9a3412] to-[#c2410c] border-orange-500/50'
+            : isRoutine
+              ? 'bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#b45309] border-amber-500/50'
+              : 'bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#059669] border-emerald-500/50'
+          }`}
       >
         <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 mb-3">
           <span className="flex items-center gap-2">
@@ -380,13 +525,12 @@ export function WorkflowResult({
                     <span>{r.label}</span>
                   </span>
                   <span
-                    className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${
-                      r.tier === 'URGENT'
-                        ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                        : r.tier === 'PRIORITY'
-                          ? 'bg-orange-950 text-orange-300 border border-orange-800'
-                          : 'bg-amber-950 text-amber-300 border border-amber-800'
-                    }`}
+                    className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${r.tier === 'URGENT'
+                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                      : r.tier === 'PRIORITY'
+                        ? 'bg-orange-950 text-orange-300 border border-orange-800'
+                        : 'bg-amber-950 text-amber-300 border border-amber-800'
+                      }`}
                   >
                     {r.tier}
                   </span>
@@ -478,54 +622,169 @@ export function WorkflowResult({
       )}
 
       {/* 7. Bilingual Patient-Friendly Summary (6th-Grade Reading Level) */}
-      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-4">
+      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#0e4331] pb-3">
           <div className="flex items-center gap-2">
-            <FileText size={16} className="text-[#34d399]" />
-            <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399]">
-              Patient Guidance Summary (6th-Grade Reading Level)
-            </h3>
+            <FileText size={17} className="text-[#34d399]" />
+            <div>
+              <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399]">
+                Patient Guidance Summary (6th-Grade Reading Level)
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Assistive patient memo · Non-diagnostic · Doctor review required prior to patient release
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1 rounded-lg border border-[#0e4331] bg-[#032a1f] p-0.5 text-xs">
+          <div className="flex items-center gap-2">
+            {/* Language Toggle */}
+            <div className="flex items-center gap-1 rounded-lg border border-[#0e4331] bg-[#032a1f] p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setLangTab('en')}
+                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
+                  langTab === 'en' ? 'bg-[#10b981] text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setLangTab('hi')}
+                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
+                  langTab === 'hi' ? 'bg-[#10b981] text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                हिन्दी (Hindi)
+              </button>
+            </div>
+
+            {/* Edit / Preview Toggle */}
             <button
               type="button"
-              onClick={() => setLangTab('en')}
-              className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                langTab === 'en' ? 'bg-[#10b981] text-white' : 'text-slate-400 hover:text-white'
-              }`}
+              onClick={() => setIsEditingPatientNote(!isEditingPatientNote)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#34d399] hover:bg-[#064e3b] transition cursor-pointer"
             >
-              English
-            </button>
-            <button
-              type="button"
-              onClick={() => setLangTab('hi')}
-              className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                langTab === 'hi' ? 'bg-[#10b981] text-white' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              हिन्दी (Hindi)
+              {isEditingPatientNote ? (
+                <>
+                  <Eye size={13} />
+                  <span>Preview Card</span>
+                </>
+              ) : (
+                <>
+                  <Edit3 size={13} />
+                  <span>Edit Note</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
-        <p className="text-xs text-slate-400">
-          This patient-facing guidance note explains why the referral is suggested, what to bring, questions to ask, and what to expect during the consultation (without diagnosis or medication advice). Clinicians may edit prior to export.
-        </p>
-
-        {langTab === 'en' ? (
-          <textarea
-            rows={8}
-            value={editableSummaryEn}
-            onChange={(e) => setEditableSummaryEn(e.target.value)}
-            className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-200 text-xs font-sans leading-relaxed focus:outline-none focus:border-[#10b981]"
-          />
+        {isEditingPatientNote ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span>
+                Edit clinician text below. Edits are immediately synced to PDF download and patient summary.
+              </span>
+              <span className="text-[11px] font-mono text-[#34d399]">
+                {langTab === 'en' ? 'English Draft' : 'हिंदी ड्राफ्ट'}
+              </span>
+            </div>
+            {langTab === 'en' ? (
+              <textarea
+                rows={9}
+                value={editableSummaryEn}
+                onChange={(e) => setEditableSummaryEn(e.target.value)}
+                className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-100 text-xs font-mono leading-relaxed focus:outline-none focus:border-[#10b981]"
+              />
+            ) : (
+              <textarea
+                rows={9}
+                value={editableSummaryHi}
+                onChange={(e) => setEditableSummaryHi(e.target.value)}
+                className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-100 text-xs font-mono leading-relaxed focus:outline-none focus:border-[#10b981]"
+              />
+            )}
+          </div>
         ) : (
-          <textarea
-            rows={8}
-            value={editableSummaryHi}
-            onChange={(e) => setEditableSummaryHi(e.target.value)}
-            className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-200 text-xs font-sans leading-relaxed focus:outline-none focus:border-[#10b981]"
-          />
+          (() => {
+            const guidance = parsePatientGuidance(
+              langTab === 'en' ? editableSummaryEn : editableSummaryHi,
+              langTab
+            )
+            return (
+              <div className="space-y-4">
+                {/* 1. Reason for Referral Card */}
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                      <Stethoscope size={15} />
+                      <span>{guidance.reasonTitle}</span>
+                    </div>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/80">
+                      Non-Diagnostic Referral
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                    {guidance.reasonBody}
+                  </p>
+                </div>
+
+                {/* 2 & 3: Checklist + Questions Grid */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Checklist Card */}
+                  <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                      <CheckSquare size={15} className="text-[#34d399]" />
+                      <span>{guidance.bringTitle}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {guidance.bringItems.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-2.5 p-2 rounded-lg bg-[#021f17] border border-[#0e4331]/80 text-xs text-slate-200"
+                        >
+                          <CheckCircle2 size={14} className="text-[#34d399] shrink-0 mt-0.5" />
+                          <span className="leading-snug">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Questions to Ask Card */}
+                  <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                      <HelpCircle size={15} className="text-[#34d399]" />
+                      <span>{guidance.questionsTitle}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {guidance.questions.map((q, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-2.5 p-2 rounded-lg bg-[#021f17] border border-[#0e4331]/80 text-xs text-slate-200"
+                        >
+                          <span className="w-4 h-4 rounded-full bg-[#10b981]/20 text-[#34d399] font-bold font-mono text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-snug">{q}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. What to Expect Card */}
+                <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                    <HeartHandshake size={15} className="text-[#34d399]" />
+                    <span>{guidance.expectTitle}</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    {guidance.expectBody}
+                  </p>
+                </div>
+              </div>
+            )
+          })()
         )}
       </section>
 
@@ -710,11 +969,10 @@ export function WorkflowResult({
 
             {emailStatus && (
               <div
-                className={`p-3 rounded-xl text-xs font-medium ${
-                  emailStatus.success
-                    ? 'bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e]'
-                    : 'bg-rose-950/80 text-rose-200 border border-rose-800'
-                }`}
+                className={`p-3 rounded-xl text-xs font-medium ${emailStatus.success
+                  ? 'bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e]'
+                  : 'bg-rose-950/80 text-rose-200 border border-rose-800'
+                  }`}
               >
                 {emailStatus.message}
               </div>
