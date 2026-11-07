@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { appAuth } from '@/lib/app-auth'
 
 const RULE_TITLES: Record<string, string> = {
   cs_consanguinity: 'Consanguineous Partnership Evaluation',
@@ -84,14 +85,29 @@ function wrapLines(text: string, maxLen = 85): string[] {
 
 export async function POST(request: Request) {
   try {
+    const user = await appAuth.currentSessionUser()
+    if (!user) {
+      return NextResponse.json(
+        { message: 'Authentication required to generate and export signed referral documentation.' },
+        { status: 401 }
+      )
+    }
+
     const data = await request.json()
     const {
       patientId = 'PATIENT-ENCOUNTER',
-      physicianName = 'Dr. Attending Clinician, MD (OB-GYN)',
-      physicianRegNumber = 'REG-74892',
+      physicianName,
+      physicianRegNumber,
       pathway = 'Preconception Carrier Screening',
       evaluation = {},
     } = data
+
+    const effectivePhysicianName = physicianName && physicianName !== 'Dr. Attending Clinician, MD (OB-GYN)'
+      ? physicianName
+      : user.name || 'Attending Clinician, MD'
+    const effectivePhysicianReg = physicianRegNumber && physicianRegNumber !== 'REG-74892'
+      ? physicianRegNumber
+      : user.medicalRegistrationNumber || user.nursingRegistrationNumber || 'REG-ON-FILE'
 
     const rawRuleId = String(evaluation.matched_rule_id || 'STD-CARE-00')
     const ruleTitle = RULE_TITLES[rawRuleId] || cleanAscii(rawRuleId.replace(/_/g, ' ').toUpperCase())
@@ -149,7 +165,7 @@ export async function POST(request: Request) {
     textOps.push('0.75 w', `40 ${curY - 32} 532 38 re S`)
     textOps.push('BT', '/F2 9 Tf', `50 ${curY - 14} Td`, `(${escapePdf(`Patient ID: ${patientId}`)}) Tj`, 'ET')
     textOps.push('BT', '/F2 9 Tf', `320 ${curY - 14} Td`, `(${escapePdf(`Encounter Date: ${dateStr}`)}) Tj`, 'ET')
-    textOps.push('BT', '/F1 8.5 Tf', `50 ${curY - 26} Td`, `(${escapePdf(`Attending: ${physicianName} (Reg: ${physicianRegNumber})`)}) Tj`, 'ET')
+    textOps.push('BT', '/F1 8.5 Tf', `50 ${curY - 26} Td`, `(${escapePdf(`Attending: ${effectivePhysicianName} (Reg: ${effectivePhysicianReg})`)}) Tj`, 'ET')
     textOps.push('BT', '/F1 8.5 Tf', `320 ${curY - 26} Td`, `(${escapePdf(`Pathway: ${pathway}`)}) Tj`, 'ET')
     curY -= 48
 
@@ -267,7 +283,7 @@ export async function POST(request: Request) {
     // Section: Attending Doctor Sign-Off & Attestation Block
     textOps.push('0.75 w', `40 ${curY - 50} 532 50 re S`)
     textOps.push('BT', '/F2 8.5 Tf', `48 ${curY - 14} Td`, `(${escapePdf('DOCTOR REVIEW COMPLETED & PHYSICIAN ATTESTATION')}) Tj`, 'ET')
-    textOps.push('BT', '/F1 8 Tf', `48 ${curY - 26} Td`, `(${escapePdf(`Confirmed and Approved by: ${physicianName} | Registration: ${physicianRegNumber}`)}) Tj`, 'ET')
+    textOps.push('BT', '/F1 8 Tf', `48 ${curY - 26} Td`, `(${escapePdf(`Confirmed and Approved by: ${effectivePhysicianName} | Registration: ${effectivePhysicianReg}`)}) Tj`, 'ET')
     textOps.push('BT', '/F1 7.5 Tf', `48 ${curY - 38} Td`, `(${escapePdf('Compliant with HIPAA Privacy & Security Rules (45 CFR 164.514 Safe Harbor), DPDP Act 2023, and ABDM.')}) Tj`, 'ET')
     textOps.push('BT', '/F2 8 Tf', `420 ${curY - 26} Td`, `(${escapePdf('[ APPROVED & SIGNED ]')}) Tj`, 'ET')
 

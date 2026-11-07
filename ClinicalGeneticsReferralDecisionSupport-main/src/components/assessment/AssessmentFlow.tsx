@@ -8,6 +8,7 @@ import {
   Check,
   ClipboardCheck,
   History,
+  Lock,
   RefreshCw,
   Save,
   ShieldAlert,
@@ -59,12 +60,23 @@ export default function AssessmentFlow({ pathway, requestSpecialistReviewAction 
           </button>
         </div>
       ) : !user ? (
-        <ClinicalAssessment
-          key={`guest:provider:${pathway.slug}`}
-          pathway={pathway}
-          provider={true}
-          requestSpecialistReviewAction={requestSpecialistReviewAction}
-        />
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-800">
+            <Lock size={24} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Clinician Authentication Required</h2>
+          <p className="text-sm text-slate-600 max-w-md mx-auto">
+            This clinical decision support module requires verified healthcare credentials. Please sign in with your approved OB-GYN or Nurse account to proceed.
+          </p>
+          <div className="pt-2">
+            <Link
+              href={`/login?redirect=/assessment/${pathway.slug}`}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition"
+            >
+              Sign In with Clinical Credentials →
+            </Link>
+          </div>
+        </div>
       ) : user.role === 'admin' ? (
         <div className={`${card} p-5`}>
           <h2 className="flex items-center gap-2 font-bold">

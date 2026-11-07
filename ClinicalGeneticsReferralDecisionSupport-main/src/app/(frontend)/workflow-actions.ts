@@ -21,22 +21,11 @@ const memoryWorkflows = new Map<string, WorkflowRecord[]>()
 
 async function currentActor() {
   const session = await appAuth.currentUser()
+  if (!session) {
+    return null
+  }
   const payload = await getPayloadClient()
   const store = workflowStore(payload)
-  if (!session) {
-    const guestUser: WorkflowUser = {
-      id: '00000000-0000-4000-8000-000000000001',
-      name: 'Attending Clinician (Provider)',
-      email: 'clinician@genobridge.in',
-      role: 'provider',
-      enabled: true,
-      reviewerAuthorized: true,
-      collection: 'users',
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    }
-    return { user: guestUser, payload, store }
-  }
   try {
     const current = await store.findByID({ collection: 'users', id: session.id, overrideAccess: false, user: session, depth: 0 })
     if (current && current.enabled !== false && ['provider', 'admin', 'nurse'].includes(current.role)) {
@@ -45,15 +34,15 @@ async function currentActor() {
     }
   } catch {}
   const fallbackUser: WorkflowUser = {
-    id: typeof session.id === 'string' && session.id.includes('-') ? session.id : '00000000-0000-4000-8000-000000000001',
-    name: session.name || 'Attending Clinician',
-    email: (session as any).email || 'clinician@genobridge.in',
-    role: 'provider',
-    enabled: true,
-    reviewerAuthorized: true,
+    id: String(session.id),
+    name: session.name || 'Clinician',
+    email: (session as any).email || '',
+    role: (session.role as any) || 'provider',
+    enabled: session.enabled !== false,
+    reviewerAuthorized: session.reviewerAuthorized === true,
     collection: 'users',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
+    createdAt: session.createdAt || new Date().toISOString(),
+    updatedAt: session.updatedAt || new Date().toISOString(),
   }
   return { user: fallbackUser, payload, store }
 }

@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import React from 'react'
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import { appAuth } from '@/lib/app-auth'
 import { AssessmentCatalogClient } from '@/components/assessment/AssessmentCatalogClient'
 
 export const metadata: Metadata = {
@@ -10,5 +12,24 @@ export const metadata: Metadata = {
 }
 
 export default async function DoctorDashboardPage() {
+  const user = await appAuth.currentSessionUser()
+
+  if (!user) {
+    redirect('/login?role=gynecologist&redirect=/doctor/dashboard')
+  }
+
+  if (user.verificationStatus === 'REJECTED') {
+    redirect('/account-rejected')
+  }
+
+  if (user.verificationStatus !== 'APPROVED' || !user.enabled) {
+    redirect('/account-pending')
+  }
+
+  // Nurses should not view doctor dashboard
+  if (user.role === 'nurse') {
+    redirect('/nurse/dashboard')
+  }
+
   return <AssessmentCatalogClient />
 }
