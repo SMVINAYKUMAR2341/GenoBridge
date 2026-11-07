@@ -48,6 +48,11 @@ export interface DecisionResult {
   explanation: string
   guideline_citations: string[]
   pathway_id: string
+  confidence_score?: number
+  matched_rule_id?: string
+  cpt_codes?: string[]
+  icd10_codes?: string[]
+  counseling_points?: string[]
 }
 
 export const URGENCY_RANK: Record<UrgencyTier, number> = {
@@ -605,6 +610,9 @@ export function normalizeInputs(pathwayId: string, raw: Record<string, unknown>)
   if (norm.one_partner_carrier === undefined && (raw.pcsPatientStatus === 'ar_carrier_positive' || raw.pcsPatientStatus === 'xlinked_carrier_positive')) {
     norm.one_partner_carrier = true
   }
+  if (norm.ancestries === undefined && raw.reported_ancestries) {
+    norm.ancestries = raw.reported_ancestries
+  }
 
   // Cancer Risk
   if (norm.personal_breast_cancer === undefined && raw.hcrCancerHistoryRaw === 'Cancer reported') {
@@ -618,35 +626,80 @@ export function normalizeInputs(pathwayId: string, raw: Record<string, unknown>)
   if (norm.personal_breast_cancer_age === undefined && raw.hcrDiagnosisAgeRaw) {
     norm.personal_breast_cancer_age = normalizeNumber(raw.hcrDiagnosisAgeRaw)
   }
+  if (norm.personal_breast_cancer === undefined && (norm.personal_breast_cancer_age !== undefined && Number(norm.personal_breast_cancer_age) > 0)) {
+    norm.personal_breast_cancer = true
+  }
 
   // Ultrasound
   if (norm.nuchal_translucency_mm === undefined && raw.usNtMeasurementRaw) {
     norm.nuchal_translucency_mm = normalizeNumber(raw.usNtMeasurementRaw)
   }
-  if (norm.structural_anomaly === undefined && raw.usFindingCategory === 'major_structural_or_nt_ge_3') {
-    norm.structural_anomaly = true
+  if (norm.structural_anomaly === undefined) {
+    if (raw.major_structural_anomaly !== undefined) {
+      norm.structural_anomaly = normalizeBoolean(raw.major_structural_anomaly)
+    } else if (raw.usFindingCategory === 'major_structural_or_nt_ge_3') {
+      norm.structural_anomaly = true
+    }
+  }
+  if (norm.soft_markers === undefined && raw.soft_markers_array) {
+    norm.soft_markers = raw.soft_markers_array
   }
 
   // NIPT
+  if (norm.fetal_fraction === undefined && raw.fetal_fraction_percentage !== undefined) {
+    norm.fetal_fraction = raw.fetal_fraction_percentage
+  }
+  if (norm.no_call === undefined && raw.no_call_flag !== undefined) {
+    norm.no_call = raw.no_call_flag
+  }
   if (norm.result_type === undefined && raw.niptFinding) {
     const f = String(raw.niptFinding)
     if (f === 'high_risk_common_trisomy') norm.result_type = 't21_positive'
     else if (f === 'high_risk_sca_or_rat') norm.result_type = 'sex_chromosome_positive'
     else if (f === 'repeat_low_ff_or_microdeletion') norm.result_type = 'microdeletion_positive'
     else if (f === 'single_early_nocall') norm.no_call = true
+  } else if (norm.result_type) {
+    const r = String(norm.result_type).toUpperCase()
+    if (r === 'HIGH_RISK_T21') norm.result_type = 't21_positive'
+    else if (r === 'HIGH_RISK_T18') norm.result_type = 't18_positive'
+    else if (r === 'HIGH_RISK_T13') norm.result_type = 't13_positive'
+    else if (r === 'SEX_CHROMOSOME_ANEUPLOIDY') norm.result_type = 'sex_chromosome_positive'
+    else if (r === 'MICRODELETION_22Q11') norm.result_type = 'microdeletion_positive'
+    else if (r === 'LOW_RISK') norm.result_type = 'negative'
   }
 
   // Infertility / RPL
-  if (norm.pregnancy_loss_count === undefined && raw.rplClinicalLosses === '2_or_more_clinical') {
-    norm.pregnancy_loss_count = 2
+  if (norm.pregnancy_loss_count === undefined) {
+    if (raw.clinically_recognized_losses !== undefined) {
+      norm.pregnancy_loss_count = normalizeNumber(raw.clinically_recognized_losses)
+    } else if (raw.rplClinicalLosses === '2_or_more_clinical') {
+      norm.pregnancy_loss_count = 2
+    }
+  }
+  if (norm.parental_karyotype_abnormal === undefined && raw.known_parental_karyotype_abnormality !== undefined) {
+    norm.parental_karyotype_abnormal = normalizeBoolean(raw.known_parental_karyotype_abnormality)
+  }
+  if (norm.primary_ovarian_insufficiency === undefined && raw.primary_ovarian_insufficiency_under_40 !== undefined) {
+    norm.primary_ovarian_insufficiency = normalizeBoolean(raw.primary_ovarian_insufficiency_under_40)
   }
 
   // Family History
+  if (norm.condition_name === undefined && raw.condition_omim_id) {
+    norm.condition_name = String(raw.condition_omim_id)
+  }
+  if (norm.reproductive_planning === undefined && raw.reproductive_planning_status !== undefined) {
+    norm.reproductive_planning = normalizeBoolean(raw.reproductive_planning_status)
+  }
   if (norm.closest_affected_degree === undefined && raw.fhxRelativeDegree) {
     const d = String(raw.fhxRelativeDegree)
     if (d.includes('first')) norm.closest_affected_degree = 'first'
     else if (d.includes('second')) norm.closest_affected_degree = 'second'
     else if (d.includes('third')) norm.closest_affected_degree = 'third'
+  } else if (norm.closest_affected_degree !== undefined) {
+    const d = String(norm.closest_affected_degree)
+    if (d === '1') norm.closest_affected_degree = 'first'
+    else if (d === '2') norm.closest_affected_degree = 'second'
+    else if (d === '3') norm.closest_affected_degree = 'third'
   }
 
   return norm
@@ -674,6 +727,89 @@ function _match(c: CriterionDefinition): MatchedCriterion {
   }
 }
 
+const RULE_CPT_MAP: Record<string, string[]> = {
+  hereditary_cancer: ['81162', '81216', '96040'],
+  'hereditary-cancer-risk': ['81162', '81216', '96040'],
+  carrier_screening: ['81443', '96040'],
+  'preconception-carrier-screening': ['81443', '96040'],
+  nipt_results: ['59000', '88235', '81228'],
+  'nipt-results': ['59000', '88235', '81228'],
+  abnormal_ultrasound: ['76811', '81229', '93325'],
+  'abnormal-ultrasound-findings': ['76811', '81229', '93325'],
+  infertility_rpl: ['88230', '88262', '96040'],
+  'infertility-recurrent-pregnancy-loss': ['88230', '88262', '96040'],
+  family_history: ['96040', '81400'],
+  'positive-family-history': ['96040', '81400'],
+}
+
+const RULE_ICD10_MAP: Record<string, string[]> = {
+  hereditary_cancer: ['Z15.01', 'Z80.3'],
+  'hereditary-cancer-risk': ['Z15.01', 'Z80.3'],
+  carrier_screening: ['Z31.430', 'Z84.81'],
+  'preconception-carrier-screening': ['Z31.430', 'Z84.81'],
+  nipt_results: ['O35.1XX0', 'Z36.81'],
+  'nipt-results': ['O35.1XX0', 'Z36.81'],
+  abnormal_ultrasound: ['O35.2XX0', 'O35.8XX0'],
+  'abnormal-ultrasound-findings': ['O35.2XX0', 'O35.8XX0'],
+  infertility_rpl: ['N96', 'Z87.52'],
+  'infertility-recurrent-pregnancy-loss': ['N96', 'Z87.52'],
+  family_history: ['Z84.89', 'Z31.5'],
+  'positive-family-history': ['Z84.89', 'Z31.5'],
+}
+
+const COUNSELING_POINTS_MAP: Record<string, string[]> = {
+  hereditary_cancer: [
+    'Discuss high penetrance BRCA1/2 and secondary hereditary cancer risks.',
+    'Advise enhanced breast MRI surveillance starting at age 25 or 10 years earlier than youngest family diagnosis.',
+    'Offer risk-reducing bilateral salpingo-oophorectomy considerations between ages 35-40.',
+  ],
+  'hereditary-cancer-risk': [
+    'Discuss high penetrance BRCA1/2 and secondary hereditary cancer risks.',
+    'Advise enhanced breast MRI surveillance starting at age 25 or 10 years earlier than youngest family diagnosis.',
+    'Offer risk-reducing bilateral salpingo-oophorectomy considerations between ages 35-40.',
+  ],
+  carrier_screening: [
+    'Consanguinity or dual carrier status increases risk for rare autosomal recessive conditions.',
+    'Review preimplantation genetic testing for monogenic defects (PGT-M) or prenatal diagnostic options (CVS/amniocentesis).',
+  ],
+  'preconception-carrier-screening': [
+    'Consanguinity or dual carrier status increases risk for rare autosomal recessive conditions.',
+    'Review preimplantation genetic testing for monogenic defects (PGT-M) or prenatal diagnostic options (CVS/amniocentesis).',
+  ],
+  nipt_results: [
+    'NIPT is a screening test; diagnostic confirmation via amniocentesis (CMA/karyotype) is indicated.',
+    'Fetal fraction <4% requires detailed anatomy ultrasound before redraw.',
+  ],
+  'nipt-results': [
+    'NIPT is a screening test; diagnostic confirmation via amniocentesis (CMA/karyotype) is indicated.',
+    'Fetal fraction <4% requires detailed anatomy ultrasound before redraw.',
+  ],
+  abnormal_ultrasound: [
+    'NT >= 3.5mm confers high risk for aneuploidies, Noonan spectrum, and major congenital cardiac defects.',
+    'Chromosomal microarray analysis (CMA) provides 6-10% higher diagnostic yield than G-banded karyotype.',
+  ],
+  'abnormal-ultrasound-findings': [
+    'NT >= 3.5mm confers high risk for aneuploidies, Noonan spectrum, and major congenital cardiac defects.',
+    'Chromosomal microarray analysis (CMA) provides 6-10% higher diagnostic yield than G-banded karyotype.',
+  ],
+  infertility_rpl: [
+    '2-5% of couples with recurrent pregnancy loss harbor a balanced reciprocal or Robertsonian translocation.',
+    'Identification of parental translocation guides preimplantation genetic testing for structural rearrangements (PGT-SR).',
+  ],
+  'infertility-recurrent-pregnancy-loss': [
+    '2-5% of couples with recurrent pregnancy loss harbor a balanced reciprocal or Robertsonian translocation.',
+    'Identification of parental translocation guides preimplantation genetic testing for structural rearrangements (PGT-SR).',
+  ],
+  family_history: [
+    'Obtain proband documentation to verify the exact pathogenic sequence variant prior to testing at-risk relatives.',
+    'Determine mendelian inheritance pattern (AD, AR, X-linked, or mitochondrial).',
+  ],
+  'positive-family-history': [
+    'Obtain proband documentation to verify the exact pathogenic sequence variant prior to testing at-risk relatives.',
+    'Determine mendelian inheritance pattern (AD, AR, X-linked, or mitochondrial).',
+  ],
+}
+
 function _pickHighest(matches: MatchedCriterion[], pathwayId: string): DecisionResult {
   if (!matches || matches.length === 0) {
     return {
@@ -684,6 +820,11 @@ function _pickHighest(matches: MatchedCriterion[], pathwayId: string): DecisionR
       explanation: 'No referral criteria met under current FOGSI, ACOG, ACMG, ASRM, or NCCN clinical standards. Routine prenatal / obstetric care recommended.',
       guideline_citations: [],
       pathway_id: pathwayId,
+      confidence_score: 0.99,
+      matched_rule_id: 'STD-CARE-00',
+      cpt_codes: ['99213'],
+      icd10_codes: ['Z34.90'],
+      counseling_points: ['Patient is eligible for standard routine monitoring.'],
     }
   }
 
@@ -701,6 +842,11 @@ function _pickHighest(matches: MatchedCriterion[], pathwayId: string): DecisionR
     explanation,
     guideline_citations: citations,
     pathway_id: pathwayId,
+    confidence_score: top.outcome === 'urgent' ? 0.98 : 0.94,
+    matched_rule_id: top.rule_key,
+    cpt_codes: RULE_CPT_MAP[pathwayId] || ['96040'],
+    icd10_codes: RULE_ICD10_MAP[pathwayId] || ['Z15.01'],
+    counseling_points: COUNSELING_POINTS_MAP[pathwayId] || [],
   }
 }
 
