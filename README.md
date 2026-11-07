@@ -284,13 +284,6 @@ python -m unittest discover backend/tests -v
 
 ---
 
-## 🚀 Production Deployment Guide
-
-Deploy GenoBridge to production for free in 3 steps:
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/SMVINAYKUMAR2341/GenoBridge)
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/SMVINAYKUMAR2341/GenoBridge)
-
 1. **Free Database (Neon PostgreSQL):**
    * Create a free account at [Neon.tech](https://neon.tech) and create a project named GENOBRIDGE-db.
    * Under **Dashboard → Connection Details**, copy the **Pooled connection string**:
