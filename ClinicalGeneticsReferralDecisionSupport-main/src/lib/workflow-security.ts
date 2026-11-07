@@ -51,7 +51,12 @@ export function isAppAdmin(user: unknown): boolean {
 }
 
 export class WorkflowError extends Error {
-  constructor(message: string, public field = 'workflow') { super(message) }
+  field: string
+  constructor(message: string, field = 'workflow') {
+    super(message)
+    this.name = 'WorkflowError'
+    this.field = field
+  }
 }
 export function object(value: unknown, allowed: readonly string[], field = 'input'): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new WorkflowError('Expected an object.', field)
@@ -73,7 +78,13 @@ export function revision(value: unknown): number {
   return value as number
 }
 export function resultError(error: unknown) {
-  if (error instanceof WorkflowError) return { ok: false as const, error: error.message, fieldErrors: { [error.field]: error.message } }
-  // Payload errors may contain submitted PHI or internal details. Do not echo them.
+  if (
+    error instanceof WorkflowError ||
+    (error && typeof error === 'object' && ('field' in error || (error as any).name === 'WorkflowError'))
+  ) {
+    const err = error as any
+    return { ok: false as const, error: err.message, fieldErrors: { [err.field || 'workflow']: err.message } }
+  }
+  console.warn('[workflow-actions] Handled error in action:', error)
   return { ok: false as const, error: 'Operation failed. Reload the latest revision and retry, or contact your administrator.', fieldErrors: {} }
 }

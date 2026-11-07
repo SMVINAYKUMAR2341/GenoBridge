@@ -307,8 +307,9 @@ function ClinicalAssessment({
                   type="button"
                   data-testid="run-assessment-btn"
                   onClick={async () => {
+                    workflow.clearError?.()
                     const features = buildConcatenatedFeatures(pathway.slug, workflow.inputs)
-                    const evaluated = evaluatePathway(pathway.slug, workflow.inputs)
+                    let evaluated = evaluatePathway(pathway.slug, workflow.inputs)
                     try {
                       const res = await fetch('/api/evaluate', {
                         method: 'POST',
@@ -317,19 +318,31 @@ function ClinicalAssessment({
                       })
                       if (res.ok) {
                         const data = await res.json()
-                        if (data.match_confidence) evaluated.confidence_score = Number(data.match_confidence) / 100
-                        if (data.recommended_action && evaluated.outcome !== 'no_referral') {
-                          evaluated.explanation = data.recommended_action
-                        }
-                        if (data.guideline_source && evaluated.guideline_citations) {
-                          evaluated.guideline_citations = Array.from(new Set([data.guideline_source, ...evaluated.guideline_citations]))
+                        evaluated = {
+                          ...evaluated,
+                          confidence_score: data.match_confidence ? Number(data.match_confidence) / 100 : evaluated.confidence_score,
+                          outcome: (data.outcome || data.clinical_risk || evaluated.outcome).toLowerCase(),
+                          tier: data.tier || evaluated.tier,
+                          explanation: data.recommended_action || data.explanation || evaluated.explanation,
+                          clinical_decision: data.clinical_decision || evaluated.clinical_decision,
+                          referral_target: data.referral_target || evaluated.referral_target,
+                          guideline_citations: data.guideline_source
+                            ? Array.from(new Set([data.guideline_source, ...(data.guideline_citations || evaluated.guideline_citations || [])]))
+                            : evaluated.guideline_citations,
+                          fired_rules: data.fired_rules && data.fired_rules.length > 0 ? data.fired_rules : evaluated.fired_rules,
+                          matched_criteria: data.matched_criteria && data.matched_criteria.length > 0 ? data.matched_criteria : evaluated.matched_criteria,
+                          counterfactuals: data.counterfactuals || evaluated.counterfactuals,
+                          patient_summary_en: data.patient_summary_en || evaluated.patient_summary_en,
+                          patient_summary_hi: data.patient_summary_hi || evaluated.patient_summary_hi,
                         }
                       }
-                    } catch { }
+                    } catch (fetchErr) {
+                      console.warn('Backend evaluation call failed, using client deterministic SaMD engine:', fetchErr)
+                    }
                     setEvaluationResult(evaluated)
                     try {
                       if (workflow.editable) {
-                        await workflow.save().catch(() => { })
+                        await workflow.save(true)
                       }
                     } catch { }
                     setTab(1)

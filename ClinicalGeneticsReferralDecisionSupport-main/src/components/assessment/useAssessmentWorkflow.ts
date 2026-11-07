@@ -134,18 +134,24 @@ export function useAssessmentWorkflow(
     setAttest(false)
   }
   const editable = !loading && !loadFailed && (!record || record.state === 'DRAFT')
-  async function run(task: () => Promise<void>) {
+  async function run(task: () => Promise<void>, silent = false) {
     // A state-only lock leaves a same-tick window before React re-renders.
     if (lock.current || loading || loadFailed) return
     lock.current = true
     setBusy(true)
-    setError('')
-    setFieldErrors({})
+    if (!silent) {
+      setError('')
+      setFieldErrors({})
+    }
     setNotice('')
     try {
       await task()
     } catch (reason) {
-      setError(message(reason))
+      if (!silent) {
+        setError(message(reason))
+      } else {
+        console.warn('[useAssessmentWorkflow] Silent operation note:', reason)
+      }
     } finally {
       lock.current = false
       setBusy(false)
@@ -185,11 +191,13 @@ export function useAssessmentWorkflow(
     window.history.replaceState(window.history.state, '', url)
     return saved
   }
-  const save = () =>
+  const save = (silent = false) =>
     run(async () => {
       await persistDraft()
-      setNotice('Draft saved as a new server revision. No clinical recommendation has been made.')
-    })
+      if (!silent) {
+        setNotice('Draft saved as a new server revision. No clinical recommendation has been made.')
+      }
+    }, silent)
   const submit = () =>
     run(async () => {
       const current = dirty || !latest.current ? await persistDraft() : latest.current
@@ -350,5 +358,9 @@ export function useAssessmentWorkflow(
     transition,
     reload,
     loadMoreHistory,
+    clearError: () => {
+      setError('')
+      setFieldErrors({})
+    },
   }
 }

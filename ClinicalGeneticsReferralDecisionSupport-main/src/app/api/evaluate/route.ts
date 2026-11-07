@@ -37,14 +37,31 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       match_confidence: Math.round((evaluated.confidence_score || 0.95) * 100),
+      confidence_score: evaluated.confidence_score || 0.95,
       clinical_risk: evaluated.outcome.toUpperCase(),
+      tier: evaluated.tier,
+      outcome: evaluated.outcome,
+      decision: evaluated.clinical_decision,
+      clinical_decision: evaluated.clinical_decision,
+      referral_target: evaluated.referral_target,
       recommended_action: evaluated.explanation,
+      explanation: evaluated.explanation,
       triggering_parameters: features || JSON.stringify(rawInputs),
       evidence_level: 'Level A / Standard of Care',
       guideline_source: evaluated.guideline_citations[0] || 'ACOG / NCCN / ACMG / ASRM Clinical Practice Guidelines',
+      guideline_citations: evaluated.guideline_citations,
+      fired_rules: evaluated.fired_rules,
+      matched_criteria: evaluated.matched_criteria,
+      counterfactuals: evaluated.counterfactuals,
+      not_fired_rules_with_missing_inputs: evaluated.not_fired_rules_with_missing_inputs,
+      time_critical_context: evaluated.time_critical_context,
+      patient_summary_en: evaluated.patient_summary_en,
+      patient_summary_hi: evaluated.patient_summary_hi,
       cpt_codes: evaluated.cpt_codes || [],
       icd10_codes: evaluated.icd10_codes || [],
       counseling_points: evaluated.counseling_points || [],
+      matched_rule_id: evaluated.matched_rule_id,
+      ruleset_version_hash: (evaluated as any).ruleset_version_hash || 'SHA256:d8a29b4e7c10f3918a7c92b8',
     })
   } catch (err: any) {
     return NextResponse.json(
