@@ -206,7 +206,7 @@ export function WorkflowResult({
             Deterministic Decision Rationale
           </h3>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e]">
-            ENGINE: FOGSI · ACOG · ACMG · NCCN
+            ENGINE: FOGSI · ACOG · ACMG · ASRM · NCCN
           </span>
         </div>
 
