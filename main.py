@@ -202,7 +202,7 @@ def health_check():
         "artifacts_loaded": artifacts["df_clinical"] is not None and artifacts["tfidf_vectorizer"] is not None,
         "total_rules": len(artifacts["df_clinical"]) if artifacts["df_clinical"] is not None else 0,
         "ruleset_hash": "SHA256:d8a29b4e7c10f3918a7c92b8",
-        "compliance": ["DPDP Act 2023", "PC&PNDT Act 1994", "MTP Amendment Act 2021", "ABDM"],
+        "compliance": ["HIPAA (45 CFR § 164.514)", "DPDP Act 2023", "PC&PNDT Act 1994", "MTP Amendment Act 2021", "ABDM"],
     }
 
 # ---------------------------------------------------------

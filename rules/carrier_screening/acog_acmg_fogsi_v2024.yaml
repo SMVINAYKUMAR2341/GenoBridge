@@ -114,3 +114,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "No high-risk carrier criteria identified. Routine pre-pregnancy planning indicated."
       next_steps_non_treatment: "Provide general pre-conception counseling (folic acid 400-500 mcg/day, routine CBC). Offer optional expanded carrier screening (ACMG Tier 3)."
+

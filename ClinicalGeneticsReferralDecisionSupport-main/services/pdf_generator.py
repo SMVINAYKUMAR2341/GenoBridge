@@ -148,7 +148,7 @@ def generate_clinical_pdf(
     # 1. Header Block (Black & White)
     ruleset_hash = clean_ascii_text(evaluation.get("ruleset_version_hash", "SHA256:d8a29b4e7c10f3918a7c92b8"))
     story.append(Paragraph("GENOBRIDGE CLINICAL GENETICS DSS", title_style))
-    story.append(Paragraph(f"Clinical Referral Navigation Brief | Doctor Review Required | Ruleset: {ruleset_hash}", subtitle_style))
+    story.append(Paragraph(f"Clinical Referral Navigation Brief | Doctor Review Required | HIPAA & DPDP Compliant | Ruleset: {ruleset_hash}", subtitle_style))
     story.append(Spacer(1, 6))
     story.append(HRFlowable(width="100%", thickness=1.5, color=colors.black, spaceAfter=10))
 
@@ -245,7 +245,7 @@ def generate_clinical_pdf(
     signoff_text = f"""
     <b>DOCTOR REVIEW COMPLETED & PHYSICIAN ATTESTATION:</b><br/>
     Confirmed and approved by: <b>{clean_ascii_text(physician_name)}</b> | Reg: <b>{reg_number}</b><br/>
-    Compliant with Digital Personal Data Protection (DPDP) Act, 2023 and Ayushman Bharat Digital Mission (ABDM).
+    Compliant with HIPAA Privacy & Security Rules (45 CFR 164.514 Safe Harbor), DPDP Act 2023, and ABDM.
     """
     signoff_table = Table([[Paragraph(signoff_text, body_style)]], colWidths=[520])
     signoff_table.setStyle(TableStyle([

@@ -91,3 +91,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "Baseline presentation does not meet genetic indications for RPL or monogenic infertility testing."
       next_steps_non_treatment: "Proceed with standard reproductive endocrinology evaluation (ovulatory tracking, hysterosalpingography, standard semen analysis). Re-evaluate if pregnancy loss occurs."
+

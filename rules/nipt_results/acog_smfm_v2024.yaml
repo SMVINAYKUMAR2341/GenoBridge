@@ -80,3 +80,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "Low-risk cfDNA screening result for common trisomies with normal fetal fraction and concordance."
       next_steps_non_treatment: "Reassure patient that cfDNA significantly reduces risk of common aneuploidies. Emphasize that cfDNA does not rule out all genetic or structural defects; continue routine second-trimester anatomy scan at 18-20 weeks."
+

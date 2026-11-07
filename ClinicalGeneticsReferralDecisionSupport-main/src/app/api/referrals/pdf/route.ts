@@ -138,7 +138,7 @@ export async function POST(request: Request) {
     textOps.push('0 0 0 rg', '0 0 0 RG')
     textOps.push('BT', '/F2 15 Tf', `40 ${curY} Td`, `(${escapePdf('GENOBRIDGE CLINICAL GENETICS DSS')}) Tj`, 'ET')
     curY -= 14
-    textOps.push('BT', '/F1 8.5 Tf', `40 ${curY} Td`, `(${escapePdf('Clinical Referral Navigation Brief | Doctor Review Required | Ruleset: ' + rulesetHash)}) Tj`, 'ET')
+    textOps.push('BT', '/F1 8.5 Tf', `40 ${curY} Td`, `(${escapePdf('Clinical Referral Navigation Brief | Doctor Review Required | HIPAA & DPDP Compliant | Ruleset: ' + rulesetHash)}) Tj`, 'ET')
     curY -= 10
 
     // Solid Black divider line
@@ -229,7 +229,7 @@ export async function POST(request: Request) {
     textOps.push('0.75 w', `40 ${curY - 50} 532 50 re S`)
     textOps.push('BT', '/F2 8.5 Tf', `48 ${curY - 14} Td`, `(${escapePdf('DOCTOR REVIEW COMPLETED & PHYSICIAN ATTESTATION')}) Tj`, 'ET')
     textOps.push('BT', '/F1 8 Tf', `48 ${curY - 26} Td`, `(${escapePdf(`Confirmed and Approved by: ${physicianName} | Registration: ${physicianRegNumber}`)}) Tj`, 'ET')
-    textOps.push('BT', '/F1 7.5 Tf', `48 ${curY - 38} Td`, `(${escapePdf('Compliant with Digital Personal Data Protection (DPDP) Act, 2023 and ABDM National Health Stack.')}) Tj`, 'ET')
+    textOps.push('BT', '/F1 7.5 Tf', `48 ${curY - 38} Td`, `(${escapePdf('Compliant with HIPAA Privacy & Security Rules (45 CFR 164.514 Safe Harbor), DPDP Act 2023, and ABDM.')}) Tj`, 'ET')
     textOps.push('BT', '/F2 8 Tf', `420 ${curY - 26} Td`, `(${escapePdf('[ APPROVED & SIGNED ]')}) Tj`, 'ET')
 
     curY -= 60

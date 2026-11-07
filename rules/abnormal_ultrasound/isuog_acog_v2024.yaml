@@ -103,3 +103,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "Single isolated second-trimester ultrasound soft marker (such as isolated choroid plexus cyst or isolated echogenic intracardiac focus) in a patient with low-risk prior screening."
       next_steps_non_treatment: "Reassure patient regarding benign nature of isolated findings. Review maternal serum/cfDNA screening status. No invasive diagnostic testing indicated if prior screening was negative."
+

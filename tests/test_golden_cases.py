@@ -323,3 +323,4 @@ def test_infertility_golden_cases(inputs, expected_tier, expected_rule):
 def test_family_golden_cases(inputs, expected_tier, expected_rule):
     tier, rule = simulate_deterministic_engine("family_history", inputs)
     assert tier == expected_tier
+

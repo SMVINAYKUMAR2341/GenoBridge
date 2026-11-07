@@ -97,3 +97,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "No personal or first/second-degree family history suggestive of inherited Mendelian disorders."
       next_steps_non_treatment: "Reassure patient regarding general population risks. Encourage routine healthcare maintenance and re-evaluation if new family medical events emerge."
+

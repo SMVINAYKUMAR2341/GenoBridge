@@ -135,3 +135,4 @@ rules:
       tier: COUNSEL_AND_REASSESS
       reason_text: "No personal or familial cancer history meeting current NCCN germline genetic testing thresholds."
       next_steps_non_treatment: "Reassure patient; recommend standard population-based cancer screening (age 40+ annual/biennial mammography, age 45+ colonoscopy). Reassess if family history changes."
+

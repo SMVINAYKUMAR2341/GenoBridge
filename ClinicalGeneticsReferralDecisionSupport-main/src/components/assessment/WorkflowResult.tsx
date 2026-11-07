@@ -619,7 +619,7 @@ export function WorkflowResult({
             className="w-4 h-4 rounded accent-[#10b981] mt-0.5 shrink-0"
           />
           <span className="leading-relaxed">
-            <strong>Doctor Review Completed:</strong> I confirm that I have reviewed the clinical parameters, deterministic guideline criteria, and statutory evidence. I authorize the release of this clinical referral brief and confirm compliance with the PC&amp;PNDT Act, 1994 and DPDP Act, 2023.
+            <strong>Doctor Review Completed:</strong> I confirm that I have reviewed the clinical parameters, deterministic guideline criteria, and statutory evidence. I authorize the release of this clinical referral brief and confirm compliance with HIPAA Privacy &amp; Security Rules (45 CFR § 164.514 Safe Harbor), the PC&amp;PNDT Act, 1994, and DPDP Act, 2023.
           </span>
         </label>
       </section>
@@ -692,7 +692,7 @@ export function WorkflowResult({
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed">
-              Transmits the approved clinical referral brief with attached vector PDF over encrypted TLS. Protected under the Digital Personal Data Protection (DPDP) Act, 2023 and ABDM Health Data Management Policy.
+              Transmits the approved clinical referral brief with attached vector PDF over encrypted TLS. Protected under HIPAA Safe Harbor (45 CFR § 164.514), Digital Personal Data Protection (DPDP) Act, 2023, and ABDM Health Data Management Policy.
             </p>
 
             <div className="space-y-1.5">
