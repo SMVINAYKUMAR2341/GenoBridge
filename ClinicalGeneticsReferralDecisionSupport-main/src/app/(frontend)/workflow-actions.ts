@@ -128,11 +128,6 @@ function clinical(user: unknown) {
 function reviewer(user: unknown) {
   if (!isReviewer(user)) throw new WorkflowError('A qualified provider with current explicit reviewer authorization is required.', 'auth')
 }
-function target(value: unknown) {
-  if (value === 'criterion') return 'clinical-criteria' as const
-  if (value === 'guideline') return 'guideline-references' as const
-  throw new WorkflowError('Select criterion or guideline.', 'kind')
-}
 
 /** Full replacement of draft sections. Missing sections become empty, never demo defaults.
  * {workflowKey?: UUID, expectedRevision: 0|latest, draft: {patient?: null,
@@ -438,90 +433,6 @@ export async function returnWorkflowToDraftAction(input: unknown) {
  */
 export async function finalizeWorkflowAction(input: unknown) {
   try { return await appendWorkflow(input, 'finalize') } catch (error) { return resultError(error) }
-}
-
-/** {kind:'criterion'|'guideline', page?}; governance catalog, never patient data. */
-export async function listGovernanceAction(input: unknown) {
-  try {
-    const data = object(input, ['kind', 'page'])
-    const collection = target(data.kind)
-    const page = data.page === undefined ? 1 : revision(data.page)
-    if (page < 1 || page > 10000) throw new WorkflowError('Invalid page.', 'page')
-    const current = await currentActor()
-    if (!current) return { ok: true as const, user: null, records: [], hasNextPage: false, page }
-    const { user, store } = current
-    if (!isClinicalStaff(user) && !isAppAdmin(user)) throw new WorkflowError('Staff access required.', 'auth')
-    const records = await store.find({ collection, overrideAccess: false, user, depth: 0, limit: 50, page, sort: '-updatedAt' })
-    return { ok: true as const, user: workspaceUser(user), records: records.docs, hasNextPage: records.hasNextPage, page }
-  } catch (error) { return resultError(error) }
-}
-
-/** {kind, id?, expectedUpdatedAt? (required when editing), patch}.
- * Fields are listed in CRITERION_EDIT_FIELDS / GUIDELINE_EDIT_FIELDS.
- * Lifecycle and approval data cannot be included in patch.
- */
-export async function saveGovernanceDraftAction(input: unknown) {
-  try {
-    const data = object(input, ['kind', 'id', 'expectedUpdatedAt', 'patch'])
-    const collection = target(data.kind)
-    const patch = validateGovernancePatch(data.patch, collection === 'clinical-criteria')
-    const { user, store } = await actor()
-    reviewer(user)
-    const id = data.id == null ? null : identifier(data.id)
-    if (id) {
-      const current = await store.findByID({ collection, id, overrideAccess: false, user, depth: 0 })
-      if (text(data.expectedUpdatedAt, 'expectedUpdatedAt', 40) !== current.updatedAt) throw new WorkflowError('Record changed. Reload it.', 'expectedUpdatedAt')
-      if (current.lifecycle && current.lifecycle !== 'DRAFT') throw new WorkflowError('Create a new revision to edit locked content.')
-      const record = await store.update({ collection, id, overrideAccess: false, user,
-        context: workflowContext(user, { kind: 'governance', target: `${collection}:${id}`, expectedDigest: digest({ id, updatedAt: current.updatedAt }) }), data: patch })
-      return { ok: true as const, record }
-    }
-    const record = await store.create({ collection, overrideAccess: false, user,
-      context: workflowContext(user, { kind: 'governance', target: `${collection}:new` }), data: { ...patch, lifecycle: 'DRAFT' } })
-    return { ok: true as const, record }
-  } catch (error) { return resultError(error) }
-}
-
-/** {kind, id, expectedUpdatedAt, to: Lifecycle}; no implicit approve-and-publish. */
-export async function transitionGovernanceAction(input: unknown) {
-  try {
-    const data = object(input, ['kind', 'id', 'expectedUpdatedAt', 'to'])
-    const collection = target(data.kind)
-    const id = identifier(data.id)
-    const to = text(data.to, 'to', 20) as Lifecycle
-    if (!LIFECYCLES.includes(to)) throw new WorkflowError('Invalid lifecycle.', 'to')
-    const { user, store } = await actor()
-    reviewer(user)
-    const current = await store.findByID({ collection, id, overrideAccess: false, user, depth: 0 })
-    if (text(data.expectedUpdatedAt, 'expectedUpdatedAt', 40) !== current.updatedAt) throw new WorkflowError('Record changed. Reload it.', 'expectedUpdatedAt')
-    const record = await store.update({ collection, id, overrideAccess: false, user,
-      context: workflowContext(user, { kind: 'governance', target: `${collection}:${id}`, expectedDigest: digest({ id, updatedAt: current.updatedAt }) }), data: { lifecycle: to } })
-    return { ok: true as const, record }
-  } catch (error) { return resultError(error) }
-}
-
-/** {kind, id, patch}; clone into a NEW DRAFT. Criteria need a new unique code and versionNumber.
- * The source record and its approval snapshot remain intact.
- */
-export async function createGovernanceRevisionAction(input: unknown) {
-  try {
-    const data = object(input, ['kind', 'id', 'patch'])
-    const collection = target(data.kind)
-    const id = identifier(data.id)
-    const patch = validateGovernancePatch(data.patch, collection === 'clinical-criteria')
-    const { user, store } = await actor()
-    reviewer(user)
-    const current = await store.findByID({ collection, id, overrideAccess: false, user, depth: 0 })
-    if (collection === 'clinical-criteria') {
-      const source = current as import('@/lib/workflow-store').GovernedCriterion
-      if (!patch.code || patch.code === source.code || !patch.versionNumber || patch.versionNumber === source.versionNumber) throw new WorkflowError('Supply a new code and version for the revision.', 'patch')
-    }
-    const content = contentSnapshot(current as unknown as Record<string, unknown>, collection === 'clinical-criteria')
-    const record = await store.create({ collection, overrideAccess: false, user,
-      context: workflowContext(user, { kind: 'governance', target: `${collection}:new` }),
-      data: { ...content, ...patch, revisionOf: id, lifecycle: 'DRAFT' } })
-    return { ok: true as const, record }
-  } catch (error) { return resultError(error) }
 }
 
 /** Fixed, clinic-wide, real-patient FINALIZED decision partition. No arbitrary filters.

@@ -10,14 +10,11 @@ import { Media } from './collections/Media'
 import { Folders } from './collections/Folders'
 import { Tags } from './collections/Tags'
 import { ClinicalPathways } from './collections/ClinicalPathways'
-import { ClinicalCriteria } from './collections/ClinicalCriteria'
 import { Patients } from './collections/Patients'
 import { Assessments } from './collections/Assessments'
 import { AuditLogs } from './collections/AuditLogs'
 import { Users } from './collections/Users'
 import { ClinicalWorkflows } from './collections/ClinicalWorkflows'
-import { GuidelineReferences } from './collections/GuidelineReferences'
-import { GovernanceCommands } from './collections/GovernanceCommands'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -59,14 +56,11 @@ export default buildConfig({
     Folders,
     Tags,
     ClinicalPathways,
-    ClinicalCriteria,
     Patients,
     Assessments,
     AuditLogs,
     Users,
     ClinicalWorkflows,
-    GuidelineReferences,
-    GovernanceCommands,
   ],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

@@ -147,28 +147,28 @@ function parsePatientGuidance(raw: string, lang: 'en' | 'hi'): ParsedGuidanceSec
   if (parsed.bringItems.length === 0) {
     parsed.bringItems = isHi
       ? [
-          'पूर्व के सभी अल्ट्रासाउंड स्कैन, रक्त जांच और प्रयोगशाला रिपोर्ट',
-          'पारिवारिक स्वास्थ्य इतिहास विवरण (रक्त संबंधियों में हुई बीमारियां)',
-          'अपने प्रश्नों की सूची और वर्तमान में ली जा रही दवाओं के विवरण',
-        ]
+        'पूर्व के सभी अल्ट्रासाउंड स्कैन, रक्त जांच और प्रयोगशाला रिपोर्ट',
+        'पारिवारिक स्वास्थ्य इतिहास विवरण (रक्त संबंधियों में हुई बीमारियां)',
+        'अपने प्रश्नों की सूची और वर्तमान में ली जा रही दवाओं के विवरण',
+      ]
       : [
-          'All prior blood test reports, ultrasound scan images, and laboratory summaries',
-          'Family health background details (any illnesses or test reports in blood relatives)',
-          'A written list of your questions and any current medications',
-        ]
+        'All prior blood test reports, ultrasound scan images, and laboratory summaries',
+        'Family health background details (any illnesses or test reports in blood relatives)',
+        'A written list of your questions and any current medications',
+      ]
   }
   if (parsed.questions.length === 0) {
     parsed.questions = isHi
       ? [
-          'इस परामर्श का मेरे या मेरे परिवार के स्वास्थ्य के लिए क्या महत्व है?',
-          'आगे कौन-सी जांचें उपलब्ध हैं और उनके क्या लाभ व सीमाएं हैं?',
-          'परिवार के भविष्य के स्वास्थ्य हेतु हम क्या कदम उठा सकते हैं?',
-        ]
+        'इस परामर्श का मेरे या मेरे परिवार के स्वास्थ्य के लिए क्या महत्व है?',
+        'आगे कौन-सी जांचें उपलब्ध हैं और उनके क्या लाभ व सीमाएं हैं?',
+        'परिवार के भविष्य के स्वास्थ्य हेतु हम क्या कदम उठा सकते हैं?',
+      ]
       : [
-          'What does this guideline referral mean for me or my pregnancy?',
-          'What further tests are available, and what are their benefits and limitations?',
-          'What steps can we take to protect our family’s health?',
-        ]
+        'What does this guideline referral mean for me or my pregnancy?',
+        'What further tests are available, and what are their benefits and limitations?',
+        'What steps can we take to protect our family’s health?',
+      ]
   }
   if (!parsed.expectBody) {
     parsed.expectBody = isHi
@@ -641,18 +641,16 @@ export function WorkflowResult({
               <button
                 type="button"
                 onClick={() => setLangTab('en')}
-                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                  langTab === 'en' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${langTab === 'en' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
               >
                 English
               </button>
               <button
                 type="button"
                 onClick={() => setLangTab('hi')}
-                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                  langTab === 'hi' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${langTab === 'hi' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
               >
                 हिन्दी (Hindi)
               </button>

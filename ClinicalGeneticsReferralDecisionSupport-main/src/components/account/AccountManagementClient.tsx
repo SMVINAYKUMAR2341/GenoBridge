@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   User,
@@ -15,14 +15,17 @@ import {
   Eye,
   EyeOff,
   LogOut,
-  Sparkles,
-  ArrowRight,
+  Edit2,
+  Save,
+  X,
   RefreshCw,
-  FileCheck,
-  Mail,
-  Phone,
-  Calendar,
   Clock,
+  Laptop,
+  Activity,
+  History,
+  Phone,
+  Mail,
+  Calendar,
   Check,
 } from 'lucide-react'
 
@@ -45,10 +48,41 @@ export interface ClinicianAccountData {
   designation?: string
   verificationStatus?: string
   emailVerified?: boolean
+  createdAt?: string
+  updatedAt?: string
   submittedAt?: string
 }
 
-export default function AccountManagementClient({ user }: { user: ClinicianAccountData }) {
+interface ActiveSessionItem {
+  id: string
+  createdAt: string
+  expiresAt: string
+  isCurrent: boolean
+  isExpired?: boolean
+}
+
+interface ActivityItem {
+  id: string
+  actionType: string
+  details: string
+  timestamp: string
+}
+
+export default function AccountManagementClient({ user: initialUser }: { user: ClinicianAccountData }) {
+  const [user, setUser] = useState<ClinicianAccountData>(initialUser)
+  
+  // Profile edit state
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [name, setName] = useState(initialUser.name || '')
+  const [firstName, setFirstName] = useState(initialUser.firstName || '')
+  const [lastName, setLastName] = useState(initialUser.lastName || '')
+  const [phone, setPhone] = useState(initialUser.phone || '')
+  const [designation, setDesignation] = useState(initialUser.designation || '')
+  const [department, setDepartment] = useState(initialUser.department || '')
+  const [hospitalClinicName, setHospitalClinicName] = useState(initialUser.hospitalClinicName || '')
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
   // Password form state
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -56,38 +90,132 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [statusMessage, setStatusMessage] = useState<{
-    type: 'success' | 'error'
-    text: string
-  } | null>(null)
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false)
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // Recovery email trigger state
-  const [recoverySent, setRecoverySent] = useState(false)
-  const [sendingRecovery, setSendingRecovery] = useState(false)
+  // Sessions and Activity
+  const [sessions, setSessions] = useState<ActiveSessionItem[]>([])
+  const [loadingSessions, setLoadingSessions] = useState(false)
+  const [revokingSessions, setRevokingSessions] = useState(false)
+  const [sessionMessage, setSessionMessage] = useState<string | null>(null)
 
-  const isDoctor = user.category === 'gynecologist' || user.role === 'provider'
+  const [activities, setActivities] = useState<ActivityItem[]>([])
+  const [loadingActivities, setLoadingActivities] = useState(false)
+
   const isNurse = user.category === 'nurse' || user.role === 'nurse'
+
+  // Fetch active sessions
+  const loadSessions = async () => {
+    setLoadingSessions(true)
+    try {
+      const res = await fetch('/api/account/sessions', { cache: 'no-store' })
+      if (res.ok) {
+        const json = await res.json()
+        if (json.sessions) setSessions(json.sessions)
+      }
+    } catch {}
+    finally {
+      setLoadingSessions(false)
+    }
+  }
+
+  // Fetch recent activity
+  const loadActivity = async () => {
+    setLoadingActivities(true)
+    try {
+      const res = await fetch('/api/account/activity', { cache: 'no-store' })
+      if (res.ok) {
+        const json = await res.json()
+        if (json.activities) setActivities(json.activities)
+      }
+    } catch {}
+    finally {
+      setLoadingActivities(false)
+    }
+  }
+
+  useEffect(() => {
+    loadSessions()
+    loadActivity()
+  }, [])
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSavingProfile(true)
+    setProfileMessage(null)
+
+    try {
+      const res = await fetch('/api/account/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          firstName,
+          lastName,
+          phone,
+          designation,
+          department,
+          hospitalClinicName,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setProfileMessage({ type: 'error', text: data.message || 'Failed to update profile.' })
+      } else {
+        setProfileMessage({ type: 'success', text: 'Account details saved and persisted to database!' })
+        setUser((prev) => ({
+          ...prev,
+          name,
+          firstName,
+          lastName,
+          phone,
+          designation,
+          department,
+          hospitalClinicName,
+        }))
+        setIsEditingProfile(false)
+        loadActivity()
+      }
+    } catch {
+      setProfileMessage({ type: 'error', text: 'Network error saving profile changes.' })
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setName(user.name || '')
+    setFirstName(user.firstName || '')
+    setLastName(user.lastName || '')
+    setPhone(user.phone || '')
+    setDesignation(user.designation || '')
+    setDepartment(user.department || '')
+    setHospitalClinicName(user.hospitalClinicName || '')
+    setIsEditingProfile(false)
+    setProfileMessage(null)
+  }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatusMessage(null)
+    setPasswordMessage(null)
 
     if (!currentPassword) {
-      setStatusMessage({ type: 'error', text: 'Please enter your current password.' })
+      setPasswordMessage({ type: 'error', text: 'Please enter your current password.' })
       return
     }
 
     if (newPassword.length < 8) {
-      setStatusMessage({
+      setPasswordMessage({
         type: 'error',
-        text: 'New password must be at least 8 characters in length.',
+        text: 'New password must be at least 8 characters long.',
       })
       return
     }
 
     if (newPassword !== confirmPassword) {
-      setStatusMessage({
+      setPasswordMessage({
         type: 'error',
         text: 'New password and confirmation do not match.',
       })
@@ -95,17 +223,17 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
     }
 
     if (currentPassword === newPassword) {
-      setStatusMessage({
+      setPasswordMessage({
         type: 'error',
-        text: 'New password must be different from your current password.',
+        text: 'New password must be different from current password.',
       })
       return
     }
 
-    setIsSubmitting(true)
+    setIsSubmittingPassword(true)
 
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res = await fetch('/api/account/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
@@ -114,46 +242,43 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
       const data = await res.json()
 
       if (!res.ok) {
-        setStatusMessage({
+        setPasswordMessage({
           type: 'error',
-          text: data.message || 'Failed to update password. Please check your credentials.',
+          text: data.message || 'Failed to update password. Check your credentials.',
         })
       } else {
-        setStatusMessage({
+        setPasswordMessage({
           type: 'success',
-          text: 'Password updated successfully! Your new password will be required on next login.',
+          text: 'Password updated successfully! Your new password is now active in the database.',
         })
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
+        loadActivity()
       }
     } catch {
-      setStatusMessage({
+      setPasswordMessage({
         type: 'error',
-        text: 'Network error occurred while updating password. Please try again.',
+        text: 'Network error occurred while updating password.',
       })
     } finally {
-      setIsSubmitting(false)
+      setIsSubmittingPassword(false)
     }
   }
 
-  const handleTriggerRecovery = async () => {
-    setSendingRecovery(true)
+  const handleRevokeOtherSessions = async () => {
+    setRevokingSessions(true)
+    setSessionMessage(null)
     try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email }),
-      })
+      const res = await fetch('/api/account/sessions', { method: 'DELETE' })
       if (res.ok) {
-        setRecoverySent(true)
-      } else {
-        setRecoverySent(true) // Still show confirmation for security
+        setSessionMessage('All other sessions signed out.')
+        loadSessions()
+        loadActivity()
       }
-    } catch {
-      setRecoverySent(true)
-    } finally {
-      setSendingRecovery(false)
+    } catch {}
+    finally {
+      setRevokingSessions(false)
     }
   }
 
@@ -172,13 +297,13 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
         <div>
           <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-slate-500 mb-1 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>CLINICAL STAFF &amp; CREDENTIAL PORTAL</span>
+            <span>CLINICAL STAFF &amp; ACCOUNT MANAGEMENT</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            Account Information &amp; Security
+            Account Details &amp; Settings
           </h1>
           <p className="mt-1 text-sm text-slate-600 max-w-2xl leading-relaxed">
-            Manage your verified clinical credentials, practice affiliations, login credentials, and account recovery options.
+            Manage your personal profile details, statutory credentials, login security, and active workstation sessions. Changes are stored directly in the database.
           </p>
         </div>
 
@@ -200,7 +325,7 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
         </div>
       </div>
 
-      {/* Account Overview Header Card */}
+      {/* Account Information Card */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-4">
@@ -235,288 +360,353 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
             </div>
           </div>
 
-          <div className="flex sm:flex-col items-end justify-between sm:justify-center border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-6 text-right">
-            <span className="text-[11px] font-mono uppercase font-bold text-slate-500">
-              ABDM Compliant
-            </span>
-            <span className="text-xs font-semibold text-slate-700">
-              HPR ID: 91-{String(user.id).padStart(4, '0')}-4491
-            </span>
+          <div className="flex sm:flex-col items-end justify-between sm:justify-center border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-6 text-right space-y-1">
+            <div className="text-[11px] font-mono uppercase text-slate-500">
+              Account ID: <strong className="text-slate-700 font-mono">{String(user.id).slice(0, 8)}...</strong>
+            </div>
+            <div className="text-xs text-slate-500">
+              Member since: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Grid: Credentials & Affiliation */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Card 1: Statutory Clinical Credentials */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900">
-              <Stethoscope size={18} />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Statutory Professional Credentials
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                Medical &amp; Nursing Council registration details
-              </p>
-            </div>
+      {/* SECTION 1: Personal Information (Editable & Persisted to DB) */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <User size={16} />
+              <span>Personal Information</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">
+              Update your personal display details and hospital affiliation. Changes persist directly to the database.
+            </p>
           </div>
 
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">
-                {isNurse ? 'Nursing Reg. Number' : 'State Medical Reg. No.'}
-              </dt>
-              <dd className="font-mono font-bold text-slate-900 text-sm mt-0.5">
-                {user.medicalRegistrationNumber ||
-                  user.nursingRegistrationNumber ||
-                  'MCI-2018-94821'}
-              </dd>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">
-                {isNurse ? 'Nursing Council' : 'State Medical Council'}
-              </dt>
-              <dd className="font-semibold text-slate-900 text-sm mt-0.5">
-                {user.stateMedicalCouncil ||
-                  user.stateNursingCouncil ||
-                  'Karnataka Medical Council (KMC)'}
-              </dd>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">Clinical Category</dt>
-              <dd className="font-semibold text-slate-900 mt-0.5">
-                {isNurse ? 'Clinical Nurse Specialist' : 'Obstetrician & Gynecologist'}
-              </dd>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">Council State / Region</dt>
-              <dd className="font-semibold text-slate-900 mt-0.5">
-                {user.registrationState || 'Karnataka, India'}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
-            <FileCheck size={14} className="text-emerald-600 shrink-0" />
-            <span>
-              Credentials stamped on referral orders &amp; patient letters in accordance with NMC / FOGSI guidelines.
-            </span>
-          </div>
+          {!isEditingProfile ? (
+            <button
+              type="button"
+              onClick={() => setIsEditingProfile(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <Edit2 size={12} />
+              <span>Edit Profile</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <X size={12} />
+              <span>Cancel</span>
+            </button>
+          )}
         </div>
 
-        {/* Card 2: Hospital & Department Affiliation */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900">
-              <Building2 size={18} />
-            </div>
+        {profileMessage && (
+          <div
+            className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${
+              profileMessage.type === 'success'
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+            }`}
+          >
+            {profileMessage.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            )}
+            <span>{profileMessage.text}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSaveProfile} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Hospital &amp; Practice Affiliation</h3>
-              <p className="text-[11px] text-slate-500">
-                Institutional OPD and departmental configuration
-              </p>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                disabled={!isEditingProfile}
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 text-xs disabled:bg-slate-50 disabled:text-slate-600 focus:outline-none focus:border-slate-900 transition shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Work Email Address
+              </label>
+              <input
+                type="email"
+                disabled
+                value={user.email}
+                title="Email change requires administrative verification"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-xs cursor-not-allowed"
+              />
+              <span className="text-[10.5px] text-slate-400 mt-1 block">
+                Work email is locked to protect clinical audit integrity.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Contact Phone
+              </label>
+              <input
+                type="tel"
+                disabled={!isEditingProfile}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 text-xs disabled:bg-slate-50 disabled:text-slate-600 focus:outline-none focus:border-slate-900 transition shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Clinical Designation
+              </label>
+              <input
+                type="text"
+                disabled={!isEditingProfile}
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                placeholder="Consultant Obstetrician & Gynecologist"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 text-xs disabled:bg-slate-50 disabled:text-slate-600 focus:outline-none focus:border-slate-900 transition shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Hospital / Clinic Facility
+              </label>
+              <input
+                type="text"
+                disabled={!isEditingProfile}
+                value={hospitalClinicName}
+                onChange={(e) => setHospitalClinicName(e.target.value)}
+                placeholder="Apex Mother & Child Hospital"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 text-xs disabled:bg-slate-50 disabled:text-slate-600 focus:outline-none focus:border-slate-900 transition shadow-2xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Clinical Department
+              </label>
+              <input
+                type="text"
+                disabled={!isEditingProfile}
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                placeholder="Department of Obstetrics & Gynecology"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-900 text-xs disabled:bg-slate-50 disabled:text-slate-600 focus:outline-none focus:border-slate-900 transition shadow-2xs"
+              />
             </div>
           </div>
 
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 sm:col-span-2">
-              <dt className="text-slate-500 font-medium text-[11px]">Hospital / Health Facility</dt>
-              <dd className="font-bold text-slate-900 text-sm mt-0.5">
-                {user.hospitalClinicName || 'Apex Mother & Child Multispecialty Hospital'}
-              </dd>
+          {isEditingProfile && (
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={savingProfile}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition shadow-xs flex items-center gap-1.5"
+              >
+                {savingProfile ? (
+                  <>
+                    <RefreshCw size={13} className="animate-spin" />
+                    <span>Saving Changes...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={13} />
+                    <span>Save to Database</span>
+                  </>
+                )}
+              </button>
             </div>
+          )}
+        </form>
+      </section>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">Clinical Department</dt>
-              <dd className="font-semibold text-slate-900 mt-0.5">
-                {user.department || 'Department of Obstetrics & Gynecology'}
-              </dd>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <dt className="text-slate-500 font-medium text-[11px]">Designation</dt>
-              <dd className="font-semibold text-slate-900 mt-0.5">
-                {user.designation || (isNurse ? 'Senior Staff Nurse' : 'Attending Consultant')}
-              </dd>
-            </div>
-          </dl>
-
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
-            <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-            <span>
-              Facility OPD workflows partitioned under Indian DPDP Act 2023 and ABDM standards.
-            </span>
-          </div>
+      {/* SECTION 2: Statutory Medical Credentials (Read-Only Security Governance) */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="border-b border-slate-100 pb-3">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Stethoscope size={16} />
+            <span>Statutory Professional Registration (Verified)</span>
+          </h3>
+          <p className="text-[11px] text-slate-500">
+            Official state council registration numbers stamped on clinical outputs. Managed under administrator verification.
+          </p>
         </div>
-      </div>
 
-      {/* Security Section: Password Change & Recovery */}
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <dt className="text-slate-500 font-medium text-[11px]">
+              {isNurse ? 'Nursing Reg. Number' : 'State Medical Reg. No.'}
+            </dt>
+            <dd className="font-mono font-bold text-slate-900 text-sm mt-0.5">
+              {user.medicalRegistrationNumber ||
+                user.nursingRegistrationNumber ||
+                'MCI-2018-94821'}
+            </dd>
+          </div>
+
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <dt className="text-slate-500 font-medium text-[11px]">
+              {isNurse ? 'Nursing Council' : 'State Medical Council'}
+            </dt>
+            <dd className="font-semibold text-slate-900 text-sm mt-0.5">
+              {user.stateMedicalCouncil ||
+                user.stateNursingCouncil ||
+                'Karnataka Medical Council (KMC)'}
+            </dd>
+          </div>
+
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <dt className="text-slate-500 font-medium text-[11px]">Clinical Role</dt>
+            <dd className="font-semibold text-slate-900 mt-0.5">
+              {isNurse ? 'Clinical Nurse Specialist' : 'Obstetrician & Gynecologist'}
+            </dd>
+          </div>
+
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <dt className="text-slate-500 font-medium text-[11px]">Registration State</dt>
+            <dd className="font-semibold text-slate-900 mt-0.5">
+              {user.registrationState || 'Karnataka, India'}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      {/* SECTION 3: Security & Password Management */}
       <div id="password" className="grid md:grid-cols-2 gap-6 scroll-mt-20">
         {/* Change Password Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
-              <KeyRound size={17} />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Change Account Password</h3>
-              <p className="text-[11px] text-slate-500">
-                Update your login credentials securely
-              </p>
-            </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <KeyRound size={16} />
+              <span>Change Password</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">
+              Update your account password with current credential validation
+            </p>
           </div>
 
-          {statusMessage && (
+          {passwordMessage && (
             <div
               className={`p-3.5 rounded-xl text-xs flex items-start gap-2.5 ${
-                statusMessage.type === 'success'
+                passwordMessage.type === 'success'
                   ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
                   : 'bg-rose-50 border border-rose-200 text-rose-800'
               }`}
             >
-              {statusMessage.type === 'success' ? (
+              {passwordMessage.type === 'success' ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               ) : (
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               )}
-              <div className="leading-relaxed">{statusMessage.text}</div>
+              <div className="leading-relaxed">{passwordMessage.text}</div>
             </div>
           )}
 
-          <form onSubmit={handlePasswordChange} className="space-y-4">
-            {/* Current Password */}
+          <form onSubmit={handlePasswordChange} className="space-y-3.5">
             <div>
-              <label
-                htmlFor="currentPassword"
-                className="block text-xs font-semibold text-slate-700 mb-1"
-              >
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Current Password
               </label>
               <div className="relative">
                 <input
-                  id="currentPassword"
                   type={showCurrent ? 'text' : 'password'}
                   required
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter your current password"
-                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition shadow-2xs"
+                  placeholder="Enter current password"
+                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-slate-900 transition shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCurrent(!showCurrent)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   tabIndex={-1}
-                  aria-label="Toggle password visibility"
                 >
                   {showCurrent ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            {/* New Password */}
             <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-xs font-semibold text-slate-700 mb-1"
-              >
-                New Password
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                New Password (Min. 8 characters)
               </label>
               <div className="relative">
                 <input
-                  id="newPassword"
                   type={showNew ? 'text' : 'password'}
                   required
                   minLength={8}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition shadow-2xs"
+                  placeholder="Enter new secure password"
+                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-slate-900 transition shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowNew(!showNew)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   tabIndex={-1}
-                  aria-label="Toggle password visibility"
                 >
                   {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            {/* Confirm New Password */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-xs font-semibold text-slate-700 mb-1"
-              >
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Confirm New Password
               </label>
               <div className="relative">
                 <input
-                  id="confirmPassword"
                   type={showConfirm ? 'text' : 'password'}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat new password"
-                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition shadow-2xs"
+                  className="w-full px-3 py-2 pr-10 rounded-xl border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-slate-900 transition shadow-2xs"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   tabIndex={-1}
-                  aria-label="Toggle password visibility"
                 >
                   {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            {/* Password requirements hint */}
-            <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1.5 text-[11px] text-slate-600">
-              <span className="font-semibold text-slate-800 block">Password Guidelines:</span>
-              <ul className="space-y-1">
-                <li className="flex items-center gap-1.5">
-                  <Check
-                    size={11}
-                    className={
-                      newPassword.length >= 8 ? 'text-emerald-600' : 'text-slate-400'
-                    }
-                  />
-                  <span>At least 8 characters in length</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check
-                    size={11}
-                    className={
-                      newPassword && confirmPassword && newPassword === confirmPassword
-                        ? 'text-emerald-600'
-                        : 'text-slate-400'
-                    }
-                  />
-                  <span>Must match the confirmation password</span>
-                </li>
-              </ul>
-            </div>
-
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs"
+              disabled={isSubmittingPassword}
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 transition cursor-pointer flex items-center justify-center gap-2 shadow-xs mt-2"
             >
-              {isSubmitting ? (
+              {isSubmittingPassword ? (
                 <>
                   <RefreshCw size={13} className="animate-spin" />
-                  <span>Updating Password...</span>
+                  <span>Updating Password in Database...</span>
                 </>
               ) : (
                 <>
@@ -528,103 +718,128 @@ export default function AccountManagementClient({ user }: { user: ClinicianAccou
           </form>
         </div>
 
-        {/* Recovery & Session Governance Card */}
-        <div id="recovery" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5 flex flex-col justify-between scroll-mt-20">
+        {/* Active Sessions & Workstation Security */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4 flex flex-col justify-between">
           <div className="space-y-4">
-            <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900">
-                <ShieldCheck size={18} />
-              </div>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Account Recovery &amp; Reset</h3>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Laptop size={16} />
+                  <span>Active Workstation Sessions</span>
+                </h3>
                 <p className="text-[11px] text-slate-500">
-                  Self-service email recovery and security assurances
+                  Track authenticated sessions and sign out other devices
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={handleRevokeOtherSessions}
+                disabled={revokingSessions}
+                className="text-xs font-semibold text-rose-600 hover:text-rose-800 hover:underline cursor-pointer"
+              >
+                {revokingSessions ? 'Revoking...' : 'Sign out other sessions'}
+              </button>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-600">
-              <p className="leading-relaxed">
-                If you ever forget your password or lose access to your clinical workstation, you can receive a single-use secure reset link delivered directly to your verified address (<strong>{user.email}</strong>).
-              </p>
+            {sessionMessage && (
+              <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+                {sessionMessage}
+              </div>
+            )}
 
-              {recoverySent ? (
-                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">Recovery Instructions Sent:</span>
-                    <p className="mt-0.5 text-[11px]">
-                      A secure reset token has been dispatched to {user.email}. Check your institutional inbox and follow the steps within 60 minutes.
-                    </p>
-                  </div>
+            <div className="space-y-2">
+              {loadingSessions ? (
+                <div className="p-6 text-center text-xs text-slate-400">Loading active sessions...</div>
+              ) : sessions.length === 0 ? (
+                <div className="p-3 rounded-xl bg-slate-50 text-xs text-slate-500">
+                  Current browser session active.
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-800">Email Recovery Link</span>
-                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700">
-                      Single-Use Token
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    Triggers an encrypted password recovery link with an automated 1-hour expiration window.
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleTriggerRecovery}
-                      disabled={sendingRecovery}
-                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 transition shadow-2xs cursor-pointer flex items-center gap-1.5"
-                    >
-                      {sendingRecovery ? (
-                        <RefreshCw size={12} className="animate-spin" />
-                      ) : (
-                        <Mail size={12} />
-                      )}
-                      <span>Send Recovery Email</span>
-                    </button>
-                    <Link
-                      href="/forgot-password"
-                      className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:underline transition"
-                    >
-                      Open Reset Page →
-                    </Link>
-                  </div>
-                </div>
-              )}
+                sessions.map((sess, idx) => (
+                  <div
+                    key={sess.id || idx}
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700">
+                        <Laptop size={14} />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                          <span>Session {sess.id.slice(0, 8)}...</span>
+                          {sess.isCurrent && (
+                            <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                              This Device
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[10.5px] text-slate-500">
+                          Started: {sess.createdAt ? new Date(sess.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Active'}
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Session Governance & Privacy */}
-              <div className="pt-2 space-y-2">
-                <span className="text-xs font-bold text-slate-900 block">
-                  Session Governance &amp; Statutory Compliance:
-                </span>
-                <ul className="space-y-2 text-[11px] text-slate-600">
-                  <li className="flex items-start gap-2">
-                    <Clock size={13} className="text-slate-500 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-800">60-Minute Session Timeout:</strong> Workstations automatically invalidate inactive sessions to prevent unauthorized patient record access.
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {sess.isExpired ? 'Expired' : '1h Timeout'}
                     </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Lock size={13} className="text-slate-500 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-800">DPDP Act 2023 &amp; HIPAA Safe Harbor:</strong> Audit logging enabled for all clinical referral actions, genetic triage evaluations, and credential modifications.
-                    </span>
-                  </li>
-                </ul>
-              </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Need administrative support?</span>
-            <span className="font-mono text-slate-700 font-semibold">
-              support@genobridge.in
+          <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              <span>Automatic 60-min session expiration</span>
             </span>
+            <Link href="/forgot-password" className="text-slate-700 hover:underline font-semibold">
+              Recovery Link →
+            </Link>
           </div>
         </div>
       </div>
+
+      {/* SECTION 4: Recent Account Activity Log */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="border-b border-slate-100 pb-3">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Activity size={16} />
+            <span>Recent Account Security Activity</span>
+          </h3>
+          <p className="text-[11px] text-slate-500">
+            Immutable security log of authentication events, credential updates, and session creations.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          {loadingActivities ? (
+            <div className="p-4 text-center text-xs text-slate-400">Loading activity records...</div>
+          ) : activities.length === 0 ? (
+            <div className="p-3 rounded-xl bg-slate-50 text-xs text-slate-500">
+              No recent security events recorded.
+            </div>
+          ) : (
+            activities.map((act) => (
+              <div
+                key={act.id}
+                className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-3 text-xs"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-semibold text-slate-900 font-mono text-[11px]">
+                    {act.actionType}
+                  </div>
+                  <div className="text-slate-600 text-xs">{act.details}</div>
+                </div>
+                <div className="text-[10.5px] font-mono text-slate-400 shrink-0">
+                  {act.timestamp ? new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </div>
   )
 }
-

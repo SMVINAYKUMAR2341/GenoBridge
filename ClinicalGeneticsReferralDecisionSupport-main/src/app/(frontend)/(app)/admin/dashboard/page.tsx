@@ -6,14 +6,12 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { appAuth } from '@/lib/app-auth'
 import { AdminVerificationPanel } from '@/components/admin/AdminVerificationPanel'
-import ClinicalCriteriaManager from '@/components/admin/ClinicalCriteriaManager'
 import {
   ShieldAlert,
   UserCheck,
   FileCheck2,
   Lock,
   Database,
-  Sliders,
   History,
 } from 'lucide-react'
 
@@ -93,11 +91,6 @@ export default async function AdminDashboardPage() {
         </div>
 
         <AdminVerificationPanel />
-      </div>
-
-      {/* Clinical Guideline Criteria & Thresholds Governance (GenoBridge Admin Engine) */}
-      <div className="pt-6 border-t border-[#164C60]/60">
-        <ClinicalCriteriaManager />
       </div>
     </div>
   )

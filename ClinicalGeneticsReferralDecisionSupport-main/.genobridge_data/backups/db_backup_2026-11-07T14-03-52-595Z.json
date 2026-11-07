@@ -1,0 +1,612 @@
+{
+  "timestamp": "2026-11-07T14:03:54.909Z",
+  "tables": {
+    "_assessments_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_assessments_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_audit_logs_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_audit_logs_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_criteria_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_criteria_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_pathways_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_pathways_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_pathways_v_version_clinical_pearls": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_workflows_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_clinical_workflows_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_folders_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_folders_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_governance_commands_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_governance_commands_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_guideline_references_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_guideline_references_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_media_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_media_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_patients_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_patients_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_tags_v": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_tags_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_users_v": {
+      "rowCount": 3,
+      "rows": [
+        {
+          "id": "2b5f6fcf-6672-43d6-87c3-18a5b6688fd9",
+          "parent_id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "version_name": "Priya Sharma",
+          "version_first_name": "Priya",
+          "version_last_name": "Sharma",
+          "version_phone": "+91 9811223344",
+          "version_category": "gynecologist",
+          "version_medical_registration_number": "DMC/2026/55412",
+          "version_state_medical_council": "Delhi Medical Council",
+          "version_registration_state": "Delhi (NCT)",
+          "version_nursing_registration_number": "",
+          "version_state_nursing_council": "",
+          "version_hospital_clinic_name": "AIIMS New Delhi",
+          "version_department": "Obstetrics & Gynecology",
+          "version_designation": "Consultant Gynecologist",
+          "version_terms_accepted": true,
+          "version_privacy_accepted": true,
+          "version_verification_consent": true,
+          "version_verification_status": "PROFESSIONAL_VERIFICATION_PENDING",
+          "version_email_verified": false,
+          "version_email_verification_token": "ad0762e8777554b38610196d7788992155890b1ba0b704f20cd96e7498e0d1f7",
+          "version_email_verification_token_expires_at": "2026-11-06T15:38:30.624Z",
+          "version_rejection_reason": null,
+          "version_reviewed_by": null,
+          "version_reviewed_at": null,
+          "version_additional_info_requested": null,
+          "version_submitted_at": "2026-11-05T15:38:30.624Z",
+          "version_clinical_qualification": "OB-GYN (Delhi Medical Council)",
+          "version_reviewer_qualification": null,
+          "version_reviewer_authorized": false,
+          "version_reviewer_authorization_expires_at": null,
+          "version_enabled": false,
+          "version_role": "provider",
+          "version_updated_at": "2026-11-05T15:38:31.922Z",
+          "version_created_at": "2026-11-05T15:38:31.920Z",
+          "version_email": "doctor@hospital.org",
+          "version_reset_password_token": null,
+          "version_reset_password_expiration": null,
+          "version_salt": "4d44dd611ec535f726f7f7d919601c8b7dc2e5715a4409ef67a1973b8b1e31ef",
+          "version_hash": "pbkdf2-sha256-v1:ba7434e646f1d2b3d68382ecbac126a7e615b1abd4aa84580c29cf0e4c93474c",
+          "version_reset_password_requested_at": null,
+          "version_login_attempts": "0",
+          "version_lock_until": null,
+          "created_at": "2026-11-05T15:38:32.438Z",
+          "updated_at": "2026-11-05T15:38:32.438Z"
+        },
+        {
+          "id": "cab63a89-bcaa-4f5d-8777-dc6ed4b7595b",
+          "parent_id": "778bf2cf-86bb-43bc-9315-7904add1b1d6",
+          "version_name": "Mary Johnson",
+          "version_first_name": "Mary",
+          "version_last_name": "Johnson",
+          "version_phone": "+91 9876543210",
+          "version_category": "nurse",
+          "version_medical_registration_number": "",
+          "version_state_medical_council": "",
+          "version_registration_state": "",
+          "version_nursing_registration_number": "DNC/RN/2026/8892",
+          "version_state_nursing_council": "Delhi Nursing Council",
+          "version_hospital_clinic_name": "AIIMS New Delhi",
+          "version_department": "Obstetrics & Clinical Genetics",
+          "version_designation": "ANC Staff Nurse",
+          "version_terms_accepted": true,
+          "version_privacy_accepted": true,
+          "version_verification_consent": true,
+          "version_verification_status": "PROFESSIONAL_VERIFICATION_PENDING",
+          "version_email_verified": false,
+          "version_email_verification_token": "c35178622e331b474d7ddf9f87f4f908bbc437baac5ba8025b82e76912fd394f",
+          "version_email_verification_token_expires_at": "2026-11-06T15:38:59.409Z",
+          "version_rejection_reason": null,
+          "version_reviewed_by": null,
+          "version_reviewed_at": null,
+          "version_additional_info_requested": null,
+          "version_submitted_at": "2026-11-05T15:38:59.409Z",
+          "version_clinical_qualification": "Nurse (ANC Staff Nurse)",
+          "version_reviewer_qualification": null,
+          "version_reviewer_authorized": false,
+          "version_reviewer_authorization_expires_at": null,
+          "version_enabled": false,
+          "version_role": "nurse",
+          "version_updated_at": "2026-11-05T15:39:00.052Z",
+          "version_created_at": "2026-11-05T15:39:00.052Z",
+          "version_email": "nurse@hospital.org",
+          "version_reset_password_token": null,
+          "version_reset_password_expiration": null,
+          "version_salt": "3f5315c55acdec169d11f1ede85a998a2f94161b5cb87ea964ae9569de34404f",
+          "version_hash": "pbkdf2-sha256-v1:20ec023ec77ee7523caccfdbf877154b6308050d8802f2d4c14e54c0dfcb99cc",
+          "version_reset_password_requested_at": null,
+          "version_login_attempts": "0",
+          "version_lock_until": null,
+          "created_at": "2026-11-05T15:39:00.604Z",
+          "updated_at": "2026-11-05T15:39:00.604Z"
+        },
+        {
+          "id": "020825de-138a-454f-987d-4292cf4e8ada",
+          "parent_id": "489290fd-54c3-4f99-a047-9cc268934dff",
+          "version_name": "System Admin",
+          "version_first_name": "System",
+          "version_last_name": "Admin",
+          "version_phone": "+91 9999999999",
+          "version_category": "gynecologist",
+          "version_medical_registration_number": "ADMIN-2026-NMC",
+          "version_state_medical_council": "Delhi Medical Council",
+          "version_registration_state": "Delhi (NCT)",
+          "version_nursing_registration_number": "",
+          "version_state_nursing_council": "",
+          "version_hospital_clinic_name": "AIIMS New Delhi",
+          "version_department": "Platform Administration",
+          "version_designation": "Chief Medical Administrator",
+          "version_terms_accepted": true,
+          "version_privacy_accepted": true,
+          "version_verification_consent": true,
+          "version_verification_status": "PROFESSIONAL_VERIFICATION_PENDING",
+          "version_email_verified": false,
+          "version_email_verification_token": "a875ea9529cea4cdaf677dcf6164ab25cc34c2dc54895602dbceb820468733f2",
+          "version_email_verification_token_expires_at": "2026-11-06T15:39:15.948Z",
+          "version_rejection_reason": null,
+          "version_reviewed_by": null,
+          "version_reviewed_at": null,
+          "version_additional_info_requested": null,
+          "version_submitted_at": "2026-11-05T15:39:15.948Z",
+          "version_clinical_qualification": "OB-GYN (Delhi Medical Council)",
+          "version_reviewer_qualification": null,
+          "version_reviewer_authorized": false,
+          "version_reviewer_authorization_expires_at": null,
+          "version_enabled": false,
+          "version_role": "provider",
+          "version_updated_at": "2026-11-05T15:39:16.632Z",
+          "version_created_at": "2026-11-05T15:39:16.632Z",
+          "version_email": "admin@helix-test.local",
+          "version_reset_password_token": null,
+          "version_reset_password_expiration": null,
+          "version_salt": "818ccbc27910496c9c05b89cb27ede26e453b7d3a6952771c767f7190a88f6b6",
+          "version_hash": "pbkdf2-sha256-v1:0650fbc7906ed4ea8eefcefe9697d3c679aabbcb649bbca4c3312f21f8bea4e5",
+          "version_reset_password_requested_at": null,
+          "version_login_attempts": "0",
+          "version_lock_until": null,
+          "created_at": "2026-11-05T15:39:17.279Z",
+          "updated_at": "2026-11-05T15:39:17.279Z"
+        }
+      ]
+    },
+    "_users_v_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "_users_v_version_sessions": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "admins": {
+      "rowCount": 1,
+      "rows": [
+        {
+          "id": "6f6b4fba-a819-445e-b3b3-36109bf14705",
+          "updated_at": "2026-11-05T15:39:37.939Z",
+          "created_at": "2026-11-05T15:39:37.939Z",
+          "email": "admin@helix-test.local",
+          "reset_password_token": null,
+          "reset_password_expiration": null,
+          "salt": "818ccbc27910496c9c05b89cb27ede26e453b7d3a6952771c767f7190a88f6b6",
+          "hash": "pbkdf2-sha256-v1:0650fbc7906ed4ea8eefcefe9697d3c679aabbcb649bbca4c3312f21f8bea4e5",
+          "reset_password_requested_at": null,
+          "login_attempts": "0",
+          "lock_until": null
+        }
+      ]
+    },
+    "admins_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "admins_sessions": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "assessments": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "assessments_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "audit_logs": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "audit_logs_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_criteria": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_criteria_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_pathways": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_pathways_clinical_pearls": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_pathways_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_workflows": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "clinical_workflows_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "folders": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "folders_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "genobridge_cache": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "governance_commands": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "governance_commands_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "guideline_references": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "guideline_references_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "helix_cache": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "media": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "media_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "patients": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "patients_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_kv": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_llm_instructions": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_llm_instructions_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_locked_documents": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_locked_documents_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_migrations": {
+      "rowCount": 1,
+      "rows": [
+        {
+          "id": "17c94653-9bb5-4fc0-b8a2-a83adccdfb2c",
+          "name": "dev",
+          "batch": "-1",
+          "updated_at": "2026-11-05T15:38:29.920Z",
+          "created_at": "2026-11-05T15:38:29.920Z"
+        }
+      ]
+    },
+    "payload_preferences": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "payload_preferences_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "tags": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "tags_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "users": {
+      "rowCount": 3,
+      "rows": [
+        {
+          "id": "778bf2cf-86bb-43bc-9315-7904add1b1d6",
+          "name": "Mary Johnson",
+          "first_name": "Mary",
+          "last_name": "Johnson",
+          "phone": "+91 9876543210",
+          "category": "nurse",
+          "medical_registration_number": "",
+          "state_medical_council": "",
+          "registration_state": "",
+          "nursing_registration_number": "DNC/RN/2026/8892",
+          "state_nursing_council": "Delhi Nursing Council",
+          "hospital_clinic_name": "AIIMS New Delhi",
+          "department": "Obstetrics & Clinical Genetics",
+          "designation": "ANC Staff Nurse",
+          "terms_accepted": true,
+          "privacy_accepted": true,
+          "verification_consent": true,
+          "verification_status": "APPROVED",
+          "email_verified": false,
+          "email_verification_token": "c35178622e331b474d7ddf9f87f4f908bbc437baac5ba8025b82e76912fd394f",
+          "email_verification_token_expires_at": "2026-11-06T15:38:59.409Z",
+          "rejection_reason": null,
+          "reviewed_by": "Medical Governance Board",
+          "reviewed_at": "2026-11-05T15:39:37.054Z",
+          "additional_info_requested": null,
+          "submitted_at": "2026-11-05T15:38:59.409Z",
+          "clinical_qualification": "Nurse (ANC Staff Nurse)",
+          "reviewer_qualification": null,
+          "reviewer_authorized": false,
+          "reviewer_authorization_expires_at": null,
+          "enabled": true,
+          "role": "nurse",
+          "updated_at": "2026-11-05T16:19:01.720Z",
+          "created_at": "2026-11-05T15:39:00.052Z",
+          "email": "nurse@hospital.org",
+          "reset_password_token": null,
+          "reset_password_expiration": null,
+          "salt": "3f5315c55acdec169d11f1ede85a998a2f94161b5cb87ea964ae9569de34404f",
+          "hash": "pbkdf2-sha256-v1:20ec023ec77ee7523caccfdbf877154b6308050d8802f2d4c14e54c0dfcb99cc",
+          "reset_password_requested_at": null,
+          "login_attempts": "0",
+          "lock_until": null
+        },
+        {
+          "id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "name": "Priya Sharma",
+          "first_name": "Priya",
+          "last_name": "Sharma",
+          "phone": "+91 9811223344",
+          "category": "gynecologist",
+          "medical_registration_number": "DMC/2026/55412",
+          "state_medical_council": "Delhi Medical Council",
+          "registration_state": "Delhi (NCT)",
+          "nursing_registration_number": "",
+          "state_nursing_council": "",
+          "hospital_clinic_name": "AIIMS New Delhi",
+          "department": "Obstetrics & Gynecology",
+          "designation": "Consultant Gynecologist",
+          "terms_accepted": true,
+          "privacy_accepted": true,
+          "verification_consent": true,
+          "verification_status": "APPROVED",
+          "email_verified": false,
+          "email_verification_token": "ad0762e8777554b38610196d7788992155890b1ba0b704f20cd96e7498e0d1f7",
+          "email_verification_token_expires_at": "2026-11-06T15:38:30.624Z",
+          "rejection_reason": null,
+          "reviewed_by": "Medical Governance Board",
+          "reviewed_at": "2026-11-05T15:39:37.054Z",
+          "additional_info_requested": null,
+          "submitted_at": "2026-11-05T15:38:30.624Z",
+          "clinical_qualification": "OB-GYN (Delhi Medical Council)",
+          "reviewer_qualification": null,
+          "reviewer_authorized": false,
+          "reviewer_authorization_expires_at": null,
+          "enabled": true,
+          "role": "provider",
+          "updated_at": "2026-11-07T12:50:11.757Z",
+          "created_at": "2026-11-05T15:38:31.920Z",
+          "email": "doctor@hospital.org",
+          "reset_password_token": null,
+          "reset_password_expiration": null,
+          "salt": "4d44dd611ec535f726f7f7d919601c8b7dc2e5715a4409ef67a1973b8b1e31ef",
+          "hash": "pbkdf2-sha256-v1:ba7434e646f1d2b3d68382ecbac126a7e615b1abd4aa84580c29cf0e4c93474c",
+          "reset_password_requested_at": null,
+          "login_attempts": "0",
+          "lock_until": null
+        },
+        {
+          "id": "489290fd-54c3-4f99-a047-9cc268934dff",
+          "name": "System Admin",
+          "first_name": "System",
+          "last_name": "Admin",
+          "phone": "+91 9999999999",
+          "category": "gynecologist",
+          "medical_registration_number": "ADMIN-2026-NMC",
+          "state_medical_council": "Delhi Medical Council",
+          "registration_state": "Delhi (NCT)",
+          "nursing_registration_number": "",
+          "state_nursing_council": "",
+          "hospital_clinic_name": "AIIMS New Delhi",
+          "department": "Platform Administration",
+          "designation": "Chief Medical Administrator",
+          "terms_accepted": true,
+          "privacy_accepted": true,
+          "verification_consent": true,
+          "verification_status": "APPROVED",
+          "email_verified": false,
+          "email_verification_token": "a875ea9529cea4cdaf677dcf6164ab25cc34c2dc54895602dbceb820468733f2",
+          "email_verification_token_expires_at": "2026-11-06T15:39:15.948Z",
+          "rejection_reason": null,
+          "reviewed_by": "Medical Governance Board",
+          "reviewed_at": "2026-11-05T15:39:37.054Z",
+          "additional_info_requested": null,
+          "submitted_at": "2026-11-05T15:39:15.948Z",
+          "clinical_qualification": "OB-GYN (Delhi Medical Council)",
+          "reviewer_qualification": null,
+          "reviewer_authorized": false,
+          "reviewer_authorization_expires_at": null,
+          "enabled": true,
+          "role": "admin",
+          "updated_at": "2026-11-05T15:39:16.632Z",
+          "created_at": "2026-11-05T15:39:16.632Z",
+          "email": "admin@helix-test.local",
+          "reset_password_token": null,
+          "reset_password_expiration": null,
+          "salt": "818ccbc27910496c9c05b89cb27ede26e453b7d3a6952771c767f7190a88f6b6",
+          "hash": "pbkdf2-sha256-v1:0650fbc7906ed4ea8eefcefe9697d3c679aabbcb649bbca4c3312f21f8bea4e5",
+          "reset_password_requested_at": null,
+          "login_attempts": "0",
+          "lock_until": null
+        }
+      ]
+    },
+    "users_rels": {
+      "rowCount": 0,
+      "rows": []
+    },
+    "users_sessions": {
+      "rowCount": 7,
+      "rows": [
+        {
+          "_order": 1,
+          "_parent_id": "489290fd-54c3-4f99-a047-9cc268934dff",
+          "id": "d1337e37-813c-4d30-92dc-bf2e4d496c33",
+          "created_at": "2026-11-05T15:40:18.512Z",
+          "expires_at": "2026-11-05T16:40:18.512Z"
+        },
+        {
+          "_order": 1,
+          "_parent_id": "778bf2cf-86bb-43bc-9315-7904add1b1d6",
+          "id": "e2f129b5-ef6a-4234-b93b-f6a8cd7c71f1",
+          "created_at": "2026-11-05T16:19:01.540Z",
+          "expires_at": "2026-11-05T17:19:01.540Z"
+        },
+        {
+          "_order": 2,
+          "_parent_id": "778bf2cf-86bb-43bc-9315-7904add1b1d6",
+          "id": "88f51918-4920-437e-9ab7-97554e21a40c",
+          "created_at": "2026-11-05T16:50:39.356Z",
+          "expires_at": "2026-11-05T17:50:39.356Z"
+        },
+        {
+          "_order": 1,
+          "_parent_id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "id": "b89224a9-6fbb-4452-be49-20a4bc5ca0c6",
+          "created_at": "2026-11-07T12:19:27.544Z",
+          "expires_at": "2026-11-07T13:19:27.544Z"
+        },
+        {
+          "_order": 2,
+          "_parent_id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "id": "da079819-f9ef-4a58-86fa-dba063f2fe1d",
+          "created_at": "2026-11-07T12:50:11.578Z",
+          "expires_at": "2026-11-07T13:50:11.578Z"
+        },
+        {
+          "_order": 3,
+          "_parent_id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "id": "e6c86615-f9c9-4c48-9003-034923fd4adb",
+          "created_at": "2026-11-07T13:14:32.810Z",
+          "expires_at": "2026-11-07T14:14:32.810Z"
+        },
+        {
+          "_order": 4,
+          "_parent_id": "f423c563-058a-4088-8a5c-5cc89a2a4753",
+          "id": "beacc2d8-cf68-4113-98fa-c02b9e62113c",
+          "created_at": "2026-11-07T13:15:31.965Z",
+          "expires_at": "2026-11-07T14:15:31.965Z"
+        }
+      ]
+    }
+  }
+}

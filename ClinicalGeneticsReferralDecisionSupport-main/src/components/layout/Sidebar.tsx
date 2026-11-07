@@ -35,15 +35,8 @@ export const NAV: NavLink[] = [
   { href: '/account', label: 'Account & Security', icon: UserCog },
 ]
 export const TOOLS: NavLink[] = [
-  { href: '/guidelines', label: 'Clinical Guidelines', icon: BookOpen },
-  { href: '/calculator', label: 'Risk Calculator', icon: Calculator },
   { href: '/saved', label: 'Saved Assessments', icon: Bookmark },
   { href: '/knowledge', label: 'Knowledge Base', icon: Layers },
-]
-const ASSURANCES = [
-  'Guideline aligned (FOGSI · ACOG · ACMG · ASRM · NCCN)',
-  'Transparent & traceable',
-  'Specialist-reviewed',
 ]
 
 function computeInitials(name?: string, email?: string): string {
@@ -260,13 +253,13 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 className="text-slate-900 shrink-0"
               />
               <p className="text-[12px] font-bold text-slate-900">
-                Evidence-Based CDS
+                Security &amp; Readiness
               </p>
             </div>
             <p className="mt-1 text-[10.5px] text-slate-500 line-clamp-1">
-              FOGSI · ACOG · ACMG · ASRM · NCCN
+              Verified access &amp; data protection controls
             </p>
-            <span className="sr-only">Open Safety &amp; Setup</span>
+            <span className="sr-only">Open Security, Privacy &amp; Readiness</span>
           </Link>
         </div>
       </aside>

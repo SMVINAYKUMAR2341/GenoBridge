@@ -49,9 +49,8 @@ def send_clinical_brief_email(
     Triage Level: {urgency_level}
     Reference Identifier: #{short_hash}
 
-    The complete, explainable Glass-Box clinical rationale, matched guideline citations 
-    (ACOG / NCCN / ACMG / ASRM), and recommended CPT/ICD-10 procedure codes are attached 
-    in the formal vector PDF brief.
+    The clinical triage decision, recommended actions, and attending physician 
+    attestation are attached in the formal vector PDF brief.
 
     Notice: This message contains protected clinical decision support data. If you are 
     not the intended physician recipient, please notify the sender and delete immediately.

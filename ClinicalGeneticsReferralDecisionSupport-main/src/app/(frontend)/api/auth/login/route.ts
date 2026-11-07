@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limiter'
 
 type SupportedRole = 'gynecologist' | 'nurse' | 'admin'
 
@@ -50,6 +51,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { message: 'Invalid professional role selected. Choose Gynecologist / OB-GYN or Nurse / Medical Assistant.' },
         { status: 400 }
+      )
+    }
+
+    // Rate limiting check
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1'
+    const rateCheck = checkRateLimit(`login:${ip}:${email}`, {
+      maxAttempts: 5,
+      windowMs: 900000, // 15 mins
+      lockoutDurationMs: 900000, // 15 mins
+    })
+
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          message: `Too many failed login attempts. Please try again in ${Math.ceil(
+            (rateCheck.retryAfterSeconds || 60) / 60
+          )} minutes.`,
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateCheck.retryAfterSeconds || 60) },
+        }
       )
     }
 
@@ -148,6 +171,9 @@ export async function POST(request: NextRequest) {
       } else {
         redirectTo = '/doctor/dashboard'
       }
+
+      // Reset rate limit counter on valid credentials
+      resetRateLimit(`login:${ip}:${email}`)
 
       // 10. Create authenticated session only when all checks pass
       const maxAge = rememberMe ? 7 * 24 * 3600 : 3600 // 7 days if rememberMe, otherwise 1 hour

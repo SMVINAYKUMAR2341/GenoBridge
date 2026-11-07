@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { BookOpen, ShieldAlert } from 'lucide-react'
-import { ReferenceCatalog } from '@/components/clinical/GovernancePanel'
 import { btnGhost, card, PageHeader } from '@/components/ui/Primitives'
 import { KNOWLEDGE } from '@/data/content'
 
@@ -12,7 +11,7 @@ export default function KnowledgePage() {
       <PageHeader
         eyebrow="Learning resources"
         title="Knowledge base"
-        subtitle="General terminology and reference-discovery metadata. This is not an approved clinical protocol or a substitute for specialist advice."
+        subtitle="General terminology and educational resources. This is not a substitute for clinical judgment or specialist consultation."
       />
       <div
         role="note"
@@ -20,9 +19,8 @@ export default function KnowledgePage() {
       >
         <ShieldAlert size={20} className="shrink-0" />
         <p>
-          Educational preview only. Terminology has not been independently clinically validated for
-          this deployment. Do not use this catalog to infer clinical eligibility, current guideline
-          recommendations, or patient-specific risk.
+          Educational reference only. Terminology has not been independently clinically validated for
+          this deployment. Do not use this catalog to infer clinical eligibility or patient-specific risk.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -34,13 +32,12 @@ export default function KnowledgePage() {
           </section>
         ))}
       </div>
-      <ReferenceCatalog />
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/guidelines" className={btnGhost}>
-          Open governed source records
+        <Link href="/history" className={btnGhost}>
+          Patient history
         </Link>
         <Link href="/safety" className={btnGhost}>
-          Review safety limitations
+          Security & readiness
         </Link>
       </div>
     </>

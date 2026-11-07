@@ -123,24 +123,11 @@ export async function POST(request: Request) {
             : 'COUNSEL & REASSESS'
 
     const confidence = Math.round(Number(evaluation.confidence_score || 0.98) * 100)
-    const guideline = cleanAscii(
-      evaluation.guideline || 'ACOG / FOGSI / NCCN / ACMG Clinical Practice Guidelines (2024-2025)'
-    )
     const action = cleanAscii(
       evaluation.action ||
       evaluation.explanation ||
       'Referral navigation decision generated deterministically against published clinical practice guidelines.'
     )
-
-    const rawCpts: string[] = Array.isArray(evaluation.cpt_codes) && evaluation.cpt_codes.length > 0
-      ? evaluation.cpt_codes
-      : ['81443', '96040']
-    const formattedCpt = rawCpts.map((c) => CPT_LABELS[c] || c).join(', ')
-
-    const rawIcds: string[] = Array.isArray(evaluation.icd10_codes) && evaluation.icd10_codes.length > 0
-      ? evaluation.icd10_codes
-      : ['Z31.430', 'Z84.81']
-    const formattedIcd10 = rawIcds.map((c) => ICD_LABELS[c] || c).join(', ')
 
     const dateStr = new Date().toISOString().slice(0, 10)
     const rulesetHash = cleanAscii(evaluation.ruleset_version_hash || 'SHA256:d8a29b4e7c10f3918a7c92b8')
@@ -213,72 +200,7 @@ export async function POST(request: Request) {
       textOps.push('BT', '/F1 8.5 Tf', `52 ${actionY} Td`, `(${escapePdf(line)}) Tj`, 'ET')
       actionY -= 13
     }
-    curY -= triageBoxHeight + 16
-
-    // Section: Glass-Box Clinical Rationale & Ground Truth
-    textOps.push('BT', '/F2 11 Tf', `40 ${curY} Td`, `(${escapePdf('Glass-Box Clinical Rationale (Guideline Ground Truth)')}) Tj`, 'ET')
-    curY -= 5
-    textOps.push('0.5 w', `40 ${curY} m 572 ${curY} l S`)
-    curY -= 14
-
-    const rationaleItems = [
-      `Matched Criteria: ${ruleTitle}`,
-      `Statutory Guideline: ${guideline}`,
-      `Evaluation Methodology: Deterministic Rule Match against Clinical Guidelines (Zero LLM / Zero Black-Box ML)`,
-      `Suggested CPT Codes: ${formattedCpt}`,
-      `Diagnostic ICD-10 Codes: ${formattedIcd10}`,
-    ]
-
-    for (const item of rationaleItems) {
-      const wrapped = wrapLines(item, 86)
-      for (let i = 0; i < wrapped.length; i++) {
-        const prefix = i === 0 ? '- ' : '  '
-        textOps.push('BT', i === 0 ? '/F2 8.5 Tf' : '/F1 8.5 Tf', `45 ${curY} Td`, `(${escapePdf(prefix + wrapped[i])}) Tj`, 'ET')
-        curY -= 12
-      }
-      curY -= 2
-    }
-
-    curY -= 6
-
-    // Section: Patient Guidance Summary (Memo for Patient & Family)
-    const rawPatientMemo = String(evaluation.patient_summary_en || '')
-    if (rawPatientMemo) {
-      textOps.push('BT', '/F2 9.5 Tf', `40 ${curY} Td`, `(${escapePdf('Patient Guidance Summary (Assistive Patient Memo)')}) Tj`, 'ET')
-      curY -= 4
-      textOps.push('0.5 w', `40 ${curY} m 572 ${curY} l S`)
-      curY -= 11
-
-      const memoLines = rawPatientMemo
-        .split(/\r?\n/)
-        .map((l) => l.replace(/^[#\s*]+|[#\s*]+$/g, '').trim())
-        .filter(
-          (l) =>
-            l.length > 0 &&
-            !l.toLowerCase().includes('patient guidance note') &&
-            !l.toLowerCase().includes('doctor review')
-        )
-        .slice(0, 6)
-
-      for (const m of memoLines) {
-        const isHeaderLine = m.endsWith(':')
-        const wrapped = wrapLines(m, 96)
-        for (let i = 0; i < wrapped.length; i++) {
-          const prefix = isHeaderLine ? '' : (i === 0 ? '- ' : '  ')
-          textOps.push(
-            'BT',
-            isHeaderLine ? '/F2 7.5 Tf' : '/F1 7.5 Tf',
-            `45 ${curY} Td`,
-            `(${escapePdf(prefix + wrapped[i])}) Tj`,
-            'ET'
-          )
-          curY -= 9.5
-        }
-      }
-      curY -= 6
-    }
-
-    curY -= 4
+    curY -= triageBoxHeight + 20
 
     // Section: Attending Doctor Sign-Off & Attestation Block
     textOps.push('0.75 w', `40 ${curY - 50} 532 50 re S`)

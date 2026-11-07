@@ -5,44 +5,6 @@ export const PATIENTS = [
   { id: 'OB-003', label: 'Simulated patient (OB-003)', note: 'Simulated record' },
   { id: 'OB-004', label: 'Simulated patient (OB-004)', note: 'Simulated record' },
 ]
-export const GUIDELINES = [
-  {
-    org: 'ACOG',
-    full: 'American College of Obstetricians and Gynecologists',
-    topics: ['Carrier screening', 'Prenatal screening', 'Hereditary cancer'],
-    url: 'https://www.acog.org/clinical',
-  },
-  {
-    org: 'NCCN',
-    full: 'National Comprehensive Cancer Network',
-    topics: ['Hereditary cancer'],
-    url: 'https://www.nccn.org/guidelines',
-  },
-  {
-    org: 'ACMG',
-    full: 'American College of Medical Genetics and Genomics',
-    topics: ['Carrier screening', 'Family history', 'Referral indications'],
-    url: 'https://www.acmg.net',
-  },
-  {
-    org: 'SMFM',
-    full: 'Society for Maternal-Fetal Medicine',
-    topics: ['Prenatal screening', 'Fetal findings'],
-    url: 'https://www.smfm.org',
-  },
-  {
-    org: 'ISUOG',
-    full: 'International Society of Ultrasound in Obstetrics and Gynecology',
-    topics: ['Fetal findings'],
-    url: 'https://www.isuog.org',
-  },
-  {
-    org: 'AAP',
-    full: 'American Academy of Pediatrics',
-    topics: ['Family history'],
-    url: 'https://www.aap.org',
-  },
-]
 export const KNOWLEDGE = [
   {
     term: 'First-degree relative',

@@ -15,7 +15,7 @@ import {
   User as UserIcon,
 } from 'lucide-react'
 import { PATHWAYS } from '@/data/pathways'
-import { GUIDELINES, KNOWLEDGE, PATIENTS, STAFF } from '@/data/content'
+import { KNOWLEDGE, PATIENTS, STAFF } from '@/data/content'
 import { useAssessments } from '@/components/providers/AssessmentsProvider'
 
 type AuthUser = {
@@ -70,11 +70,10 @@ const TITLES: Record<string, string> = {
   '/history': 'Patient History',
   '/referrals': 'Referral Overview',
   '/analytics': 'Reports & Analytics',
-  '/guidelines': 'Clinical Guidelines',
-  '/calculator': 'Risk Calculator',
   '/saved': 'Saved Assessments',
   '/knowledge': 'Knowledge Base',
-  '/safety': 'Safety & Setup',
+  '/safety': 'Security & Readiness',
+  '/account': 'Account & Security',
 }
 export default function Topbar({ onMenu }: { onMenu: () => void }) {
   const path = usePathname(),
@@ -163,11 +162,6 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
         .filter((a) => hit(a.title + a.patientId))
         .slice(0, 3)
         .map((a) => ({ k: 'Assessment', label: `${a.title} · ${a.patientId}`, href: '/history' })),
-      ...GUIDELINES.filter((g) => hit(g.org + g.full + g.topics.join(' '))).map((g) => ({
-        k: 'Guideline',
-        label: `${g.org} — ${g.full}`,
-        href: '/guidelines',
-      })),
       ...KNOWLEDGE.filter((k) => hit(k.term + k.body)).map((k) => ({
         k: 'Knowledge',
         label: k.term,
@@ -217,7 +211,7 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
             setMenu('search')
           }}
           onKeyDown={(e) => e.key === 'Enter' && results[0] && go(results[0].href)}
-          placeholder="Search patients, assessments, guidelines..."
+          placeholder="Search patients, assessments..."
           className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pr-4 pl-[46px] text-[13px] text-slate-900 shadow-xs transition outline-none placeholder:text-slate-400 hover:border-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100 sm:pr-[70px]"
         />
         <kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md bg-slate-100 border border-slate-200 px-2 py-[3px] font-sans text-[12px] font-medium text-slate-600 sm:block">
