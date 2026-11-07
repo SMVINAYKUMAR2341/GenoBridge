@@ -87,8 +87,8 @@ export async function POST(request: Request) {
     const data = await request.json()
     const {
       patientId = 'PATIENT-ENCOUNTER',
-      physicianName = 'Dr. SM Vinay Kumar, MD (OB-GYN)',
-      physicianRegNumber = 'KMC-74892',
+      physicianName = 'Dr. Attending Clinician, MD (OB-GYN)',
+      physicianRegNumber = 'REG-74892',
       pathway = 'Preconception Carrier Screening',
       evaluation = {},
     } = data

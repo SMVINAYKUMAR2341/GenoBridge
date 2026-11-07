@@ -204,8 +204,8 @@ export function WorkflowResult({
   const [isOverridden, setIsOverridden] = useState(false)
   const [overrideTier, setOverrideTier] = useState<StandardTier>('PRIORITY')
   const [overrideReason, setOverrideReason] = useState('')
-  const [doctorName, setDoctorName] = useState('Dr. SM Vinay Kumar, MD (OB-GYN)')
-  const [doctorRegNumber, setDoctorRegNumber] = useState('KMC-74892')
+  const [doctorName, setDoctorName] = useState('Dr. Attending Clinician, MD (OB-GYN)')
+  const [doctorRegNumber, setDoctorRegNumber] = useState('REG-74892')
   const [attestationConfirmed, setAttestationConfirmed] = useState(false)
 
   // Bilingual Patient Note Tab State

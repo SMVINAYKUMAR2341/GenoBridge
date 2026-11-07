@@ -80,7 +80,7 @@ def clean_ascii_text(text: str) -> str:
 
 def generate_clinical_pdf(
     patient_id: str = "PATIENT-ENCOUNTER",
-    physician_name: str = "Dr. SM Vinay Kumar, MD (OB-GYN)",
+    physician_name: str = "Dr. Attending Clinician, MD (OB-GYN)",
     pathway: str = "Preconception Carrier Screening",
     evaluation: dict = None,
 ) -> bytes:
@@ -294,7 +294,7 @@ def generate_clinical_pdf(
 
 def generate_clinical_report_pdf(
     patient_id: str = "PATIENT-ENCOUNTER",
-    physician_name: str = "Dr. SM Vinay Kumar, MD (OB-GYN)",
+    physician_name: str = "Dr. Attending Clinician, MD (OB-GYN)",
     pathway: str = "Preconception Carrier Screening",
     evaluation: dict = None,
 ) -> bytes:

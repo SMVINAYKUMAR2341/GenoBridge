@@ -26,7 +26,7 @@ async function currentActor() {
   if (!session) {
     const guestUser: WorkflowUser = {
       id: '00000000-0000-4000-8000-000000000001',
-      name: 'Dr. SM Vinay Kumar (Provider)',
+      name: 'Attending Clinician (Provider)',
       email: 'clinician@genobridge.in',
       role: 'provider',
       enabled: true,
@@ -46,7 +46,7 @@ async function currentActor() {
   } catch {}
   const fallbackUser: WorkflowUser = {
     id: typeof session.id === 'string' && session.id.includes('-') ? session.id : '00000000-0000-4000-8000-000000000001',
-    name: session.name || 'Dr. SM Vinay Kumar',
+    name: session.name || 'Attending Clinician',
     email: (session as any).email || 'clinician@genobridge.in',
     role: 'provider',
     enabled: true,

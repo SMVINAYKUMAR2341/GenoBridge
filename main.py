@@ -349,14 +349,14 @@ async def generate_pdf_route(request: Request, id: Optional[str] = None):
         asm = assessments_store.get(id, {})
         data = {
             "patient_id": asm.get("id", "PT-ENCOUNTER"),
-            "physician_name": asm.get("signed_by", "Dr. SM Vinay Kumar, MD (OB-GYN)"),
+            "physician_name": asm.get("signed_by", "Dr. Attending Clinician, MD (OB-GYN)"),
             "pathway": asm.get("module", "Clinical Genetics"),
             "evaluation": asm,
         }
 
     pdf_bytes = generate_clinical_report_pdf(
         patient_id=data.get("patient_id", "PT-ENCOUNTER"),
-        physician_name=data.get("physician_name", "Dr. SM Vinay Kumar, MD (OB-GYN)"),
+        physician_name=data.get("physician_name", "Dr. Attending Clinician, MD (OB-GYN)"),
         pathway=data.get("pathway", "Clinical Genetics"),
         evaluation=data.get("evaluation", {}),
     )
@@ -412,7 +412,7 @@ async def send_email_route(request: Request):
     
     pdf_bytes = generate_clinical_report_pdf(
         patient_id=patient_id,
-        physician_name="Dr. SM Vinay Kumar, MD (OB-GYN)",
+        physician_name=data.get("physician_name", "Dr. Attending Clinician, MD (OB-GYN)"),
         pathway=pathway,
         evaluation=evaluation,
     )

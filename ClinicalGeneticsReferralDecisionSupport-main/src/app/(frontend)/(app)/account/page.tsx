@@ -68,12 +68,12 @@ export default async function AccountPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#00D8C3]/30 to-[#22C9EE]/20 border border-[#00D8C3]/50 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-[#00D8C3]/10">
-              {user?.name ? user.name.slice(0, 2).toUpperCase() : 'VK'}
+              {user?.name ? user.name.slice(0, 2).toUpperCase() : 'DR'}
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-white">
-                  {user?.name || 'Dr. SM Vinay Kumar'}
+                  {user?.name || 'Dr. Attending Clinician'}
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-[#00D8C3]/20 text-[#00D8C3] border border-[#00D8C3]/40">
                   {user?.role ? user.role.toUpperCase() : 'PROVIDER · OB/GYN'}
@@ -83,7 +83,7 @@ export default async function AccountPage() {
                 </span>
               </div>
               <p className="text-xs text-[#A9BDCA]">
-                {user?.email || 'vinaykumar.obg@hospital.gov.in'} · State Medical Council Reg: <strong className="text-white">KMC-94821</strong>
+                {user?.email || 'clinician.obg@hospital.gov.in'} · State Medical Council Reg: <strong className="text-white">REG-94821</strong>
               </p>
               <div className="text-[11px] text-[#A9BDCA] flex items-center gap-4 pt-1">
                 <span>Facility: <strong>Department of Obstetrics &amp; Gynecology</strong></span>

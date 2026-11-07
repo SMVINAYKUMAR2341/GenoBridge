@@ -14,6 +14,7 @@ import { parseRoutineAnc } from '@/lib/anc-model'
 import { canFinalizeWorkflow } from './workflow-result-model'
 import type { StructuredFormState, PathwaySlug } from '@/lib/decision-engine'
 import type { WorkflowRecord, WorkflowDraftInput, WorkflowIntake } from '@/lib/workflow-store'
+import { deriveFeatures } from '@/components/pedigree/PedigreeStudioClient'
 
 export type WorkflowActionResult =
   | { ok: true; record: WorkflowRecord }
@@ -76,7 +77,14 @@ export function useAssessmentWorkflow(
     if (hydrate) {
       setInputs({ ...saved.assessmentInputs } as StructuredFormState)
       setIntake({ ...saved.intake } as WorkflowIntake)
-      setPedigree(saved.pedigree)
+      let ped = saved.pedigree
+      if ((!ped || Object.keys(ped).length === 0) && typeof window !== 'undefined') {
+        try {
+          const stored = localStorage.getItem('genobridge_active_pedigree_model')
+          if (stored) ped = JSON.parse(stored)
+        } catch {}
+      }
+      setPedigree(ped)
       setAnc(saved.anc)
       setAncError('')
       setSyntheticReference(saved.syntheticPatientReference ?? '')
@@ -89,6 +97,31 @@ export function useAssessmentWorkflow(
     let active = true
     const key = new URL(window.location.href).searchParams.get('workflow')
     if (!key) {
+      if (typeof window !== 'undefined') {
+        try {
+          const savedModel = localStorage.getItem('genobridge_active_pedigree_model')
+          const savedPed = localStorage.getItem('genobridge_active_pedigree')
+          if (savedModel) {
+            const parsed = JSON.parse(savedModel)
+            setPedigree(parsed)
+          }
+          if (savedPed) {
+            const parsedData = JSON.parse(savedPed)
+            const derived = deriveFeatures(parsedData)
+            setInputs((prev) => ({
+              ...prev,
+              ...(derived.consanguinity ? { consanguinity: true, consanguineous_partnership: true } : {}),
+              ...(derived.ashkenazi_ancestry ? { ashkenazi_ancestry: true } : {}),
+              ...(derived.family_history_recessive_condition ? { family_history_recessive_condition: true, family_history_recessive: true } : {}),
+              ...(derived.male_breast_cancer_family ? { male_breast_cancer_family: true, male_breast_cancer: true } : {}),
+              ...((derived.family_ovarian_cancer_count ?? 0) > 0 ? { family_ovarian_cancer_count: derived.family_ovarian_cancer_count, family_history_ovarian: true } : {}),
+              ...((derived.family_breast_cancer_first_degree_count ?? 0) > 0 ? { family_breast_cancer_first_degree_count: derived.family_breast_cancer_first_degree_count, family_history_breast: true } : {}),
+            }))
+          }
+        } catch (e) {
+          console.warn('[useAssessmentWorkflow] Could not hydrate pedigree:', e)
+        }
+      }
       setLoading(false)
       return
     }

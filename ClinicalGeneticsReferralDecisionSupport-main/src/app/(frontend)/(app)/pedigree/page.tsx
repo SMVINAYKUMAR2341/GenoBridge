@@ -14,7 +14,7 @@ export default async function PedigreeStudioPage() {
   const user = await appAuth.currentSessionUser()
   return (
     <PedigreeStudioClient
-      userName={user?.name || 'SM VINAY KUMAR'}
+      userName={user?.name || 'Attending Clinician'}
       userRole={user?.role || 'provider'}
     />
   )
