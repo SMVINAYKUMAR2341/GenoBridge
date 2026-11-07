@@ -162,7 +162,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
 
       {/* Referral Lifecycle Status Filter Tabs */}
       {view === 'referrals' && (
-        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl bg-[#08243B]/80 border border-[#164C60] p-1.5">
+        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl bg-slate-50 border border-slate-200 p-1.5">
           {(
             [
               { key: 'all', label: 'All Referrals', icon: Clock },
@@ -181,14 +181,14 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                 onClick={() => setReferralFilter(tab.key)}
                 className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   active
-                    ? 'bg-[#00D8C3] text-[#031525] shadow-md shadow-[#00D8C3]/20'
-                    : 'text-[#A9BDCA] hover:text-white hover:bg-white/5'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <Icon size={13} />
                 <span>{tab.label}</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  active ? 'bg-[#031525]/20 text-[#031525]' : 'bg-[#031525] text-[#8aaec3]'
+                  active ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                 }`}>
                   {counts[tab.key]}
                 </span>
@@ -235,7 +235,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
               {records.map((record) => {
                 const currentStatus = getStatus(record.workflowKey)
                 return (
-                  <article key={record.id} className="rounded-[14px] border border-[#0e4331] bg-[#021f17] p-5 text-white shadow-hx">
+                  <article key={record.id} className="rounded-[14px] border border-slate-200 bg-white p-5 text-slate-900 shadow-xs">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -265,14 +265,14 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                           Synthetic workflow · <span className="break-all">{record.workflowKey}</span>
                         </p>
                       </div>
-                      <span className="rounded-full border border-[#0e5c3e] bg-[#033424] px-3 py-1 text-xs font-bold text-[#34d399]">
+                      <span className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-bold text-slate-800">
                         {record.state.replaceAll('_', ' ')}
                       </span>
                     </div>
 
                     {record.decision && (
-                      <p className="mt-3 text-sm text-slate-200">
-                        Persisted decision: <span className="font-semibold text-[#00e5ce]">{record.decision.replaceAll('_', ' ')}</span>
+                      <p className="mt-3 text-sm text-slate-700">
+                        Persisted decision: <span className="font-semibold text-slate-900">{record.decision.replaceAll('_', ' ')}</span>
                       </p>
                     )}
 
@@ -281,7 +281,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                         className={btnGhost}
                         href={`/assessment/${encodeURIComponent(record.pathwaySlug)}?workflow=${encodeURIComponent(record.workflowKey)}`}
                       >
-                        <ArrowUpRight size={16} className="text-[#00e5ce]" />{' '}
+                        <ArrowUpRight size={16} className="text-slate-800" />{' '}
                         {record.state === 'DRAFT' ? 'Resume draft' : 'Open workflow'}
                       </Link>
 
@@ -293,7 +293,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                           setExpanded(expanded === record.workflowKey ? null : record.workflowKey)
                         }
                       >
-                        <History size={16} className="text-[#00e5ce]" /> Revisions
+                        <History size={16} className="text-slate-800" /> Revisions
                       </button>
 
                       {view === 'referrals' && (
@@ -308,7 +308,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                                 decisionLabel: record.decision?.replaceAll('_', ' ') || 'Genetic Referral',
                               })
                             }
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#033424] text-[#00e5ce] border border-[#0e5c3e] hover:bg-[#064e3b] transition-all"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 transition-all shadow-xs"
                           >
                             <Mail size={14} />
                             <span>Email to Specialist</span>
@@ -330,7 +330,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                                 `referral-${record.workflowKey.slice(0, 12)}-fhir-genomics-abdm.json`
                               )
                             }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#08243B] text-[#A9BDCA] border border-[#164C60] hover:text-[#00D8C3] hover:border-[#00D8C3] transition-all"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 border border-slate-300 hover:border-slate-900 transition-all shadow-xs"
                             title="Export HL7 FHIR Genomics R4 Bundle with LOINC & SNOMED-CT codes (ABDM compliant)"
                           >
                             <FileCode2 size={14} />
@@ -338,7 +338,7 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                           </button>
 
                           {/* Quick Lifecycle Status Switcher */}
-                          <div className="flex items-center gap-1 ml-auto text-xs text-[#8aaec3]">
+                          <div className="flex items-center gap-1 ml-auto text-xs text-slate-500">
                             <span>Mark:</span>
                             {(['pending', 'sent', 'completed', 'declined'] as const).map((s) => (
                               <button
@@ -347,8 +347,8 @@ export default function WorkspaceHistory({ view = 'history' }: { view?: View }) 
                                 onClick={() => setStatus(record.workflowKey, s)}
                                 className={`px-2 py-0.5 rounded text-[10px] font-semibold capitalize transition-all ${
                                   currentStatus === s
-                                    ? 'bg-[#00D8C3] text-[#031525]'
-                                    : 'bg-[#08243B] text-[#A9BDCA] hover:text-white'
+                                    ? 'bg-slate-900 text-white'
+                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                 }`}
                               >
                                 {s}

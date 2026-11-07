@@ -398,12 +398,12 @@ export function WorkflowResult({
     <div className="space-y-6 text-white animate-in fade-in duration-300">
       {/* 1. Indian Statutory PCPNDT Notice (for prenatal pathways) */}
       {timeCtx?.pcpndt_notice && (
-        <div className="rounded-2xl border border-red-900/70 bg-red-950/40 p-5 text-xs text-red-200 space-y-1.5 shadow-lg">
-          <div className="flex items-center gap-2 font-bold text-red-300 uppercase tracking-wider text-xs">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-xs text-red-950 space-y-1.5 shadow-xs">
+          <div className="flex items-center gap-2 font-bold text-red-900 uppercase tracking-wider text-xs">
             <ShieldAlert size={16} />
             <span>Statutory Notice: PC&amp;PNDT Act, 1994 Mandatory Compliance</span>
           </div>
-          <p className="leading-relaxed text-red-200">
+          <p className="leading-relaxed text-red-900">
             {timeCtx.pcpndt_notice}
           </p>
         </div>
@@ -411,22 +411,22 @@ export function WorkflowResult({
 
       {/* 2. MTP Act 2021 Urgency Benchmark Banner (if pregnant & GA entered) */}
       {timeCtx?.urgency_deadline && (
-        <div className="rounded-2xl border border-amber-800/70 bg-amber-950/40 p-5 text-xs text-amber-200 space-y-2 shadow-lg">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-xs text-amber-950 space-y-2 shadow-xs">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-amber-300 uppercase tracking-wider text-xs">
+            <div className="flex items-center gap-2 font-bold text-amber-900 uppercase tracking-wider text-xs">
               <Clock size={16} />
               <span>Time-Critical Urgency Benchmark (MTP Act 2021)</span>
             </div>
             {timeCtx.days_to_mtp_24w_limit !== undefined && (
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-900 text-amber-200 font-bold text-[11px]">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 font-bold text-[11px]">
                 {timeCtx.days_to_mtp_24w_limit} days to 24-week limit
               </span>
             )}
           </div>
-          <p className="font-bold text-white text-sm">
+          <p className="font-bold text-amber-950 text-sm">
             {timeCtx.urgency_deadline}
           </p>
-          <p className="text-slate-300 text-[11px] leading-relaxed">
+          <p className="text-amber-800 text-[11px] leading-relaxed">
             {timeCtx.mtp_notice}
           </p>
         </div>
@@ -440,7 +440,7 @@ export function WorkflowResult({
             ? 'bg-gradient-to-r from-[#7c2d12] via-[#9a3412] to-[#c2410c] border-orange-500/50'
             : isRoutine
               ? 'bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#b45309] border-amber-500/50'
-              : 'bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#059669] border-emerald-500/50'
+              : 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700'
           }`}
       >
         <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 mb-3">
@@ -457,7 +457,7 @@ export function WorkflowResult({
           {isUrgent && <AlertCircle className="w-9 h-9 text-rose-200 shrink-0" />}
           {isPriority && <AlertTriangle className="w-9 h-9 text-orange-200 shrink-0" />}
           {isRoutine && <AlertTriangle className="w-9 h-9 text-amber-200 shrink-0" />}
-          {isNoReferral && <CheckCircle2 className="w-9 h-9 text-emerald-200 shrink-0" />}
+          {isNoReferral && <CheckCircle2 className="w-9 h-9 text-slate-200 shrink-0" />}
           <span>
             {isUrgent
               ? 'Urgent Clinical Referral Recommended (Same day – 72h)'
@@ -485,65 +485,65 @@ export function WorkflowResult({
       </div>
 
       {/* 4. Glass-Box Clinical Rationale (Replacing SHAP with Fired Criteria Waterfall) */}
-      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#0e4331] pb-3">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-[#34d399]" />
-            <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399]">
+            <Sparkles size={16} className="text-slate-900" />
+            <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-slate-900">
               Glass-Box Clinical Rationale (Guideline Waterfall)
             </h3>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e] flex items-center gap-1.5">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-1.5">
               <span>Determinism:</span>
-              <strong className="text-white font-mono">100% Guideline Match</strong>
+              <strong className="text-slate-900 font-mono">100% Guideline Match</strong>
             </span>
-            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-[#033424] text-[#34d399] border border-[#0e5c3e]">
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
               RULE: {decision?.matched_rule_id || 'STATUTORY-CRITERIA'}
             </span>
           </div>
         </div>
 
-        <p className="text-sm leading-relaxed text-slate-200 font-medium">
+        <p className="text-sm leading-relaxed text-slate-800 font-medium">
           {explanation}
         </p>
 
         {/* Fired Criteria Waterfall Cards */}
         {firedRules.length > 0 ? (
           <div className="space-y-3 pt-2">
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
               Triggering Guideline Criteria Met ({firedRules.length})
             </div>
             {firedRules.map((r, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-4 text-sm space-y-2"
+                className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm space-y-2"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-white flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                  <span className="font-bold text-slate-900 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
                     <span>{r.label}</span>
                   </span>
                   <span
                     className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${r.tier === 'URGENT'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                      ? 'bg-rose-100 text-rose-800 border border-rose-200'
                       : r.tier === 'PRIORITY'
-                        ? 'bg-orange-950 text-orange-300 border border-orange-800'
-                        : 'bg-amber-950 text-amber-300 border border-amber-800'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                        : 'bg-slate-200 text-slate-800 border border-slate-300'
                       }`}
                   >
                     {r.tier}
                   </span>
                 </div>
                 {r.description && (
-                  <p className="text-xs text-slate-300 leading-relaxed">{r.description}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">{r.description}</p>
                 )}
-                <div className="pt-2 border-t border-[#0e4331]/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                  <span className="text-[#34d399] font-medium flex items-center gap-1.5">
+                <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                  <span className="text-slate-800 font-medium flex items-center gap-1.5">
                     <ShieldCheck size={13} className="shrink-0" />
                     <span>Citation: {r.citation}</span>
                   </span>
-                  <span className="text-slate-400 font-mono text-[10px]">
+                  <span className="text-slate-500 font-mono text-[10px]">
                     Action: Non-treatment referral
                   </span>
                 </div>
@@ -551,7 +551,7 @@ export function WorkflowResult({
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-4 text-xs text-slate-300 text-center">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600 text-center">
             No active high-risk clinical genetics referral criteria were triggered by the entered inputs.
           </div>
         )}
@@ -559,37 +559,37 @@ export function WorkflowResult({
 
       {/* 5. What Would Change This (Counterfactual Sensitivity Analysis) */}
       {counterfactuals.length > 0 && (
-        <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-3">
-          <div className="flex items-center gap-2 border-b border-[#0e4331] pb-3">
-            <Sparkles size={16} className="text-[#34d399]" />
-            <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399]">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-3">
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <Sparkles size={16} className="text-slate-900" />
+            <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-slate-900">
               What Would Change This (Counterfactual Analysis)
             </h3>
           </div>
-          <p className="text-xs text-slate-300">
+          <p className="text-xs text-slate-600">
             Sensitivity modeling showing what clinical changes would alter the recommended referral tier:
           </p>
           <div className="space-y-2.5 pt-1">
             {counterfactuals.map((cf, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-[#0e4331] bg-[#032a1f] p-3.5 text-xs grid sm:grid-cols-3 gap-3 items-center"
+                className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs grid sm:grid-cols-3 gap-3 items-center text-slate-800"
               >
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 block">Factor</span>
-                  <strong className="text-white font-medium">{cf.factor}</strong>
-                  <span className="block text-[11px] text-slate-300 mt-0.5">Currently: {cf.current_value}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 block">Factor</span>
+                  <strong className="text-slate-900 font-medium">{cf.factor}</strong>
+                  <span className="block text-[11px] text-slate-600 mt-0.5">Currently: {cf.current_value}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 block">Alternative Scenario</span>
-                  <span className="text-amber-200 font-medium">{cf.alternate_value}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 block">Alternative Scenario</span>
+                  <span className="text-amber-800 font-medium">{cf.alternate_value}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 block">Resulting Tier</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#033424] text-[#34d399] border border-[#0e5c3e] inline-block">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 block">Resulting Tier</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800 border border-slate-300 inline-block">
                     {cf.resulting_tier}
                   </span>
-                  <p className="text-[10px] text-slate-400 mt-1">{cf.explanation}</p>
+                  <p className="text-[10px] text-slate-500 mt-1">{cf.explanation}</p>
                 </div>
               </div>
             ))}
@@ -599,22 +599,22 @@ export function WorkflowResult({
 
       {/* 6. Data Gaps (Missing Inputs That Could Alter Tier) */}
       {dataGaps.length > 0 && (
-        <section className="rounded-2xl border border-slate-700/80 bg-slate-900/60 p-5 text-xs text-slate-300 space-y-2.5">
-          <div className="flex items-center gap-2 font-bold text-slate-200 uppercase tracking-wider text-xs">
-            <Info size={15} className="text-[#34d399]" />
+        <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-xs text-slate-800 space-y-2.5">
+          <div className="flex items-center gap-2 font-bold text-slate-900 uppercase tracking-wider text-xs">
+            <Info size={15} className="text-slate-700" />
             <span>Data Gaps — Unentered Clinical Parameters</span>
           </div>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-slate-500">
             The following fields were left unanswered. Entering them may escalate or modify the referral tier:
           </p>
           <div className="grid sm:grid-cols-2 gap-2 pt-1">
             {dataGaps.map((gap, i) => (
-              <div key={i} className="p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 space-y-1">
-                <div className="font-semibold text-white flex items-center justify-between">
+              <div key={i} className="p-2.5 rounded-lg border border-slate-200 bg-white space-y-1">
+                <div className="font-semibold text-slate-900 flex items-center justify-between">
                   <span>{gap.rule_label}</span>
-                  <span className="text-[10px] font-mono text-amber-300">Potential: {gap.potential_tier}</span>
+                  <span className="text-[10px] font-mono text-amber-700">Potential: {gap.potential_tier}</span>
                 </div>
-                <div className="text-[10px] text-slate-400">{gap.guideline_citation}</div>
+                <div className="text-[10px] text-slate-500">{gap.guideline_citation}</div>
               </div>
             ))}
           </div>
@@ -622,27 +622,27 @@ export function WorkflowResult({
       )}
 
       {/* 7. Bilingual Patient-Friendly Summary (6th-Grade Reading Level) */}
-      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#0e4331] pb-3">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
-            <FileText size={17} className="text-[#34d399]" />
+            <FileText size={17} className="text-slate-900" />
             <div>
-              <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-[#34d399]">
+              <h3 className="text-sm font-mono tracking-[0.18em] uppercase font-bold text-slate-900">
                 Patient Guidance Summary (6th-Grade Reading Level)
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Assistive patient memo · Non-diagnostic · Doctor review required prior to patient release
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {/* Language Toggle */}
-            <div className="flex items-center gap-1 rounded-lg border border-[#0e4331] bg-[#032a1f] p-0.5 text-xs">
+            <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs">
               <button
                 type="button"
                 onClick={() => setLangTab('en')}
                 className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                  langTab === 'en' ? 'bg-[#10b981] text-white shadow' : 'text-slate-400 hover:text-white'
+                  langTab === 'en' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 English
@@ -651,7 +651,7 @@ export function WorkflowResult({
                 type="button"
                 onClick={() => setLangTab('hi')}
                 className={`px-3 py-1 rounded-md font-semibold transition cursor-pointer ${
-                  langTab === 'hi' ? 'bg-[#10b981] text-white shadow' : 'text-slate-400 hover:text-white'
+                  langTab === 'hi' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 हिन्दी (Hindi)
@@ -662,7 +662,7 @@ export function WorkflowResult({
             <button
               type="button"
               onClick={() => setIsEditingPatientNote(!isEditingPatientNote)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#34d399] hover:bg-[#064e3b] transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition cursor-pointer shadow-xs"
             >
               {isEditingPatientNote ? (
                 <>
@@ -681,11 +681,11 @@ export function WorkflowResult({
 
         {isEditingPatientNote ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center justify-between text-xs text-slate-500">
               <span>
                 Edit clinician text below. Edits are immediately synced to PDF download and patient summary.
               </span>
-              <span className="text-[11px] font-mono text-[#34d399]">
+              <span className="text-[11px] font-mono text-slate-800 font-bold">
                 {langTab === 'en' ? 'English Draft' : 'हिंदी ड्राफ्ट'}
               </span>
             </div>
@@ -694,14 +694,14 @@ export function WorkflowResult({
                 rows={9}
                 value={editableSummaryEn}
                 onChange={(e) => setEditableSummaryEn(e.target.value)}
-                className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-100 text-xs font-mono leading-relaxed focus:outline-none focus:border-[#10b981]"
+                className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-mono leading-relaxed focus:outline-none focus:border-slate-900 shadow-xs"
               />
             ) : (
               <textarea
                 rows={9}
                 value={editableSummaryHi}
                 onChange={(e) => setEditableSummaryHi(e.target.value)}
-                className="w-full p-4 rounded-xl border border-[#0e4331] bg-[#032a1f] text-slate-100 text-xs font-mono leading-relaxed focus:outline-none focus:border-[#10b981]"
+                className="w-full p-4 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-mono leading-relaxed focus:outline-none focus:border-slate-900 shadow-xs"
               />
             )}
           </div>
@@ -714,17 +714,17 @@ export function WorkflowResult({
             return (
               <div className="space-y-4">
                 {/* 1. Reason for Referral Card */}
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-4 space-y-2">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-slate-900 text-xs font-bold uppercase tracking-wider">
                       <Stethoscope size={15} />
                       <span>{guidance.reasonTitle}</span>
                     </div>
-                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/80">
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-800 border border-slate-300">
                       Non-Diagnostic Referral
                     </span>
                   </div>
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                  <p className="text-xs text-slate-700 leading-relaxed font-sans">
                     {guidance.reasonBody}
                   </p>
                 </div>
@@ -732,18 +732,18 @@ export function WorkflowResult({
                 {/* 2 & 3: Checklist + Questions Grid */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Checklist Card */}
-                  <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                      <CheckSquare size={15} className="text-[#34d399]" />
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-slate-900 text-xs font-bold uppercase tracking-wider">
+                      <CheckSquare size={15} className="text-slate-900" />
                       <span>{guidance.bringTitle}</span>
                     </div>
                     <div className="space-y-2">
                       {guidance.bringItems.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-2.5 p-2 rounded-lg bg-[#021f17] border border-[#0e4331]/80 text-xs text-slate-200"
+                          className="flex items-start gap-2.5 p-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-xs"
                         >
-                          <CheckCircle2 size={14} className="text-[#34d399] shrink-0 mt-0.5" />
+                          <CheckCircle2 size={14} className="text-slate-900 shrink-0 mt-0.5" />
                           <span className="leading-snug">{item}</span>
                         </div>
                       ))}
@@ -751,18 +751,18 @@ export function WorkflowResult({
                   </div>
 
                   {/* Questions to Ask Card */}
-                  <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                      <HelpCircle size={15} className="text-[#34d399]" />
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-slate-900 text-xs font-bold uppercase tracking-wider">
+                      <HelpCircle size={15} className="text-slate-900" />
                       <span>{guidance.questionsTitle}</span>
                     </div>
                     <div className="space-y-2">
                       {guidance.questions.map((q, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-2.5 p-2 rounded-lg bg-[#021f17] border border-[#0e4331]/80 text-xs text-slate-200"
+                          className="flex items-start gap-2.5 p-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-xs"
                         >
-                          <span className="w-4 h-4 rounded-full bg-[#10b981]/20 text-[#34d399] font-bold font-mono text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="w-4 h-4 rounded-full bg-slate-900 text-white font-bold font-mono text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
                           <span className="leading-snug">{q}</span>
@@ -773,12 +773,12 @@ export function WorkflowResult({
                 </div>
 
                 {/* 4. What to Expect Card */}
-                <div className="rounded-xl border border-[#0e4331] bg-[#032a1f]/60 p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                    <HeartHandshake size={15} className="text-[#34d399]" />
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-slate-900 text-xs font-bold uppercase tracking-wider">
+                    <HeartHandshake size={15} className="text-slate-900" />
                     <span>{guidance.expectTitle}</span>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                  <p className="text-xs text-slate-700 leading-relaxed font-sans">
                     {guidance.expectBody}
                   </p>
                 </div>
@@ -789,46 +789,46 @@ export function WorkflowResult({
       </section>
 
       {/* 8. Doctor-in-the-Loop Override & Attestation Panel */}
-      <section className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-md space-y-4">
-        <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
-          <div className="flex items-center gap-2 font-bold text-white text-sm">
-            <UserCheck size={18} className="text-[#34d399]" />
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+            <UserCheck size={18} className="text-slate-900" />
             <span>Doctor-in-the-Loop Override &amp; Approval Sign-Off</span>
           </div>
-          <span className="text-[11px] font-mono text-[#34d399] uppercase">
+          <span className="text-[11px] font-mono text-slate-500 uppercase">
             Mandatory Attestation
           </span>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs text-slate-300 font-semibold block">Attending Clinician Name</label>
+            <label className="text-xs text-slate-700 font-semibold block">Attending Clinician Name</label>
             <input
               type="text"
               value={doctorName}
               onChange={(e) => setDoctorName(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-medium focus:outline-none focus:border-[#10b981]"
+              className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-slate-900 shadow-xs"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs text-slate-300 font-semibold block">Medical Council Reg. No. (NMC / SMC)</label>
+            <label className="text-xs text-slate-700 font-semibold block">Medical Council Reg. No. (NMC / SMC)</label>
             <input
               type="text"
               value={doctorRegNumber}
               onChange={(e) => setDoctorRegNumber(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-medium focus:outline-none focus:border-[#10b981]"
+              className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-slate-900 shadow-xs"
             />
           </div>
         </div>
 
         {/* Override Control */}
-        <div className="p-4 rounded-xl border border-[#0e5c3e] bg-[#033424]/40 space-y-3">
-          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-white">
+        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+          <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-900">
             <input
               type="checkbox"
               checked={isOverridden}
               onChange={(e) => setIsOverridden(e.target.checked)}
-              className="w-4 h-4 rounded accent-[#10b981]"
+              className="w-4 h-4 rounded accent-slate-900"
             />
             <span>Override Algorithmic Tier Recommendation with Clinical Judgement</span>
           </label>
@@ -837,13 +837,13 @@ export function WorkflowResult({
             <div className="space-y-3 pt-2">
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[11px] uppercase tracking-wider text-slate-500 block mb-1">
                     Select Clinician-Assigned Tier
                   </label>
                   <select
                     value={overrideTier}
                     onChange={(e) => setOverrideTier(e.target.value as StandardTier)}
-                    className="w-full h-10 px-3 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-bold focus:outline-none focus:border-[#10b981]"
+                    className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-bold focus:outline-none focus:border-slate-900 shadow-xs"
                   >
                     <option value="URGENT">URGENT (Time-Critical, same day to 72h)</option>
                     <option value="PRIORITY">PRIORITY (Within 1–2 weeks)</option>
@@ -852,7 +852,7 @@ export function WorkflowResult({
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider text-slate-400 block mb-1">
+                  <label className="text-[11px] uppercase tracking-wider text-slate-500 block mb-1">
                     Mandatory Clinical Override Justification (Audit Logged)
                   </label>
                   <input
@@ -861,7 +861,7 @@ export function WorkflowResult({
                     placeholder="Document clinical rationale for overriding engine recommendation"
                     value={overrideReason}
                     onChange={(e) => setOverrideReason(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs focus:outline-none focus:border-[#10b981]"
+                    className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs focus:outline-none focus:border-slate-900 shadow-xs"
                   />
                 </div>
               </div>
@@ -870,12 +870,12 @@ export function WorkflowResult({
         </div>
 
         {/* Doctor Review Attestation Checkbox */}
-        <label className="flex items-start gap-3 p-4 rounded-xl border border-[#0e5c3e] bg-[#033424] cursor-pointer text-xs text-white">
+        <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-300 bg-slate-50 cursor-pointer text-xs text-slate-900">
           <input
             type="checkbox"
             checked={attestationConfirmed}
             onChange={(e) => setAttestationConfirmed(e.target.checked)}
-            className="w-4 h-4 rounded accent-[#10b981] mt-0.5 shrink-0"
+            className="w-4 h-4 rounded accent-slate-900 mt-0.5 shrink-0"
           />
           <span className="leading-relaxed">
             <strong>Doctor Review Completed:</strong> I confirm that I have reviewed the clinical parameters, deterministic guideline criteria, and statutory evidence. I authorize the release of this clinical referral brief and confirm compliance with HIPAA Privacy &amp; Security Rules (45 CFR § 164.514 Safe Harbor), the PC&amp;PNDT Act, 1994, and DPDP Act, 2023.
@@ -889,7 +889,7 @@ export function WorkflowResult({
           <button
             type="button"
             onClick={onReturnToForm}
-            className="px-5 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white hover:bg-[#063825] hover:border-[#10b981]/50 text-sm font-semibold transition cursor-pointer flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
           >
             ← Modify Inputs
           </button>
@@ -899,7 +899,7 @@ export function WorkflowResult({
           <button
             type="button"
             onClick={handleExportFhir}
-            className="px-4 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-[#34d399] hover:bg-[#033424] hover:border-[#10b981] text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
+            className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
           >
             <FileCode2 size={16} />
             <span>Export FHIR ABDM Bundle</span>
@@ -908,7 +908,7 @@ export function WorkflowResult({
           <button
             type="button"
             onClick={() => setShowEmailModal(true)}
-            className="px-4 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-[#34d399] hover:bg-[#033424] hover:border-[#10b981] text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
+            className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs"
           >
             <Mail size={16} />
             <span>Email Brief to Physician</span>
@@ -918,7 +918,7 @@ export function WorkflowResult({
             type="button"
             onClick={handleDownloadPdf}
             disabled={downloadingPdf || !attestationConfirmed}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#34d399] hover:to-[#10b981] text-white text-sm font-bold transition cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition cursor-pointer flex items-center gap-2 shadow-sm disabled:opacity-50"
           >
             <Download size={16} />
             <span>
@@ -934,35 +934,35 @@ export function WorkflowResult({
 
       {/* Email Dispatch Modal */}
       {showEmailModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
-              <div className="flex items-center gap-2 font-bold text-white text-sm">
-                <Mail size={18} className="text-[#34d399]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 text-slate-900">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                <Mail size={18} className="text-slate-900" />
                 <span>Secure Physician Email Dispatch</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEmailModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               Transmits the approved clinical referral brief with attached vector PDF over encrypted TLS. Protected under HIPAA Safe Harbor (45 CFR § 164.514), Digital Personal Data Protection (DPDP) Act, 2023, and ABDM Health Data Management Policy.
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-bold block">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-700 font-bold block">
                 Attending Physician Email
               </label>
               <input
                 type="email"
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
-                className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-semibold focus:outline-none focus:border-[#10b981]"
+                className="w-full h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-semibold focus:outline-none focus:border-slate-900 shadow-xs"
                 placeholder="physician@hospital.org"
               />
             </div>
@@ -970,8 +970,8 @@ export function WorkflowResult({
             {emailStatus && (
               <div
                 className={`p-3 rounded-xl text-xs font-medium ${emailStatus.success
-                  ? 'bg-[#033424] text-[#a7f3d0] border border-[#0e5c3e]'
-                  : 'bg-rose-950/80 text-rose-200 border border-rose-800'
+                  ? 'bg-slate-100 text-slate-800 border border-slate-300'
+                  : 'bg-rose-50 text-rose-800 border border-rose-200'
                   }`}
               >
                 {emailStatus.message}
@@ -982,7 +982,7 @@ export function WorkflowResult({
               <button
                 type="button"
                 onClick={() => setShowEmailModal(false)}
-                className="px-4 py-2 rounded-xl text-xs text-slate-300 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs text-slate-600 hover:text-slate-900"
               >
                 Cancel
               </button>
@@ -990,7 +990,7 @@ export function WorkflowResult({
                 type="button"
                 onClick={handleSendEmail}
                 disabled={emailSending}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#10b981] to-[#059669] hover:brightness-110 text-white font-bold text-xs flex items-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
               >
                 <Send size={14} />
                 <span>{emailSending ? 'Dispatching…' : 'Transmit Brief'}</span>

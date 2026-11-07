@@ -181,24 +181,24 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
     router.push(href)
   }
   const pop =
-    'absolute z-30 mt-2 rounded-2xl border border-[#0e4331] bg-[#00261c] p-2 shadow-2xl backdrop-blur-xl text-white'
+    'absolute z-30 mt-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl text-slate-900'
   const iconBtn =
-    'relative flex h-10 w-10 items-center justify-center rounded-xl text-white transition hover:bg-white/10 hover:text-hx-accent'
+    'relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-700 transition hover:bg-slate-100 hover:text-slate-900'
   return (
     <header
       ref={ref}
-      className="sticky top-0 z-30 flex h-[74px] items-center gap-3 border-b border-[#0e4331] bg-[#00261c]/95 px-4 backdrop-blur-xl lg:pr-[30px] lg:pl-[37px] text-white"
+      className="sticky top-0 z-30 flex h-[74px] items-center gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xl lg:pr-[30px] lg:pl-[37px] text-slate-900 shadow-xs"
     >
       <button onClick={onMenu} aria-label="Open menu" className={`${iconBtn} lg:hidden`}>
         <Menu size={20} />
       </button>
       <nav aria-label="Breadcrumb" className="hidden shrink-0 items-center text-[14px] xl:flex">
-        <Link href="/" aria-label="Home" className="text-white transition hover:text-hx-accent">
-          <House size={23} strokeWidth={1.8} />
+        <Link href="/" aria-label="Home" className="text-slate-700 transition hover:text-slate-900">
+          <House size={21} strokeWidth={1.8} />
         </Link>
         <span className="ml-[21px] font-medium text-slate-400">Workspace</span>
-        <ChevronRight size={15} strokeWidth={2} className="mx-4 text-slate-500" />
-        <span className="font-bold text-white">{title}</span>
+        <ChevronRight size={15} strokeWidth={2} className="mx-4 text-slate-400" />
+        <span className="font-bold text-slate-900">{title}</span>
       </nav>
       <div className="relative mx-auto w-full max-w-[398px]">
         <Search
@@ -218,9 +218,9 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
           }}
           onKeyDown={(e) => e.key === 'Enter' && results[0] && go(results[0].href)}
           placeholder="Search patients, assessments, guidelines..."
-          className="h-11 w-full rounded-full border border-[#0e4331] bg-[#021f17] pr-4 pl-[46px] text-[13px] text-white shadow-[0_1px_2px_rgb(0_0_0/0.2)] transition outline-none placeholder:text-slate-400 hover:border-[#137a2c] focus:border-hx-accent focus:ring-4 focus:ring-hx-accent/20 sm:pr-[70px]"
+          className="h-11 w-full rounded-full border border-slate-300 bg-slate-50 pr-4 pl-[46px] text-[13px] text-slate-900 shadow-xs transition outline-none placeholder:text-slate-400 hover:border-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-100 sm:pr-[70px]"
         />
-        <kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md bg-[#063327] border border-[#0e4331] px-2 py-[3px] font-sans text-[12px] font-medium text-slate-300 sm:block">
+        <kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md bg-slate-100 border border-slate-200 px-2 py-[3px] font-sans text-[12px] font-medium text-slate-600 sm:block">
           Ctrl K
         </kbd>
         {menu === 'search' && q.trim() && (
@@ -230,25 +230,25 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
                 <button
                   key={i}
                   onClick={() => go(r.href)}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-white transition hover:bg-white/10"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-slate-100"
                 >
-                  <span className="w-20 shrink-0 text-[10px] font-bold tracking-wider text-hx-accent uppercase">
+                  <span className="w-20 shrink-0 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
                     {r.k}
                   </span>
                   <span className="truncate">{r.label}</span>
                 </button>
               ))
             ) : (
-              <p className="px-3 py-3 text-sm text-slate-400">No matches for “{q}”.</p>
+              <p className="px-3 py-3 text-sm text-slate-500">No matches for “{q}”.</p>
             )}
           </div>
         )}
       </div>
-      <span className="hidden shrink-0 items-center gap-[9px] text-[13px] font-medium text-slate-400 2xl:flex">
-        <span className="h-2.5 w-2.5 rounded-full bg-hx-accent shadow-[0_0_0_3px_rgb(22_163_74/0.2)]" />
+      <span className="hidden shrink-0 items-center gap-[9px] text-[13px] font-medium text-slate-600 2xl:flex">
+        <span className="h-2.5 w-2.5 rounded-full bg-slate-900 shadow-xs" />
         Decision support workspace
       </span>
-      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-[#0e4331] 2xl:block" />
+      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-slate-200 2xl:block" />
       <div className="relative">
         <button
           aria-label="Notifications"
@@ -256,8 +256,8 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
           onClick={() => setMenu(menu === 'notif' ? null : 'notif')}
           className={iconBtn}
         >
-          <Bell size={23} strokeWidth={1.8} />
-          <span className="absolute top-[7px] right-[8px] h-[9px] w-[9px] rounded-full bg-hx-accent ring-2 ring-[#00261c]" />
+          <Bell size={21} strokeWidth={1.8} />
+          <span className="absolute top-[7px] right-[8px] h-[8px] w-[8px] rounded-full bg-slate-900 ring-2 ring-white" />
         </button>
         {menu === 'notif' && (
           <div className={`${pop} right-0 w-72`}>
@@ -275,38 +275,38 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
           </div>
         )}
       </div>
-      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-[#0e4331] sm:block" />
+      <span aria-hidden className="mx-1.5 hidden h-7 w-px bg-slate-200 sm:block" />
       <div className="relative">
         <button
           aria-label="User menu"
           aria-expanded={menu === 'profile'}
           onClick={() => setMenu(menu === 'profile' ? null : 'profile')}
-          className="flex items-center gap-[18px] rounded-2xl p-1 transition hover:bg-white/10 sm:pr-2"
+          className="flex items-center gap-[14px] rounded-2xl p-1 transition hover:bg-slate-100 sm:pr-2"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#13703a,#0b4f26_70%)] text-[15px] font-bold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2)] ring-2 ring-[#00e5ce]/40">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-[14px] font-bold text-white shadow-xs">
             {computeInitials(currentUser?.name, currentUser?.email)}
           </span>
           <span className="hidden text-left sm:block">
-            <span className="block text-[13.5px] leading-tight font-extrabold text-white">
+            <span className="block text-[13.5px] leading-tight font-extrabold text-slate-900">
               {currentUser?.name || (currentUser?.email ? currentUser.email.split('@')[0] : 'Clinical Staff')}
             </span>
-            <span className="mt-0.5 block text-[13px] leading-tight text-slate-400">
+            <span className="mt-0.5 block text-[12px] leading-tight text-slate-500">
               {currentUser ? computeRole(currentUser) : 'Staff · OB/GYN'}
             </span>
           </span>
-          <ChevronDown size={17} strokeWidth={2} className="hidden text-slate-400 sm:block" />
+          <ChevronDown size={16} strokeWidth={2} className="hidden text-slate-400 sm:block" />
         </button>
         {menu === 'profile' && (
           <div className={`${pop} right-0 w-64`}>
-            <div className="border-b border-[#0e4331] px-3 pt-1 pb-3">
-              <p className="text-sm font-extrabold text-white">
+            <div className="border-b border-slate-200 px-3 pt-1 pb-3">
+              <p className="text-sm font-extrabold text-slate-900">
                 {currentUser?.name || 'Clinical Staff'}
               </p>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-500">
                 {currentUser ? computeRole(currentUser) : 'Staff · OB/GYN'}
               </p>
               {currentUser?.email && (
-                <p className="mt-1 text-[11px] font-medium text-[#00e5ce] truncate">
+                <p className="mt-1 text-[11px] font-medium text-slate-600 truncate">
                   {currentUser.email}
                 </p>
               )}
@@ -321,9 +321,9 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
                   key={h as string}
                   href={h as string}
                   onClick={() => setMenu(null)}
-                  className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white transition hover:bg-white/10"
+                  className="mt-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-800 transition hover:bg-slate-100"
                 >
-                  <Icon size={15} className="text-[#00e5ce]" />
+                  <Icon size={15} className="text-slate-600" />
                   {l as string}
                 </Link>
               )
@@ -332,7 +332,7 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-[#0e4331] px-3 pt-3 pb-1 text-sm font-semibold text-red-400 hover:text-red-300 transition"
+                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-slate-200 px-3 pt-3 pb-1 text-sm font-semibold text-red-600 hover:text-red-700 transition"
               >
                 <LogOut size={15} /> Sign out
               </button>
@@ -340,7 +340,7 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
               <Link
                 href="/login"
                 onClick={() => setMenu(null)}
-                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-[#0e4331] px-3 pt-3 pb-1 text-sm font-semibold text-[#00e5ce] hover:brightness-110 transition"
+                className="mt-2 flex w-full items-center gap-2 rounded-xl border-t border-slate-200 px-3 pt-3 pb-1 text-sm font-semibold text-slate-900 hover:text-slate-700 transition"
               >
                 <UserIcon size={15} /> Sign in
               </Link>

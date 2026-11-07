@@ -13,12 +13,12 @@ import { CardArt } from './Graphics'
 import { FamilyTree, UltrasoundScan } from './Icons'
 
 const TILES: { icon: LucideIcon; tone: string }[] = [
-  { icon: Dna, tone: 'bg-[#033424] text-[#00e5ce] border border-[#0e5c3e]' },
-  { icon: Users, tone: 'bg-[#062c38] text-[#38d8f0] border border-[#12586e]' },
-  { icon: Bean, tone: 'bg-[#2b172a] text-[#f472b6] border border-[#5c244f]' },
-  { icon: FamilyTree, tone: 'bg-[#2e1d0c] text-[#fbbf24] border border-[#6b4217]' },
-  { icon: UltrasoundScan, tone: 'bg-[#0d233a] text-[#60a5fa] border border-[#1e4976]' },
-  { icon: ClipboardPlus, tone: 'bg-[#033424] text-[#34d399] border border-[#0e5c3e]' },
+  { icon: Dna, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
+  { icon: Users, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
+  { icon: Bean, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
+  { icon: FamilyTree, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
+  { icon: UltrasoundScan, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
+  { icon: ClipboardPlus, tone: 'bg-slate-100 text-slate-900 border border-slate-200' },
 ]
 
 /** Sentence-case for display only (acronyms kept); stored pathway titles are unchanged. */
@@ -30,9 +30,9 @@ function sentenceCase(title: string) {
 }
 
 const pill =
-  'inline-flex h-[34px] shrink-0 items-center gap-2.5 rounded-full px-5 text-[13px] font-bold transition duration-200'
-const pillPrimary = `${pill} bg-[linear-gradient(180deg,#1db342_0%,#0c7f2e_52%,#04561c_100%)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_8px_16px_-8px_rgb(4_86_28/0.7)] hover:brightness-110`
-const pillOutline = `${pill} border border-[#0e4331] bg-[#032a1f] text-white shadow-sm hover:border-[#00e5ce]/60 hover:bg-[#063825] hover:text-[#00e5ce]`
+  'inline-flex h-[36px] shrink-0 items-center gap-2 rounded-xl px-4 text-[13px] font-bold transition duration-200'
+const pillPrimary = `${pill} bg-slate-900 text-white hover:bg-slate-800 shadow-xs`
+const pillOutline = `${pill} border border-slate-300 bg-white text-slate-800 shadow-xs hover:bg-slate-50 hover:border-slate-400`
 
 export default function PathwayCard({
   pathway,
@@ -44,11 +44,8 @@ export default function PathwayCard({
   layout?: 'grid' | 'list'
 }) {
   const { icon: Icon, tone } = TILES[index % TILES.length]
-  const featured = index === 0
   const title = sentenceCase(pathway.title)
-  const surface = featured
-    ? 'border-2 border-[#10b981] bg-[linear-gradient(165deg,#032b1f_35%,#011912_100%)] shadow-[0_0_0_2px_rgb(16_185_129/0.2),0_16px_32px_-20px_rgb(0_0_0/0.8)] text-white'
-    : 'border border-[#0e4331] bg-[#021f17] shadow-hx hover:border-[#10b981]/50 hover:bg-[#03261c] hover:shadow-hx-lift text-white'
+  const surface = 'border border-slate-200 bg-white shadow-xs hover:border-slate-300 hover:shadow-sm text-slate-900'
   const tile = (
     <span
       className={`relative flex h-[45px] w-[57px] shrink-0 items-center justify-center rounded-xl ${tone}`}
@@ -57,16 +54,16 @@ export default function PathwayCard({
     </span>
   )
   const guidelines = (
-    <span className="flex items-center gap-[13px] text-[13px] font-medium text-slate-300">
-      <BookOpen size={18} strokeWidth={1.7} className="text-[#00e5ce]" />
+    <span className="flex items-center gap-[10px] text-[13px] font-medium text-slate-500">
+      <BookOpen size={16} strokeWidth={1.7} className="text-slate-700" />
       {pathway.guidelines}
     </span>
   )
   const cta = (
-    <Link href={`/assessment/${pathway.slug}`} className={featured ? pillPrimary : pillOutline}>
+    <Link href={`/assessment/${pathway.slug}`} className={pillPrimary}>
       Start assessment
       <ArrowRight
-        size={16}
+        size={15}
         strokeWidth={2}
         className="transition-transform duration-200 group-hover:translate-x-0.5"
       />
@@ -76,14 +73,14 @@ export default function PathwayCard({
   if (layout === 'list') {
     return (
       <article
-        className={`group relative flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[14px] py-4 pr-4 pl-5 transition duration-300 ${surface}`}
+        className={`group relative flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[14px] py-4 pr-4 pl-5 transition duration-200 ${surface}`}
       >
         {tile}
         <div className="min-w-[220px] flex-1">
-          <h3 className="text-[16px] leading-snug font-bold tracking-[-0.01em] text-white">
+          <h3 className="text-[16px] leading-snug font-bold tracking-[-0.01em] text-slate-900">
             {title}
           </h3>
-          <p className="mt-1 text-[13px] leading-[18px] text-slate-300">{pathway.description}</p>
+          <p className="mt-1 text-[13px] leading-[18px] text-slate-600">{pathway.description}</p>
         </div>
         <span className="hidden lg:block">{guidelines}</span>
         {cta}
@@ -93,17 +90,16 @@ export default function PathwayCard({
 
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-[14px] pt-[13px] pr-4 pb-3 pl-[26px] transition duration-300 hover:-translate-y-0.5 ${surface}`}
+      className={`group relative flex flex-col overflow-hidden rounded-[14px] pt-[15px] pr-4 pb-4 pl-[24px] transition duration-200 hover:-translate-y-0.5 ${surface}`}
     >
-      <CardArt index={index} />
       {tile}
-      <h3 className="relative mt-[11px] text-[17px] leading-[22px] font-bold tracking-[-0.01em] text-white">
+      <h3 className="relative mt-[12px] text-[17px] leading-[22px] font-bold tracking-[-0.01em] text-slate-900">
         {title}
       </h3>
-      <p className="relative mt-[6px] max-w-[285px] text-[13px] leading-[17px] text-slate-300">
+      <p className="relative mt-[6px] max-w-[285px] text-[13px] leading-[18px] text-slate-600">
         {pathway.description}
       </p>
-      <div className="relative mt-auto flex flex-wrap items-center justify-between gap-3 pt-[27px]">
+      <div className="relative mt-auto flex flex-wrap items-center justify-between gap-3 pt-[24px]">
         {guidelines}
         {cta}
       </div>

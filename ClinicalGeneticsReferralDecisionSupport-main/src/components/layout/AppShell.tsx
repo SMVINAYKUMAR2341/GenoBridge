@@ -46,7 +46,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <AssessmentsProvider>
-      <div className="min-h-screen bg-hx-bg text-white">
+      <div className="min-h-screen bg-white text-slate-900">
         <Sidebar open={open} onClose={() => setOpen(false)} />
         {/* overflow-x-clip contains full-bleed bands without breaking the sticky top bar */}
         <div className="overflow-x-clip lg:pl-[284px]">

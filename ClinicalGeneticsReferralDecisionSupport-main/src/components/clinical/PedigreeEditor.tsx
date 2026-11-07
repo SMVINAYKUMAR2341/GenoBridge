@@ -163,7 +163,7 @@ export function PedigreeEditor({
         </button>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#033424] text-[#00e5ce] border border-[#0e5c3e] hover:bg-[#064e3b] transition-all disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 border border-slate-300 hover:border-slate-900 transition-all disabled:opacity-40 shadow-xs"
           onClick={() => {
             const hasConsanguinity = model.families.some((f) => f.consanguineous)
             const bundle = buildFhirGenomicsBundle(model, {

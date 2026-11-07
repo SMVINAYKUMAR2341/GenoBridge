@@ -24,9 +24,9 @@ export default function CalculatorPage() {
         </p>
         <div
           role="note"
-          className="mt-5 flex items-start gap-3 rounded-xl border border-[#0e5c3e] bg-[#033424] p-4 text-sm text-[#6ee7b7]"
+          className="mt-5 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-800"
         >
-          <ShieldAlert size={19} className="shrink-0 text-[#00e5ce]" />
+          <ShieldAlert size={19} className="shrink-0 text-slate-900" />
           <p>
             Use the structured assessment workflow for reviewer-governed referral support, subject
             to its clinical-preview limitations. Saved drafts and finalized decisions can be

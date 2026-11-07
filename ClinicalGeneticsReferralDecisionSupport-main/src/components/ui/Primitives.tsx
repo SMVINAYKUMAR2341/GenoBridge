@@ -2,13 +2,13 @@ import type { ReactNode } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import type { Priority } from '@/components/providers/AssessmentsProvider'
 
-export const card = 'rounded-[14px] border border-[#0e4331] bg-[#021f17] shadow-hx text-white'
+export const card = 'rounded-[14px] border border-slate-200 bg-white shadow-xs text-slate-900'
 export const btnPrimary =
-  'inline-flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#1db342_0%,#0c7f2e_52%,#04561c_100%)] px-5 py-2.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_8px_18px_-8px_rgb(4_86_28/0.7)] transition duration-200 hover:-translate-y-px hover:brightness-110 active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:brightness-100'
+  'inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition duration-200 hover:bg-slate-800 active:translate-y-0 disabled:opacity-50'
 export const btnGhost =
-  'inline-flex items-center justify-center gap-2 rounded-full border border-[#0e4331] bg-[#032a1f] px-5 py-2.5 text-sm font-bold text-white shadow-[0_1px_2px_rgb(0_0_0/0.2)] transition duration-200 hover:-translate-y-px hover:border-hx-accent/60 hover:bg-[#063825] active:translate-y-0'
+  'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-800 shadow-xs transition duration-200 hover:bg-slate-50 active:translate-y-0'
 export const inputCls =
-  'w-full rounded-xl border border-[#0e4331] bg-[#032a1f] px-3.5 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none transition hover:border-[#10b981] focus:border-[#00e5ce] focus:bg-[#033426] focus:ring-4 focus:ring-[#00e5ce]/20 [&>option]:bg-[#032a1f] [&>option]:text-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0'
+  'w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition hover:border-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0'
 
 export function PageHeader({
   eyebrow,
@@ -40,9 +40,9 @@ export function PreviewBanner({ className = 'mb-6' }: { className?: string }) {
   return null
 }
 const pri: Record<Priority, string> = {
-  routine: 'bg-hx-mint text-hx-emerald ring-[#cdeed6]',
-  priority: 'bg-hx-warn-bg text-hx-warn ring-hx-warn-line',
-  urgent: 'bg-red-50 text-red-700 ring-red-100',
+  routine: 'bg-slate-100 text-slate-800 ring-slate-200',
+  priority: 'bg-amber-50 text-amber-800 ring-amber-200',
+  urgent: 'bg-red-50 text-red-800 ring-red-200',
 }
 export function PriorityBadge({ value }: { value: Priority }) {
   return (
@@ -56,9 +56,9 @@ export function PriorityBadge({ value }: { value: Priority }) {
 }
 export function Empty({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-[14px] border border-dashed border-[#0e4331] bg-[#021f17] p-12 text-center text-white shadow-hx">
-      <p className="font-bold text-base text-white">{title}</p>
-      <p className="mt-2 text-sm text-slate-300 max-w-xl mx-auto">{text}</p>
+    <div className="rounded-[14px] border border-dashed border-slate-300 bg-slate-50 p-12 text-center text-slate-900 shadow-xs">
+      <p className="font-bold text-base text-slate-900">{title}</p>
+      <p className="mt-2 text-sm text-slate-600 max-w-xl mx-auto">{text}</p>
     </div>
   )
 }

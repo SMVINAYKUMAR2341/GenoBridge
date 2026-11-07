@@ -107,22 +107,22 @@ export default function PathwayScenarioHub({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
         <div>
-          <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#34d399] font-bold">
+          <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-slate-900 font-bold">
             Evidence-Based Triage
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
             {title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mt-1">
             {subtitle}
           </p>
         </div>
 
         <Link
           href="/pedigree"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#032a1f] text-white border border-[#0e4331] hover:border-[#10b981] hover:text-[#34d399] transition-all self-start sm:self-auto shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-900 border border-slate-300 hover:border-slate-900 hover:text-slate-950 transition-all self-start sm:self-auto shrink-0 shadow-xs"
         >
-          <GitFork className="w-3.5 h-3.5 text-[#34d399]" />
+          <GitFork className="w-3.5 h-3.5 text-slate-900" />
           <span>Open Pedigree Studio</span>
         </Link>
       </div>
@@ -134,11 +134,11 @@ export default function PathwayScenarioHub({
             <Link
               key={p.id}
               href={`/assessment/${p.slug}`}
-              className="group p-5 rounded-2xl bg-[#021f17] border border-[#0e4331] hover:border-[#10b981] hover:shadow-xl hover:shadow-[#10b981]/10 transition-all flex flex-col justify-between space-y-4"
+              className="group p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all flex flex-col justify-between space-y-4 text-slate-900"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-[#033424] border border-[#0e5c3e] flex items-center justify-center text-[#34d399] group-hover:bg-[#10b981] group-hover:text-[#01140e] transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-colors">
                     <IconComponent className="w-5 h-5" />
                   </div>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${p.badgeTone}`}>
@@ -147,21 +147,21 @@ export default function PathwayScenarioHub({
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-[#34d399] transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-slate-950 transition-colors">
                     {p.title}
                   </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mt-1.5">
+                  <p className="text-xs text-slate-600 leading-relaxed mt-1.5">
                     {p.description}
                   </p>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-[#0e4331] flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-slate-400 text-[11px]">
-                  <BookOpen className="w-3.5 h-3.5 text-[#34d399]" />
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-slate-500 text-[11px]">
+                  <BookOpen className="w-3.5 h-3.5 text-slate-700" />
                   <span>{p.guidelines}</span>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-[#34d399] group-hover:translate-x-1 transition-transform">
+                <span className="flex items-center gap-1 font-semibold text-slate-900 group-hover:translate-x-1 transition-transform">
                   <span>Start</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>

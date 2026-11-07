@@ -105,7 +105,7 @@ export default function StaffSignIn() {
     }
   }
   return (
-    <section aria-label="Staff access" className="mb-6 rounded-[14px] border border-[#0e4331] bg-[#021f17] p-5 shadow-hx text-white">
+    <section aria-label="Staff access" className="mb-6 rounded-[14px] border border-slate-200 bg-white p-5 shadow-xs text-slate-900">
       {loading ? (
         <p role="status" className="flex items-center gap-2 text-sm text-slate-300">
           <RefreshCw size={16} className="animate-spin text-[#00e5ce]" /> Checking staff session…

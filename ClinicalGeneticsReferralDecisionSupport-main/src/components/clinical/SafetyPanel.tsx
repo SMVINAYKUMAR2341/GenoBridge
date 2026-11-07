@@ -38,7 +38,7 @@ export default function SafetyPanel() {
       />
       <div
         role="note"
-        className="mb-6 rounded-xl border border-[#0e5c3e] bg-[#033424] p-5 text-sm text-[#a7f3d0]"
+        className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-800"
       >
         <strong>Clinical Safety Architecture.</strong> SaMD deterministic decision rules calibrated against statutory guidelines (FOGSI · ACOG · ACMG · ASRM · NCCN).
       </div>

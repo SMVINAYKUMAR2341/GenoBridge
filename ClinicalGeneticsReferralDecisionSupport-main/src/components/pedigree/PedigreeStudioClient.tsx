@@ -340,17 +340,17 @@ export default function PedigreeStudioClient({
   const derived = useMemo(() => deriveFeatures(pedigree), [pedigree])
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-16">
+    <div className="space-y-8 max-w-6xl mx-auto pb-16 bg-white text-slate-900">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#0e4331]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <div className="text-[11px] font-mono tracking-[0.22em] uppercase font-bold text-[#34d399] mb-1">
+          <div className="text-[11px] font-mono tracking-[0.22em] uppercase font-bold text-slate-500 mb-1">
             MULTIGENERATIONAL PEDIGREE STUDIO
           </div>
-          <h1 className="font-heading font-bold text-3xl sm:text-4xl tracking-tight text-white">
+          <h1 className="font-heading font-bold text-3xl sm:text-4xl tracking-tight text-slate-900">
             Family History &amp; Pedigree Chart
           </h1>
-          <p className="mt-2 text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="mt-2 text-sm text-slate-600 max-w-2xl leading-relaxed">
             Fills family history for all six clinical pathways automatically. Fixed slots exist for 4 grandparents, both parents, and proband. Add siblings, children, aunts, and uncles as needed.
           </p>
         </div>
@@ -359,7 +359,7 @@ export default function PedigreeStudioClient({
           <button
             type="button"
             onClick={savePedigree}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#34d399] hover:to-[#10b981] text-white shadow-md transition cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition cursor-pointer"
           >
             <Save size={16} />
             <span>{savedNotice ? 'Pedigree Saved!' : 'Save Pedigree'}</span>
@@ -368,23 +368,23 @@ export default function PedigreeStudioClient({
       </div>
 
       {/* Live SVG Pedigree Canvas (GenoBridge Visualization) */}
-      <div className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-5 shadow-lg space-y-3">
-        <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
-          <div className="text-xs font-mono font-bold tracking-wider text-[#34d399] uppercase">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="text-xs font-mono font-bold tracking-wider text-slate-900 uppercase">
             Pedigree · Live Canvas
           </div>
-          <div className="flex items-center gap-4 text-[11px] font-medium text-slate-300">
+          <div className="flex items-center gap-4 text-[11px] font-medium text-slate-600">
             <span className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 border border-[#34d399] inline-block bg-[#032a1f]" /> Male
+              <span className="w-3.5 h-3.5 border-2 border-slate-900 inline-block bg-white" /> Male
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 border border-[#34d399] inline-block rounded-full bg-[#032a1f]" /> Female
+              <span className="w-3.5 h-3.5 border-2 border-slate-900 inline-block rounded-full bg-white" /> Female
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 bg-[#e11d48] inline-block" /> Affected
+              <span className="w-3.5 h-3.5 bg-slate-900 inline-block" /> Affected
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="font-bold text-[#34d399]">P</span> Proband
+              <span className="font-bold text-slate-900">P</span> Proband
             </span>
           </div>
         </div>
@@ -393,78 +393,78 @@ export default function PedigreeStudioClient({
       </div>
 
       {/* Automated Features Derived for the Decision Engine */}
-      <div className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-5 shadow-lg space-y-3">
-        <div className="flex items-center justify-between border-b border-[#0e4331] pb-3">
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#34d399] flex items-center gap-2">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
             <Dna size={16} />
             <span>Engine Features Auto-Derived from Pedigree</span>
           </div>
-          <span className="text-xs text-slate-400 font-mono">decision_engine.py integration</span>
+          <span className="text-xs text-slate-500 font-mono">decision_engine.py integration</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">1st-Deg Breast Cancer</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.family_breast_cancer_first_degree_count}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">1st-Deg Breast Cancer</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.family_breast_cancer_first_degree_count}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Ovarian Cancer (Any)</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.family_ovarian_cancer_count}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Ovarian Cancer (Any)</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.family_ovarian_cancer_count}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Colorectal Cancer (Any)</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.family_colon_cancer_count}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Colorectal Cancer (Any)</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.family_colon_cancer_count}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Male Breast Cancer</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.male_breast_cancer_family ? 'Yes' : 'No'}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Male Breast Cancer</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.male_breast_cancer_family ? 'Yes' : 'No'}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Closest Affected Relative</div>
-            <div className="text-base font-bold text-white mt-0.5 capitalize">{derived.closest_affected_degree || 'None'}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Closest Affected Relative</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5 capitalize">{derived.closest_affected_degree || 'None'}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Multiple Relatives Affected</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.multiple_affected ? 'Yes (>= 2)' : 'No'}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Multiple Relatives Affected</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.multiple_affected ? 'Yes (>= 2)' : 'No'}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Consanguinity</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.consanguinity ? 'Yes' : 'No'}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Consanguinity</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.consanguinity ? 'Yes' : 'No'}</div>
           </div>
-          <div className="p-3 rounded-xl bg-[#032a1f] border border-[#0e4331]">
-            <div className="text-slate-400">Recessive Condition Hx</div>
-            <div className="text-base font-bold text-white mt-0.5">{derived.family_history_recessive_condition ? 'Yes' : 'No'}</div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="text-slate-500">Recessive Condition Hx</div>
+            <div className="text-base font-bold text-slate-900 mt-0.5">{derived.family_history_recessive_condition ? 'Yes' : 'No'}</div>
           </div>
         </div>
       </div>
 
       {/* Pedigree-Level Factors */}
-      <div className="rounded-2xl border border-[#0e4331] bg-[#021f17] p-6 shadow-lg space-y-4">
-        <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#34d399]">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
           Pedigree-Level Factors
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
-          <label className="flex items-center justify-between p-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] hover:bg-[#064e3b]/40 cursor-pointer transition">
-            <span className="text-sm font-semibold text-slate-200">Ashkenazi Jewish ancestry</span>
+          <label className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition">
+            <span className="text-sm font-semibold text-slate-800">Ashkenazi Jewish ancestry</span>
             <input
               type="checkbox"
               checked={pedigree.ashkenazi_ancestry}
               onChange={(e) => setPedigree((p) => ({ ...p, ashkenazi_ancestry: e.target.checked }))}
-              className="h-4 w-4 rounded border-[#0e4331] text-[#10b981] accent-[#10b981]"
+              className="h-4 w-4 rounded border-slate-300 text-slate-900 accent-slate-900"
             />
           </label>
-          <label className="flex items-center justify-between p-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] hover:bg-[#064e3b]/40 cursor-pointer transition">
-            <span className="text-sm font-semibold text-slate-200">Consanguineous partnership</span>
+          <label className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer transition">
+            <span className="text-sm font-semibold text-slate-800">Consanguineous partnership</span>
             <input
               type="checkbox"
               checked={pedigree.consanguinity}
               onChange={(e) => setPedigree((p) => ({ ...p, consanguinity: e.target.checked }))}
-              className="h-4 w-4 rounded border-[#0e4331] text-[#10b981] accent-[#10b981]"
+              className="h-4 w-4 rounded border-slate-300 text-slate-900 accent-slate-900"
             />
           </label>
         </div>
 
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 mb-2">
             Reported Ancestries
           </label>
           <div className="flex flex-wrap gap-2">
@@ -481,8 +481,8 @@ export default function PedigreeStudioClient({
                   }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer ${
                     active
-                      ? 'bg-[#10b981] text-white border-[#10b981] shadow'
-                      : 'border-[#0e4331] bg-[#032a1f] text-slate-300 hover:border-emerald-500 hover:text-white'
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   {a.label}
@@ -495,36 +495,36 @@ export default function PedigreeStudioClient({
 
       {/* Member Management Cards */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3 border-b border-[#0e4331] pb-3">
-          <div className="text-sm font-mono font-bold text-[#34d399] uppercase tracking-wider">
+        <div className="flex items-center justify-between flex-wrap gap-3 border-b border-slate-200 pb-3">
+          <div className="text-sm font-mono font-bold text-slate-900 uppercase tracking-wider">
             Family Members ({pedigree.members.length})
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => addMember('sibling', 'U')}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#a7f3d0] hover:bg-[#10b981] hover:text-white transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition cursor-pointer shadow-xs"
             >
               + Add Sibling
             </button>
             <button
               type="button"
               onClick={() => addMember('child', 'U')}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#a7f3d0] hover:bg-[#10b981] hover:text-white transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition cursor-pointer shadow-xs"
             >
               + Add Child
             </button>
             <button
               type="button"
               onClick={() => addMember('paternal_uncle_aunt', 'U')}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#a7f3d0] hover:bg-[#10b981] hover:text-white transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition cursor-pointer shadow-xs"
             >
               + Paternal Aunt/Uncle
             </button>
             <button
               type="button"
               onClick={() => addMember('maternal_uncle_aunt', 'U')}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0e4331] bg-[#032a1f] text-[#a7f3d0] hover:bg-[#10b981] hover:text-white transition cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 transition cursor-pointer shadow-xs"
             >
               + Maternal Aunt/Uncle
             </button>
@@ -539,18 +539,18 @@ export default function PedigreeStudioClient({
             return (
               <div
                 key={m.id}
-                className={`rounded-xl border p-4 transition ${
+                className={`rounded-xl border p-4 transition shadow-xs ${
                   m.affected
-                    ? 'border-rose-500/60 bg-rose-950/30 text-white'
-                    : 'border-[#0e4331] bg-[#032a1f] hover:border-emerald-600/50 text-white'
+                    ? 'border-slate-800 bg-slate-50 text-slate-900'
+                    : 'border-slate-200 bg-white hover:border-slate-300 text-slate-900'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-bold text-white capitalize">
+                    <div className="text-sm font-bold text-slate-900 capitalize">
                       {m.relation.replace(/_/g, ' ')}
                     </div>
-                    <div className="text-xs text-[#34d399] mt-0.5">
+                    <div className="text-xs text-slate-600 mt-0.5">
                       {m.label || m.relation.replace(/_/g, ' ')} · {m.sex === 'M' ? 'Male (Square)' : m.sex === 'F' ? 'Female (Circle)' : 'Unknown sex'}
                     </div>
                   </div>
@@ -559,7 +559,7 @@ export default function PedigreeStudioClient({
                     <button
                       type="button"
                       onClick={() => removeMember(m.id)}
-                      className="text-slate-400 hover:text-rose-400 transition p-1 cursor-pointer"
+                      className="text-slate-400 hover:text-slate-900 transition p-1 cursor-pointer"
                       title="Remove member"
                     >
                       <Trash2 size={15} />
@@ -569,18 +569,18 @@ export default function PedigreeStudioClient({
 
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {isMaleRole ? (
-                    <div className="h-8 rounded-lg border border-[#0e4331] bg-[#021f17] px-2.5 flex items-center text-xs font-semibold text-slate-200">
+                    <div className="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2.5 flex items-center text-xs font-semibold text-slate-700">
                       Male (Square)
                     </div>
                   ) : isFemaleRole ? (
-                    <div className="h-8 rounded-lg border border-[#0e4331] bg-[#021f17] px-2.5 flex items-center text-xs font-semibold text-slate-200">
+                    <div className="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2.5 flex items-center text-xs font-semibold text-slate-700">
                       Female (Circle)
                     </div>
                   ) : (
                     <select
                       value={m.sex}
                       onChange={(e) => updateMember(m.id, { sex: e.target.value as any })}
-                      className="h-8 rounded-lg border border-[#0e4331] bg-[#021f17] px-2 text-xs font-semibold text-slate-100 focus:outline-none focus:border-[#10b981]"
+                      className="h-8 rounded-lg border border-slate-300 bg-white px-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-900"
                     >
                       <option value="M">Male (Square)</option>
                       <option value="F">Female (Circle)</option>
@@ -596,24 +596,24 @@ export default function PedigreeStudioClient({
                         age: e.target.value === '' ? null : Number(e.target.value),
                       })
                     }
-                    className="h-8 rounded-lg border border-[#0e4331] bg-[#021f17] px-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#10b981]"
+                    className="h-8 rounded-lg border border-slate-300 bg-white px-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900"
                   />
                   <div className="flex items-center gap-2.5">
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 cursor-pointer">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={m.affected}
                         onChange={(e) => updateMember(m.id, { affected: e.target.checked })}
-                        className="rounded border-[#0e4331] text-[#10b981] accent-[#10b981]"
+                        className="rounded border-slate-300 text-slate-900 accent-slate-900"
                       />
                       <span>Affected</span>
                     </label>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 cursor-pointer">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={m.deceased}
                         onChange={(e) => updateMember(m.id, { deceased: e.target.checked })}
-                        className="rounded border-[#0e4331] text-slate-400 accent-[#10b981]"
+                        className="rounded border-slate-300 text-slate-500 accent-slate-900"
                       />
                       <span>Deceased</span>
                     </label>
@@ -621,8 +621,8 @@ export default function PedigreeStudioClient({
                 </div>
 
                 {m.affected && (
-                  <div className="mt-3 pt-3 border-t border-[#0e4331]/80">
-                    <div className="text-[11px] font-bold text-[#34d399] uppercase tracking-wider mb-2">
+                  <div className="mt-3 pt-3 border-t border-slate-200">
+                    <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-2">
                       Reported Conditions
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -639,8 +639,8 @@ export default function PedigreeStudioClient({
                             }}
                             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${
                               active
-                                ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow'
-                                : 'bg-[#021f17] text-slate-300 border border-[#0e4331] hover:bg-[#064e3b]'
+                                ? 'bg-slate-900 text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
                             }`}
                           >
                             {c.label}
@@ -649,7 +649,7 @@ export default function PedigreeStudioClient({
                       })}
                     </div>
                     <div className="mt-2.5 flex items-center gap-2">
-                      <span className="text-xs text-slate-400">Age at diagnosis:</span>
+                      <span className="text-xs text-slate-500">Age at diagnosis:</span>
                       <input
                         type="number"
                         placeholder="Age"
@@ -660,7 +660,7 @@ export default function PedigreeStudioClient({
                               e.target.value === '' ? null : Number(e.target.value),
                           })
                         }
-                        className="h-7 w-20 rounded-md border border-[#0e4331] bg-[#021f17] px-2 text-xs text-white focus:outline-none focus:border-[#10b981]"
+                        className="h-7 w-20 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900 focus:outline-none focus:border-slate-900"
                       />
                     </div>
                   </div>
@@ -675,7 +675,7 @@ export default function PedigreeStudioClient({
         <button
           type="button"
           onClick={savePedigree}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-base font-bold bg-gradient-to-r from-[#10b981] via-[#059669] to-[#047857] hover:brightness-110 text-white shadow-xl transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-base font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-lg transition cursor-pointer"
         >
           <Save size={18} />
           <span>Save Pedigree &amp; Link to Decision Support</span>
@@ -785,9 +785,9 @@ function LivePedigreeCanvas({ pedigree }: { pedigree: PedigreeData }) {
   }, [pedigree])
 
   return (
-    <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className="w-full h-[290px] bg-[#032a1f] border border-[#0e4331] rounded-xl shadow-inner">
+    <svg viewBox={`0 0 ${layout.width} ${layout.height}`} className="w-full h-[290px] bg-slate-50 border border-slate-200 rounded-xl shadow-inner">
       {layout.lines.map((l: any, i: number) => (
-        <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#34d399" strokeWidth="1.5" />
+        <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#334155" strokeWidth="2" />
       ))}
       {layout.nodes.map((n: any, i: number) => (
         <g key={i} transform={`translate(${n.x}, ${n.y})`}>
@@ -797,34 +797,34 @@ function LivePedigreeCanvas({ pedigree }: { pedigree: PedigreeData }) {
               y={-16}
               width={32}
               height={32}
-              fill={n.affected ? '#e11d48' : '#021f17'}
-              stroke="#34d399"
+              fill={n.affected ? '#0f172a' : '#ffffff'}
+              stroke="#0f172a"
               strokeWidth="2"
             />
           ) : n.sex === 'F' ? (
             <circle
               r={16}
-              fill={n.affected ? '#e11d48' : '#021f17'}
-              stroke="#34d399"
+              fill={n.affected ? '#0f172a' : '#ffffff'}
+              stroke="#0f172a"
               strokeWidth="2"
             />
           ) : (
             <polygon
               points="0,-18 18,0 0,18 -18,0"
-              fill={n.affected ? '#e11d48' : '#021f17'}
-              stroke="#34d399"
+              fill={n.affected ? '#0f172a' : '#ffffff'}
+              stroke="#0f172a"
               strokeWidth="2"
             />
           )}
           {n.deceased && (
-            <line x1={-18} y1={-18} x2={18} y2={18} stroke="#f43f5e" strokeWidth="2" />
+            <line x1={-18} y1={-18} x2={18} y2={18} stroke="#e11d48" strokeWidth="2.5" />
           )}
           {n.proband && (
-            <text x={0} y={32} textAnchor="middle" fontSize="12" fill="#34d399" fontWeight="bold">
+            <text x={0} y={32} textAnchor="middle" fontSize="12" fill="#0f172a" fontWeight="bold">
               P
             </text>
           )}
-          <text x={0} y={-22} textAnchor="middle" fontSize="10" fill="#f1f5f9" fontWeight="600">
+          <text x={0} y={-22} textAnchor="middle" fontSize="10" fill="#0f172a" fontWeight="600">
             {n.short}
           </text>
         </g>

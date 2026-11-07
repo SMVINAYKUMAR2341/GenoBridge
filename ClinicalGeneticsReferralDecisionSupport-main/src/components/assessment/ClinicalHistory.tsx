@@ -29,13 +29,13 @@ export function ClinicalHistory({
   const fields = visibleIntakeFields(slug, inputs)
 
   return (
-    <div className="space-y-6 text-white">
+    <div className="space-y-6 text-slate-900">
       {/* Guidance Note */}
-      <div className="rounded-xl border border-[#0e5c3e] bg-[#033424] p-4 text-xs text-[#a7f3d0] flex items-center justify-between shadow-xs">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700 flex items-center justify-between shadow-xs">
         <span className="font-medium">
           Fill in only what applies. Fields left blank are treated as negative / not present.
         </span>
-        <span className="font-mono text-[11px] text-[#34d399] font-bold tracking-wider">
+        <span className="font-mono text-[11px] text-slate-900 font-bold tracking-wider">
           POINT-OF-CARE OPD
         </span>
       </div>
@@ -72,8 +72,8 @@ function SwitchToggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#10b981] ${
-        checked ? 'bg-[#10b981]' : 'bg-[#0b291e] border border-[#0e4331]'
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-slate-900 ${
+        checked ? 'bg-slate-900' : 'bg-slate-200'
       }`}
     >
       <span
@@ -103,10 +103,10 @@ function FieldRenderer({
   if (field.type === 'bool' || field.type === 'checkbox') {
     const isChecked = Boolean(value === true || value === 'true')
     return (
-      <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-[#0e4331] bg-[#021f17] hover:border-[#10b981]/50 transition-colors">
-        <label htmlFor={id} className="text-sm font-medium text-white cursor-pointer select-none max-w-[80%]">
+      <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors shadow-xs">
+        <label htmlFor={id} className="text-sm font-medium text-slate-900 cursor-pointer select-none max-w-[80%]">
           {field.label}
-          {field.hint && <span className="block text-xs text-slate-300 font-normal mt-0.5">{field.hint}</span>}
+          {field.hint && <span className="block text-xs text-slate-500 font-normal mt-0.5">{field.hint}</span>}
         </label>
         <SwitchToggle id={id} checked={isChecked} onChange={onChange} />
       </div>
@@ -131,9 +131,9 @@ function FieldRenderer({
 
     return (
       <div className="space-y-2 pt-2">
-        <label className="block text-sm font-semibold text-white">
+        <label className="block text-sm font-semibold text-slate-900">
           {field.label}
-          {field.hint && <span className="block text-xs text-slate-300 font-normal">{field.hint}</span>}
+          {field.hint && <span className="block text-xs text-slate-500 font-normal">{field.hint}</span>}
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {field.options?.map(([optVal, optLabel]) => {
@@ -144,17 +144,17 @@ function FieldRenderer({
                 onClick={() => toggleOption(optVal)}
                 className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 cursor-pointer text-xs font-semibold transition-all select-none ${
                   isSelected
-                    ? 'border-[#10b981] bg-[#033424] text-[#a7f3d0] shadow-sm'
-                    : 'border-[#0e4331] bg-[#021f17] text-slate-200 hover:border-[#10b981]/40 hover:bg-[#03261c]'
+                    ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
+                    : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 <div
                   className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                    isSelected ? 'border-[#10b981] bg-[#10b981]' : 'border-[#0e5c3e] bg-[#032a1f]'
+                    isSelected ? 'border-white bg-white text-slate-900' : 'border-slate-300 bg-white'
                   }`}
                 >
                   {isSelected && (
-                    <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
+                    <svg className="w-3 h-3 text-slate-900" viewBox="0 0 12 12" fill="none">
                       <path
                         d="M2.5 6L4.8 8.5L9.5 3.5"
                         stroke="currentColor"
@@ -179,10 +179,10 @@ function FieldRenderer({
     return (
       <div className="space-y-1.5 py-1">
         <div className="flex justify-between items-center">
-          <label htmlFor={id} className="text-sm font-semibold text-white">
+          <label htmlFor={id} className="text-sm font-semibold text-slate-900">
             {field.label}
           </label>
-          {field.hint && <span className="text-xs text-slate-300">{field.hint}</span>}
+          {field.hint && <span className="text-xs text-slate-500">{field.hint}</span>}
         </div>
         <input
           id={id}
@@ -192,9 +192,9 @@ function FieldRenderer({
           value={value ?? ''}
           placeholder="0"
           onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}
-          className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white placeholder-slate-400 focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/20 text-sm"
+          className="w-full h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-100 text-sm shadow-xs"
         />
-        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+        {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
       </div>
     )
   }
@@ -204,16 +204,16 @@ function FieldRenderer({
     return (
       <div className="space-y-1.5 py-1">
         <div className="flex justify-between items-center">
-          <label htmlFor={id} className="text-sm font-semibold text-white">
+          <label htmlFor={id} className="text-sm font-semibold text-slate-900">
             {field.label}
           </label>
-          {field.hint && <span className="text-xs text-slate-300">{field.hint}</span>}
+          {field.hint && <span className="text-xs text-slate-500">{field.hint}</span>}
         </div>
         <select
           id={id}
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/20 text-sm [&>option]:bg-[#032a1f] [&>option]:text-white"
+          className="w-full h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-100 text-sm shadow-xs [&>option]:bg-white [&>option]:text-slate-900"
         >
           <option value="">Select option...</option>
           {field.options?.map(([optVal, optLabel]) => (
@@ -222,7 +222,7 @@ function FieldRenderer({
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+        {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
       </div>
     )
   }
@@ -231,10 +231,10 @@ function FieldRenderer({
   return (
     <div className="space-y-1.5 py-1">
       <div className="flex justify-between items-center">
-        <label htmlFor={id} className="text-sm font-semibold text-white">
+        <label htmlFor={id} className="text-sm font-semibold text-slate-900">
           {field.label}
         </label>
-        {field.hint && <span className="text-xs text-slate-300">{field.hint}</span>}
+        {field.hint && <span className="text-xs text-slate-500">{field.hint}</span>}
       </div>
       {field.type === 'textarea' ? (
         <textarea
@@ -242,7 +242,7 @@ function FieldRenderer({
           rows={3}
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-3.5 py-2.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white placeholder-slate-400 focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/20 text-sm"
+          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-100 text-sm shadow-xs"
         />
       ) : (
         <input
@@ -250,10 +250,10 @@ function FieldRenderer({
           type="text"
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white placeholder-slate-400 focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/20 text-sm"
+          className="w-full h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-100 text-sm shadow-xs"
         />
       )}
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   )
 }

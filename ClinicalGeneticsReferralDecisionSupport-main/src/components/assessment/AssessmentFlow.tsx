@@ -36,7 +36,7 @@ export default function AssessmentFlow({ pathway, requestSpecialistReviewAction 
     <>
       <Link
         href="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-hx-emerald"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-800 hover:text-slate-950 transition"
       >
         <ArrowLeft size={15} /> All pathways
       </Link>
@@ -150,14 +150,14 @@ function ClinicalAssessment({
 
   return (
     <div className="space-y-5" aria-busy={workflow.busy}>
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#0e4331] bg-[#021f17] p-4 text-white shadow-hx">
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-slate-200 bg-white p-4 text-slate-900 shadow-xs">
         <div className="text-sm">
-          <p className="font-bold text-[#34d399]">
+          <p className="font-bold text-slate-900">
             {record
               ? `${record.syntheticPatientReference || 'Clinical Record'} · ${record.state} · Revision ${record.revision}`
               : `Clinical Decision Support · ${pathway.title}`}
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-500">
             {record
               ? 'Persisted clinical workflow and referral audit record.'
               : 'Deterministic 2-step clinical evaluation. Inputs are evaluated against verified clinical practice guidelines.'}
@@ -170,7 +170,7 @@ function ClinicalAssessment({
             disabled={workflow.busy}
             onClick={() => void workflow.reload()}
           >
-            <RefreshCw size={15} className="text-[#00e5ce]" /> Reload persisted record
+            <RefreshCw size={15} className="text-slate-700" /> Reload persisted record
           </button>
           <a
             href={`/assessment/${pathway.slug}`}
@@ -191,9 +191,9 @@ function ClinicalAssessment({
       {workflow.error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-900/60 bg-red-950/40 p-4 text-sm text-red-200"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900"
         >
-          <p className="font-bold text-red-100">Action not confirmed</p>
+          <p className="font-bold text-red-900">Action not confirmed</p>
           <p className="mt-1">{workflow.error}</p>
           {Object.entries(workflow.fieldErrors).length > 0 && (
             <ul className="mt-2 list-disc pl-5">
@@ -211,14 +211,14 @@ function ClinicalAssessment({
         </div>
       )}
       {workflow.notice && (
-        <p role="status" className="rounded-xl border border-[#0e5c3e] bg-[#033424] p-4 text-sm font-semibold text-[#6ee7b7]">
+        <p role="status" className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-800">
           {workflow.notice}
         </p>
       )}
 
       {workflow.busy && (
-        <p role="status" className="flex items-center gap-2 text-sm text-slate-300">
-          <RefreshCw size={15} className="animate-spin text-[#00e5ce]" /> Waiting for server confirmation…
+        <p role="status" className="flex items-center gap-2 text-sm text-slate-600">
+          <RefreshCw size={15} className="animate-spin text-slate-900" /> Waiting for server confirmation…
         </p>
       )}
 
@@ -264,7 +264,7 @@ function ClinicalAssessment({
       >
         {tab === 0 && (
           <div className="grid lg:grid-cols-3 gap-6 items-start">
-            <div className="lg:col-span-2 rounded-xl border border-[#0e4331] bg-[#021f17] p-6 lg:p-8 text-white shadow-hx">
+            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-6 lg:p-8 text-slate-900 shadow-xs">
               <fieldset disabled={disabled}>
                 <ClinicalHistory
                   slug={pathway.slug}
@@ -280,8 +280,8 @@ function ClinicalAssessment({
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-xl border border-[#0e4331] bg-[#021f17] p-5 text-white shadow-hx space-y-3">
-                <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-[#34d399]">
+              <div className="rounded-xl border border-slate-200 bg-white p-5 text-slate-900 shadow-xs space-y-3">
+                <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-slate-700">
                   Patient MRN / ID
                 </div>
                 <input
@@ -289,15 +289,15 @@ function ClinicalAssessment({
                   placeholder="e.g. MRN-94821 or Patient Name"
                   value={workflow.syntheticReference || ''}
                   onChange={(e) => workflow.changeReference(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-semibold placeholder:text-slate-500 focus:outline-none focus:border-[#10b981]"
+                  className="w-full h-11 px-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:border-slate-900 shadow-xs"
                 />
-                <div className="text-xs text-slate-300 leading-relaxed">
+                <div className="text-xs text-slate-600 leading-relaxed">
                   Linked directly to the clinical encounter for automated brief and PDF generation.
                 </div>
                 {Object.keys(workflow.pedigree).length > 0 && (
-                  <div className="rounded-xl bg-[#033424] border border-[#0e5c3e] p-3 text-xs text-[#a7f3d0]">
-                    <div className="font-bold text-[#34d399]">Pedigree on file</div>
-                    <div className="mt-0.5 text-slate-300">Family history is auto-derived from the pedigree.</div>
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 p-3 text-xs text-slate-800">
+                    <div className="font-bold text-slate-900">Pedigree on file</div>
+                    <div className="mt-0.5 text-slate-600">Family history is auto-derived from the pedigree.</div>
                   </div>
                 )}
               </div>
@@ -348,12 +348,12 @@ function ClinicalAssessment({
                     setTab(1)
                   }}
                   disabled={workflow.busy}
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-[#10b981] via-[#059669] to-[#047857] hover:brightness-110 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
+                  className="w-full h-12 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-white" />
                   <span>{workflow.busy ? 'Evaluating…' : 'Run Decision Support →'}</span>
                 </button>
-                <p className="text-[11px] text-slate-400 leading-relaxed text-center">
+                <p className="text-[11px] text-slate-500 leading-relaxed text-center">
                   Live statutory evaluation · Deterministic Glass-Box clinical rationale.
                 </p>
               </div>
@@ -447,10 +447,10 @@ function ClinicalAssessment({
                     )}
                     {finalizable && (
                       <div className="space-y-4 border-t border-hx-border pt-4">
-                        <label className="flex items-start gap-3 rounded-xl bg-hx-mint p-4 text-sm text-hx-forest">
+                        <label className="flex items-start gap-3 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-800">
                           <input
                             type="checkbox"
-                            className="mt-1 h-4 w-4 accent-hx-emerald"
+                            className="mt-1 h-4 w-4 accent-slate-900"
                             checked={workflow.attest}
                             disabled={workflow.busy}
                             onChange={(event) => workflow.setAttest(event.target.checked)}

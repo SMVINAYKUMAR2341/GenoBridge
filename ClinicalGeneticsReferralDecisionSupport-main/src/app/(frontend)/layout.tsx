@@ -44,13 +44,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const customScripts = makeSiteSettings.customScripts
 
   return (
-    <html lang={language} className="dark">
+    <html lang={language}>
       <head>
         {renderHeadCustomCode(customScripts?.headStart, 'head-start')}
         {renderHeadCustomCode(customScripts?.headEnd, 'head-end')}
       </head>
       <body
-        className={`${manrope.variable} min-h-screen bg-hx-bg text-hx-text antialiased`}
+        className={`${manrope.variable} min-h-screen bg-white text-slate-900 antialiased`}
       >
         <BodyCustomCode html={customScripts?.bodyStart} />
         {addBypassLinks && (
