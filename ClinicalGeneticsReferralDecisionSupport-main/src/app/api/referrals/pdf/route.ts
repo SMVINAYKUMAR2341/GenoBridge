@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { appAuth } from '@/lib/app-auth'
+import fs from 'fs'
+import path from 'path'
 
 const RULE_TITLES: Record<string, string> = {
   cs_consanguinity: 'Consanguineous Partnership Evaluation',
@@ -248,6 +250,54 @@ export async function POST(request: Request) {
     ]
 
     const pdfBuffer = Buffer.from(pdfLines.join('\n'), 'utf-8')
+
+    // Persist document metadata to central repository for audit and unified patient history
+    try {
+      const dataDir = path.resolve(process.cwd(), '.genobridge_data')
+      const reportsDir = path.join(dataDir, 'reports')
+      const metaFile = path.join(dataDir, 'reports_metadata.json')
+      if (!fs.existsSync(reportsDir)) {
+        fs.mkdirSync(reportsDir, { recursive: true })
+      }
+      const safeId = cleanAscii(patientId).replace(/[^a-zA-Z0-9_-]/g, '_')
+      const reportFileName = `Clinical_Brief_${safeId}_${Date.now()}.pdf`
+      const reportFilePath = path.join(reportsDir, reportFileName)
+      fs.writeFileSync(reportFilePath, pdfBuffer)
+
+      let existingMeta: any[] = []
+      if (fs.existsSync(metaFile)) {
+        try {
+          existingMeta = JSON.parse(fs.readFileSync(metaFile, 'utf-8'))
+        } catch {}
+      }
+
+      const reportEntry = {
+        id: `rep_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        patientId: patientId,
+        mrn: data.mrn || patientId,
+        patientName: data.patientName || effectivePhysicianName,
+        fileName: reportFileName,
+        filePath: reportFilePath,
+        fileSize: pdfBuffer.length,
+        generatedAt: new Date().toISOString(),
+        generatedBy: {
+          name: effectivePhysicianName,
+          role: user.role || 'Doctor',
+        },
+        recordVersion: 1,
+        lastUpdatedTimestamp: new Date().toISOString(),
+        summary: {
+          pathway: pathway,
+          riskLevel: riskLabel,
+          ruleMatched: ruleTitle,
+        },
+      }
+
+      existingMeta.unshift(reportEntry)
+      fs.writeFileSync(metaFile, JSON.stringify(existingMeta, null, 2), 'utf-8')
+    } catch (saveMetaErr) {
+      console.warn('Could not record referral report metadata:', saveMetaErr)
+    }
 
     return new NextResponse(pdfBuffer, {
       status: 200,

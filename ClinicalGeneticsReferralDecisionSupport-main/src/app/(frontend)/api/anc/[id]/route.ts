@@ -8,6 +8,7 @@ import {
 } from '@/lib/anc-store'
 import { getPatientReports } from '@/lib/anc-report-generator'
 import { parseRoutineAnc } from '@/lib/anc-model'
+import { syncAndPersistAncPedigree } from '@/lib/anc-pedigree-sync'
 
 /**
  * SINGLE PATIENT ANC RECORD API
@@ -81,6 +82,13 @@ export async function PUT(request: Request, context: RouteContext) {
       return NextResponse.json({ error: result.message }, { status: 404 })
     }
 
+    // Auto-sync pedigree and patient in database
+    try {
+      await syncAndPersistAncPedigree(result.data, user.id)
+    } catch (pedErr) {
+      console.warn('Could not auto-sync pedigree:', pedErr)
+    }
+
     return NextResponse.json({
       success: true,
       data: result.data,
@@ -110,6 +118,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     const result = await updateAncRecord(id, updates, actor)
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 404 })
+    }
+
+    // Auto-sync pedigree and patient in database
+    try {
+      await syncAndPersistAncPedigree(result.data, user.id)
+    } catch (pedErr) {
+      console.warn('Could not auto-sync pedigree on patch:', pedErr)
     }
 
     return NextResponse.json({

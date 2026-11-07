@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { appAuth } from '@/lib/app-auth'
-import WorkspaceHistory from '@/components/clinical/WorkspaceHistory'
+import PatientHistoryClient from '@/components/history/PatientHistoryClient'
 
 export default async function HistoryPage() {
   const user = await appAuth.currentSessionUser()
@@ -17,6 +17,6 @@ export default async function HistoryPage() {
     redirect('/account-pending')
   }
 
-  return <WorkspaceHistory view="history" />
+  return <PatientHistoryClient />
 }
 
