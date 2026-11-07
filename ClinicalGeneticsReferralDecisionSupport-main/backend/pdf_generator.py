@@ -131,3 +131,4 @@ def generate_clinical_pdf(
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
+

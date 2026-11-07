@@ -24,7 +24,7 @@ import { ClinicalHistory } from './ClinicalHistory'
 import { WorkflowResult, OUTCOME_LABELS } from './WorkflowResult'
 import { canFinalizeWorkflow } from './workflow-result-model'
 import { useAssessmentWorkflow, type SpecialistReviewAction } from './useAssessmentWorkflow'
-import { evaluatePathway, type DecisionResult } from '@/lib/decision-engine'
+import { evaluatePathway, buildConcatenatedFeatures, type DecisionResult } from '@/lib/decision-engine'
 
 const TABS = ['Clinical history', 'Pedigree', 'Routine ANC', 'Result']
 type Props = { pathway: Pathway; requestSpecialistReviewAction?: SpecialistReviewAction }
@@ -323,7 +323,25 @@ function ClinicalAssessment({
                   type="button"
                   data-testid="run-assessment-btn"
                   onClick={async () => {
+                    const features = buildConcatenatedFeatures(pathway.slug, workflow.inputs)
                     const evaluated = evaluatePathway(pathway.slug, workflow.inputs)
+                    try {
+                      const res = await fetch('/api/evaluate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pathway: pathway.slug, features, inputs: workflow.inputs }),
+                      })
+                      if (res.ok) {
+                        const data = await res.json()
+                        if (data.match_confidence) evaluated.confidence_score = Number(data.match_confidence) / 100
+                        if (data.recommended_action && evaluated.outcome !== 'no_referral') {
+                          evaluated.explanation = data.recommended_action
+                        }
+                        if (data.guideline_source && evaluated.guideline_citations) {
+                          evaluated.guideline_citations = [data.guideline_source, ...evaluated.guideline_citations]
+                        }
+                      }
+                    } catch {}
                     setEvaluationResult(evaluated)
                     try {
                       if (workflow.editable) {

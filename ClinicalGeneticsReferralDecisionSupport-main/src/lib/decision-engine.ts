@@ -597,6 +597,79 @@ function normalizeArray(val: unknown): string[] {
 }
 
 /** Normalizes raw intake / legacy form inputs to canonical keys */
+export function buildConcatenatedFeatures(pathway: string, inputs: Record<string, unknown>): string {
+  const norm = normalizeInputs(pathway, inputs)
+  const tokens: string[] = []
+
+  switch (pathway) {
+    case 'preconception-carrier-screening':
+    case 'carrier_screening': {
+      if (norm.consanguinity) tokens.push('consanguinity: true (consanguineous partnership)')
+      if (norm.both_partners_same_carrier) tokens.push('both_partners_same_carrier: true (25% autosomal recessive risk)')
+      if (norm.one_partner_carrier) tokens.push('one_partner_carrier: true')
+      if (Array.isArray(norm.reported_ancestries) && norm.reported_ancestries.length > 0) {
+        tokens.push(`reported_ancestries: ${norm.reported_ancestries.join(', ')}`)
+      } else if (Array.isArray(norm.ancestries) && norm.ancestries.length > 0) {
+        tokens.push(`reported_ancestries: ${norm.ancestries.join(', ')}`)
+      }
+      break
+    }
+    case 'nipt-results':
+    case 'nipt_results': {
+      if (norm.result_type) tokens.push(`result_type: ${norm.result_type}`)
+      if (norm.fetal_fraction_percentage !== undefined) tokens.push(`fetal_fraction_percentage: ${norm.fetal_fraction_percentage}%`)
+      else if (norm.fetal_fraction !== undefined) tokens.push(`fetal_fraction_percentage: ${norm.fetal_fraction}%`)
+      if (norm.no_call_flag || norm.no_call) tokens.push('no_call_flag: true (low fetal fraction or uninformative assay)')
+      if (norm.discordant_with_ultrasound) tokens.push('discordant_with_ultrasound: true')
+      break
+    }
+    case 'abnormal-ultrasound-findings':
+    case 'abnormal_ultrasound': {
+      if (norm.gestational_age_weeks) tokens.push(`gestational_age_weeks: ${norm.gestational_age_weeks}`)
+      if (norm.nuchal_translucency_mm) tokens.push(`nuchal_translucency_mm: ${norm.nuchal_translucency_mm}`)
+      if (norm.major_structural_anomaly || norm.structural_anomaly) tokens.push('major_structural_anomaly: true (identified on anatomy scan)')
+      if (Array.isArray(norm.soft_markers_array) && norm.soft_markers_array.length > 0) {
+        tokens.push(`soft_markers_array: ${norm.soft_markers_array.join(', ')}`)
+      } else if (Array.isArray(norm.soft_markers) && norm.soft_markers.length > 0) {
+        tokens.push(`soft_markers_array: ${norm.soft_markers.join(', ')}`)
+      }
+      break
+    }
+    case 'infertility-recurrent-pregnancy-loss':
+    case 'infertility_rpl': {
+      const losses = norm.clinically_recognized_losses ?? norm.pregnancy_loss_count
+      if (losses !== undefined) tokens.push(`clinically_recognized_losses: ${losses}`)
+      if (norm.known_parental_karyotype_abnormality || norm.parental_karyotype_abnormal) {
+        tokens.push('known_parental_karyotype_abnormality: true (balanced reciprocal or Robertsonian translocation)')
+      }
+      if (norm.primary_ovarian_insufficiency_under_40 || norm.primary_ovarian_insufficiency) {
+        tokens.push('primary_ovarian_insufficiency_under_40: true')
+      }
+      break
+    }
+    case 'positive-family-history':
+    case 'family_history': {
+      if (norm.condition_omim_id) tokens.push(`condition_omim_id: ${norm.condition_omim_id}`)
+      if (norm.closest_affected_degree) tokens.push(`closest_affected_degree: ${norm.closest_affected_degree}`)
+      if (norm.reproductive_planning_status || norm.reproductive_planning) {
+        tokens.push('reproductive_planning_status: true (actively planning or pregnant)')
+      }
+      if (norm.multiple_affected) tokens.push('multiple_affected_relatives: true')
+      break
+    }
+    default: {
+      if (norm.personal_breast_cancer_age) tokens.push(`personal_breast_cancer_age: ${norm.personal_breast_cancer_age}`)
+      if (norm.personal_ovarian_cancer) tokens.push('personal_ovarian_cancer: true')
+      if (norm.ashkenazi_ancestry) tokens.push('ashkenazi_ancestry: true')
+      if (norm.family_breast_cancer_first_degree_count) tokens.push(`family_breast_cancer_first_degree_count: ${norm.family_breast_cancer_first_degree_count}`)
+      if (norm.family_colon_cancer_count) tokens.push(`family_colon_cancer_count: ${norm.family_colon_cancer_count}`)
+      break
+    }
+  }
+
+  return tokens.length > 0 ? tokens.join('; ') : 'routine baseline non-elevated parameters'
+}
+
 export function normalizeInputs(pathwayId: string, raw: Record<string, unknown>): Record<string, unknown> {
   const norm: Record<string, unknown> = { ...raw }
 

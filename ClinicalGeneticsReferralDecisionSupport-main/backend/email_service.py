@@ -80,3 +80,4 @@ def send_clinical_brief_email(
     except Exception as exc:
         logger.error(f"Failed to dispatch clinical email: {str(exc)}", exc_info=True)
         return False
+

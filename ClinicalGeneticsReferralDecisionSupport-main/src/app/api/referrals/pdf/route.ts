@@ -100,3 +100,4 @@ export async function POST(request: Request) {
 function escapePdf(str: string): string {
   return str.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 }
+
