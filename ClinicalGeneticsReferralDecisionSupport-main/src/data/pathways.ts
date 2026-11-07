@@ -62,6 +62,9 @@ const catalog: Omit<Pathway, 'fields'>[] = [
 ]
 export const PATHWAYS: Pathway[] = catalog.map((pathway) => ({
   ...pathway,
-  fields: CLINICAL_INTAKE_FIELDS[pathway.slug].map((field) => ({ ...field, name: field.key })),
+  fields: (CLINICAL_INTAKE_FIELDS[pathway.slug] ?? []).map((field) => {
+    const { showIf, ...serializable } = field
+    return { ...serializable, name: field.key }
+  }),
 }))
 export const pathwayBySlug = (slug: string) => PATHWAYS.find((pathway) => pathway.slug === slug)

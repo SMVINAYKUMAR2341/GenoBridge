@@ -15,6 +15,7 @@ export type InputField = {
   step?: number
   min?: number
   default?: number | string | boolean
+  dependsOn?: string
   showIf?: (inputs: StructuredFormState) => boolean
 }
 
@@ -248,7 +249,7 @@ export const CLINICAL_INTAKE_FIELDS: Record<string, InputField[]> = {
       key: 'personal_breast_cancer_age',
       label: 'Age at breast cancer diagnosis (if any)',
       type: 'number',
-      showIf: (v) => Boolean(v.personal_breast_cancer),
+      dependsOn: 'personal_breast_cancer',
     },
     {
       key: 'personal_ovarian_cancer',
@@ -456,7 +457,9 @@ export function parseClinicalInputs(slug: string, input: unknown): StructuredFor
 }
 
 export function visibleIntakeFields(slug: string, inputs: StructuredFormState): InputField[] {
-  return (CLINICAL_INTAKE_FIELDS[slug] ?? []).filter(
-    (f) => !f.showIf || f.showIf(inputs),
-  )
+  return (CLINICAL_INTAKE_FIELDS[slug] ?? []).filter((f) => {
+    if (f.dependsOn && !Boolean(inputs[f.dependsOn])) return false
+    if (f.showIf && !f.showIf(inputs)) return false
+    return true
+  })
 }
