@@ -26,7 +26,7 @@ import { canFinalizeWorkflow } from './workflow-result-model'
 import { useAssessmentWorkflow, type SpecialistReviewAction } from './useAssessmentWorkflow'
 import { evaluatePathway, buildConcatenatedFeatures, type DecisionResult } from '@/lib/decision-engine'
 
-const TABS = ['1. Clinical Intake & Parameters', '2. Referral Decision & Clinical Report']
+const TABS = ['Clinical Intake & Parameters', 'Referral Decision & Clinical Report']
 type Props = { pathway: Pathway; requestSpecialistReviewAction?: SpecialistReviewAction }
 
 export default function AssessmentFlow({ pathway, requestSpecialistReviewAction }: Props) {
