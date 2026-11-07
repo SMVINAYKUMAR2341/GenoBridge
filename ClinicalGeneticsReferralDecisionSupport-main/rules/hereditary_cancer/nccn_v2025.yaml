@@ -1,0 +1,137 @@
+module: hereditary_cancer
+source_guideline: "NCCN Clinical Practice Guidelines in Oncology: Genetic/Familial High-Risk Assessment"
+version: "v.1.2025"
+ruleset_id: nccn_hereditary_cancer_2025
+rules:
+  - id: hc_personal_breast_young
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-BR-1: Breast Cancer Diagnosed <= 50 Years"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      any:
+        - field: personal_breast_cancer_age
+          operator: "<="
+          value: 50
+    outputs:
+      tier: URGENT
+      reason_text: "Personal diagnosis of breast cancer at or below age 50 meets NCCN high-risk germline genetic testing criteria (BRCA1, BRCA2, PALB2, TP53, PTEN, CDH1)."
+      next_steps_non_treatment: "Refer to Cancer Genetic Counselor for multi-gene germline panel testing discussion prior to definitive surgical and therapeutic decisions."
+    time_critical_window: "Immediate prior to definitive surgical decision (lumpectomy vs bilateral mastectomy)"
+
+  - id: hc_ovarian_any_age
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-OV-1: Epithelial Ovarian / Fallopian Tube Cancer"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      any:
+        - field: personal_ovarian_cancer
+          operator: "=="
+          value: true
+        - field: first_degree_ovarian_cancer
+          operator: "=="
+          value: true
+    outputs:
+      tier: URGENT
+      reason_text: "Personal or first-degree relative history of epithelial ovarian, fallopian tube, or primary peritoneal cancer at any age mandates genetic evaluation."
+      next_steps_non_treatment: "Refer to Medical Geneticist / Cancer Genetic Counselor for comprehensive germline and somatic homologous recombination repair (HRR) testing."
+    time_critical_window: "Within 72 hours for therapeutic PARP inhibitor eligibility stratification"
+
+  - id: hc_triple_negative_young
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-TNBC-1: Triple-Negative Breast Cancer <= 65 Years"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      all:
+        - field: triple_negative_breast
+          operator: "=="
+          value: true
+        - field: personal_breast_cancer_age
+          operator: "<="
+          value: 65
+    outputs:
+      tier: URGENT
+      reason_text: "Triple-negative breast cancer (ER-, PR-, HER2-) diagnosed at age <=65 years meets statutory NCCN criteria for BRCA1/2 germline evaluation."
+      next_steps_non_treatment: "Expedited Cancer Genetics referral for germline testing to guide systemic therapy and bilateral risk reduction."
+    time_critical_window: "Within 72 hours for surgical planning"
+
+  - id: hc_male_breast_cancer
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-MBC-1: Male Breast Cancer at Any Age"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      any:
+        - field: personal_male_breast_cancer
+          operator: "=="
+          value: true
+        - field: family_male_breast_cancer
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Personal or family history of male breast cancer at any age has high pre-test probability of BRCA2/BRCA1 or PALB2 pathogenic variants."
+      next_steps_non_treatment: "Refer for genetic counseling, germline BRCA2-focused panel, and cascade family testing."
+
+  - id: hc_known_familial_variant
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-PV-1: Known Pathogenic Germline Variant in Family"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      any:
+        - field: known_familial_pathogenic_variant
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Known pathogenic or likely pathogenic variant in a cancer susceptibility gene in a biological relative warrants targeted single-site cascade testing."
+      next_steps_non_treatment: "Obtain copy of relative's genetic test report and schedule pre-test genetic counseling for targeted variant testing."
+
+  - id: hc_multiple_relatives_breast_colorectal
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-FAM-2: Multiple Close Relatives with Cancer"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      any:
+        - field: family_breast_cancer_count
+          operator: ">="
+          value: 2
+        - field: family_colorectal_cancer_count
+          operator: ">="
+          value: 2
+    outputs:
+      tier: ROUTINE
+      reason_text: "Two or more close relatives with breast or colorectal cancer meeting familial clustering thresholds."
+      next_steps_non_treatment: "Schedule routine cancer genetics assessment, formal 3-generation pedigree risk modeling, and age-appropriate surveillance protocol."
+
+  - id: hc_no_criteria_met
+    module: hereditary_cancer
+    source_guideline: NCCN
+    version: "v.1.2025"
+    section: "CRIT-GEN-0: Standard Population Cancer Risk"
+    citation_url: "https://www.nccn.org/professionals/physician_gls/pdf/genetics_bop.pdf"
+    conditions:
+      all:
+        - field: personal_breast_cancer_age
+          operator: "not_present_or_gt"
+          value: 50
+        - field: personal_ovarian_cancer
+          operator: "=="
+          value: false
+        - field: known_familial_pathogenic_variant
+          operator: "=="
+          value: false
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "No personal or familial cancer history meeting current NCCN germline genetic testing thresholds."
+      next_steps_non_treatment: "Reassure patient; recommend standard population-based cancer screening (age 40+ annual/biennial mammography, age 45+ colonoscopy). Reassess if family history changes."

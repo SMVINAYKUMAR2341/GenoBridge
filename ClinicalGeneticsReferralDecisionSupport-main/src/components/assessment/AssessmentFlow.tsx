@@ -329,7 +329,7 @@ function ClinicalAssessment({
                     setEvaluationResult(evaluated)
                     try {
                       if (workflow.editable) {
-                        await workflow.saveDraft().catch(() => { })
+                        await workflow.save().catch(() => { })
                       }
                     } catch { }
                     setTab(1)

@@ -22,6 +22,7 @@ export type PathwaySlug =
   | 'family_history'
 
 export type UrgencyTier = 'no_referral' | 'borderline' | 'routine' | 'urgent'
+export type StandardTier = 'URGENT' | 'PRIORITY' | 'ROUTINE' | 'COUNSEL_AND_REASSESS' | 'INSUFFICIENT_DATA'
 export type PrimaryDecision = 'urgent_referral' | 'routine_referral' | 'no_referral_needed'
 export type SafeguardDecision =
   | 'borderline_consideration'
@@ -40,11 +41,60 @@ export interface MatchedCriterion {
   threshold?: number | null
 }
 
+export interface FiredRule {
+  id: string
+  rule_key: string
+  label: string
+  description: string
+  tier: StandardTier
+  triggering_parameters: Record<string, unknown>
+  guideline_source: string
+  guideline_version?: string
+  guideline_section?: string
+  citation: string
+  citation_url?: string
+  next_steps_non_treatment: string
+  time_critical_window?: string
+}
+
+export interface MissingInputGap {
+  rule_id: string
+  rule_label: string
+  potential_tier: StandardTier
+  missing_fields: string[]
+  guideline_citation: string
+}
+
+export interface Counterfactual {
+  factor: string
+  current_value: string
+  alternate_value: string
+  resulting_tier: StandardTier
+  explanation: string
+}
+
+export interface TimeCriticalContext {
+  gestational_age_weeks?: number
+  is_pregnant: boolean
+  days_to_cvs_deadline?: number
+  days_to_amnio_window?: number
+  days_to_mtp_20w_limit?: number
+  days_to_mtp_24w_limit?: number
+  urgency_deadline?: string
+  mtp_notice?: string
+  pcpndt_notice?: string
+}
+
 export interface DecisionResult {
   outcome: UrgencyTier
   clinical_decision: ClinicalDecision
+  tier: StandardTier
   referral_target: string
   matched_criteria: MatchedCriterion[]
+  fired_rules: FiredRule[]
+  not_fired_rules_with_missing_inputs: MissingInputGap[]
+  counterfactuals: Counterfactual[]
+  time_critical_context?: TimeCriticalContext
   explanation: string
   guideline_citations: string[]
   pathway_id: string
@@ -53,6 +103,8 @@ export interface DecisionResult {
   cpt_codes?: string[]
   icd10_codes?: string[]
   counseling_points?: string[]
+  patient_summary_en?: string
+  patient_summary_hi?: string
 }
 
 export const URGENCY_RANK: Record<UrgencyTier, number> = {
@@ -883,35 +935,390 @@ const COUNSELING_POINTS_MAP: Record<string, string[]> = {
   ],
 }
 
-function _pickHighest(matches: MatchedCriterion[], pathwayId: string): DecisionResult {
+export function computeTimeCriticalContext(
+  pathwayId: string,
+  inputs: Record<string, unknown>,
+): TimeCriticalContext {
+  const isPrenatal = [
+    'nipt_results',
+    'abnormal_ultrasound',
+    'carrier_screening',
+    'nipt-results',
+    'abnormal-ultrasound-findings',
+    'preconception-carrier-screening',
+  ].includes(pathwayId)
+  const gaRaw =
+    inputs.gestational_age ??
+    inputs.gestational_age_weeks ??
+    inputs.ga_weeks ??
+    inputs.ga ??
+    inputs.aufGestationalAgeWeeks ??
+    inputs.niptGestationalAge
+  const ga = typeof gaRaw === 'number' ? gaRaw : parseFloat(String(gaRaw || ''))
+  const isPregnant = Boolean(inputs.pregnant || inputs.is_pregnant || (!isNaN(ga) && ga > 0))
+
+  const ctx: TimeCriticalContext = {
+    is_pregnant: isPregnant,
+    pcpndt_notice: isPrenatal
+      ? 'STATUTORY COMPLIANCE: PRE-CONCEPTION & PRE-NATAL DIAGNOSTIC TECHNIQUES (PC&PNDT) ACT, 1994 — Pre-natal determination and disclosure of the sex of the fetus is strictly prohibited by law. GenoBridge strictly enforces PC&PNDT compliance; fetal sex is never determined, stored, or revealed.'
+      : undefined,
+  }
+
+  if (isPregnant && !isNaN(ga) && ga > 0) {
+    ctx.gestational_age_weeks = ga
+    const currentDays = Math.round(ga * 7)
+    const cvsMaxDays = 14 * 7 - 1 // 13w6d = 97 days
+    const amnioMinDays = 15 * 7 // 15w0d = 105 days
+    const mtp20wDays = 20 * 7 // 140 days
+    const mtp24wDays = 24 * 7 // 168 days
+
+    ctx.days_to_cvs_deadline = Math.max(0, cvsMaxDays - currentDays)
+    ctx.days_to_amnio_window = Math.max(0, amnioMinDays - currentDays)
+    ctx.days_to_mtp_20w_limit = Math.max(0, mtp20wDays - currentDays)
+    ctx.days_to_mtp_24w_limit = Math.max(0, mtp24wDays - currentDays)
+
+    if (ga < 14) {
+      ctx.urgency_deadline = `CVS diagnostic window closing: ${ctx.days_to_cvs_deadline} days remaining (13w6d limit).`
+    } else if (ga <= 24) {
+      ctx.urgency_deadline = `MTP Act (2021) legal benchmark: ${ctx.days_to_mtp_24w_limit} days remaining before 24-week statutory threshold.`
+    } else {
+      ctx.urgency_deadline = `Gestational Age > 24 weeks. State Medical Board approval mandatory under Section 3(2B) MTP Act (2021) for severe fetal abnormalities.`
+    }
+
+    ctx.mtp_notice = `MTP Act (2021) Clinical Benchmark: Gestational age is ${ga.toFixed(1)} weeks. Statutory limits: 20 weeks (opinion of 1 RMP), 24 weeks for defined categories / fetal abnormalities (2 RMPs / Medical Board). Beyond 24 weeks requires Medical Board review.`
+  }
+
+  return ctx
+}
+
+export function computeCounterfactuals(
+  pathwayId: string,
+  inputs: Record<string, unknown>,
+  tier: StandardTier,
+): Counterfactual[] {
+  const list: Counterfactual[] = []
+  if (pathwayId.includes('cancer')) {
+    if (tier === 'URGENT' || tier === 'PRIORITY') {
+      list.push({
+        factor: 'Personal breast cancer diagnosis age',
+        current_value: inputs.personal_breast_cancer_age
+          ? `<= 50 (${inputs.personal_breast_cancer_age}y)`
+          : 'Reported early-onset',
+        alternate_value: 'Diagnosis age > 50 with no high-risk histology',
+        resulting_tier: 'ROUTINE',
+        explanation:
+          'If age of onset exceeded 50 years without high-risk histology or family clustering, NCCN testing criteria would fall to standard routine population risk.',
+      })
+      list.push({
+        factor: 'Known familial mutation in BRCA1/2, PALB2, or Lynch gene',
+        current_value: inputs.known_familial_mutation ? 'Present' : 'Not recorded',
+        alternate_value: 'Absent (tested negative in relative)',
+        resulting_tier: 'COUNSEL_AND_REASSESS',
+        explanation:
+          'Absence of known familial pathogenic variants and early-onset disease reduces referral priority to routine surveillance.',
+      })
+    }
+  } else if (pathwayId.includes('carrier')) {
+    if (inputs.consanguinity || inputs.pcsConsanguinity) {
+      list.push({
+        factor: 'Consanguineous partnership',
+        current_value: 'Present (second-degree cousin or closer)',
+        alternate_value: 'Non-consanguineous union',
+        resulting_tier: 'ROUTINE',
+        explanation:
+          'If consanguinity were absent, homozygous autosomal recessive risk decreases significantly; tier would become Routine carrier screening.',
+      })
+    }
+    if (inputs.both_partners_same_carrier || inputs.pcsPartnerStatus === 'concordant_positive') {
+      list.push({
+        factor: 'Dual carrier status for identical condition',
+        current_value: 'Both partners confirmed carriers (25% fetal recurrence)',
+        alternate_value: 'Only one partner is a carrier',
+        resulting_tier: 'ROUTINE',
+        explanation:
+          'If the partner is non-carrier, risk of affected pregnancy drops to near-zero; invasive prenatal diagnosis is not required.',
+      })
+    }
+  } else if (pathwayId.includes('nipt')) {
+    if (tier === 'URGENT') {
+      list.push({
+        factor: 'Cell-free DNA screening risk finding',
+        current_value: 'High-risk cfDNA aneuploidy finding',
+        alternate_value: 'Low-risk cfDNA result',
+        resulting_tier: 'COUNSEL_AND_REASSESS',
+        explanation:
+          'If cfDNA were low-risk without ultrasound discordance, referral would not be indicated; patient would receive standard obstetric monitoring.',
+      })
+    }
+  } else if (pathwayId.includes('ultrasound')) {
+    if (inputs.cystic_hygroma || inputs.fetal_hydrops || inputs.major_structural_anomaly) {
+      list.push({
+        factor: 'Major structural defect or cystic hygroma',
+        current_value: 'Present on ultrasound scan',
+        alternate_value: 'Absent (isolated minor finding only)',
+        resulting_tier: 'COUNSEL_AND_REASSESS',
+        explanation:
+          'If structural malformations and hydrops were absent, urgency would reduce from Urgent to Routine or Counsel & Reassess.',
+      })
+    }
+  } else if (pathwayId.includes('infertility') || pathwayId.includes('rpl')) {
+    const losses = Number(
+      inputs.recurrent_losses_count ||
+        inputs.pregnancy_loss_count ||
+        inputs.irplLossesCount ||
+        0,
+    )
+    if (losses >= 2) {
+      list.push({
+        factor: 'Recurrent pregnancy loss count',
+        current_value: `${losses} documented clinical losses`,
+        alternate_value: '< 2 pregnancy losses',
+        resulting_tier: 'COUNSEL_AND_REASSESS',
+        explanation:
+          'If loss count were less than 2, ASRM diagnostic criteria for RPL workup would not be met; standard obstetrical reassurance indicated.',
+      })
+    }
+  } else if (pathwayId.includes('family')) {
+    if (inputs.known_familial_variant || inputs.known_familial_mutation) {
+      list.push({
+        factor: 'Documented pathogenic familial variant',
+        current_value: 'Present in relative',
+        alternate_value: 'No known familial pathogenic mutation',
+        resulting_tier: 'ROUTINE',
+        explanation:
+          'In the absence of a verified familial pathogenic variant, single-site cascade testing is not applicable; tier would be Routine surveillance.',
+      })
+    }
+  }
+  return list
+}
+
+export function computeMissingGaps(
+  pathwayId: string,
+  inputs: Record<string, unknown>,
+): MissingInputGap[] {
+  const gaps: MissingInputGap[] = []
+  if (pathwayId.includes('cancer')) {
+    if (
+      inputs.known_familial_mutation === undefined &&
+      inputs.hcrKnownFamilialMutation === undefined
+    ) {
+      gaps.push({
+        rule_id: 'hc_known_familial_variant',
+        rule_label: 'Known Familial Pathogenic Variant Status',
+        potential_tier: 'PRIORITY',
+        missing_fields: ['known_familial_mutation'],
+        guideline_citation:
+          'NCCN Genetics: Relatives with known pathogenic mutation (BRCA1/2, PALB2, Lynch)',
+      })
+    }
+  } else if (pathwayId.includes('carrier')) {
+    if (inputs.partner_tested === undefined && inputs.pcsPartnerStatus === undefined) {
+      gaps.push({
+        rule_id: 'cs_both_carriers_same_gene',
+        rule_label: 'Partner Carrier Testing Status',
+        potential_tier: 'URGENT',
+        missing_fields: ['partner_tested', 'both_partners_same_carrier'],
+        guideline_citation:
+          'ACOG CO 691 / FOGSI: Partner testing is mandatory when maternal carrier identified',
+      })
+    }
+  } else if (pathwayId.includes('nipt')) {
+    if (inputs.fetal_fraction === undefined && inputs.niptFetalFraction === undefined) {
+      gaps.push({
+        rule_id: 'nipt_low_fetal_fraction',
+        rule_label: 'Fetal Fraction (%) Percentage',
+        potential_tier: 'PRIORITY',
+        missing_fields: ['fetal_fraction'],
+        guideline_citation:
+          'ACOG PB 226: Fetal fraction <4% carries increased aneuploidy / triploidy risk',
+      })
+    }
+  } else if (pathwayId.includes('ultrasound')) {
+    if (
+      inputs.nuchal_translucency_mm === undefined &&
+      inputs.aufNuchalTranslucencyMm === undefined
+    ) {
+      gaps.push({
+        rule_id: 'us_increased_nt',
+        rule_label: 'Nuchal Translucency (NT in mm)',
+        potential_tier: 'PRIORITY',
+        missing_fields: ['nuchal_translucency_mm'],
+        guideline_citation:
+          'ISUOG / FMF: NT >= 3.0 mm is primary indication for diagnostic karyotype/CMA',
+      })
+    }
+  } else if (pathwayId.includes('infertility') || pathwayId.includes('rpl')) {
+    if (
+      inputs.parental_karyotype_abnormal === undefined &&
+      inputs.irplPriorKaryotypeAbnormal === undefined
+    ) {
+      gaps.push({
+        rule_id: 'rpl_parental_karyotype_abnormal',
+        rule_label: 'Parental Peripheral Blood Karyotype Results',
+        potential_tier: 'PRIORITY',
+        missing_fields: ['parental_karyotype_abnormal'],
+        guideline_citation:
+          'ASRM RPL Guidelines: 3-5% of couples with RPL carry a balanced reciprocal translocation',
+      })
+    }
+  } else if (pathwayId.includes('family')) {
+    if (inputs.sudden_cardiac_death_under_40 === undefined) {
+      gaps.push({
+        rule_id: 'fh_sudden_unexplained_cardiac_death',
+        rule_label: 'Family History of Sudden Premature Death (<40y)',
+        potential_tier: 'PRIORITY',
+        missing_fields: ['sudden_cardiac_death_under_40'],
+        guideline_citation:
+          'HRS / ACMG: Sudden unexpected death <40 indicates inherited channelopathy/cardiomyopathy',
+      })
+    }
+  }
+  return gaps
+}
+
+export function generateBilingualPatientSummary(
+  pathwayId: string,
+  tier: StandardTier,
+  referralTarget: string,
+  firedRules: FiredRule[],
+): { summary_en: string; summary_hi: string } {
+  const reasonTextEn =
+    firedRules.length > 0
+      ? firedRules.map((r) => r.label).join(', ')
+      : 'Standard routine clinical health evaluation'
+
+  const summary_en = `### Patient Guidance Note (Doctor Review Required)
+**Why this referral is suggested:**
+Your doctor has recommended a consultation with a ${referralTarget} based on verified clinical practice guidelines regarding: ${reasonTextEn}. This is not a diagnosis of disease, but a specialist appointment to discuss testing choices and care options for you and your family.
+
+**What to bring to your consultation:**
+- All prior blood test reports, ultrasound scan images, and laboratory summaries.
+- Family health background details (any illnesses, ages of diagnoses, or prior test reports in blood relatives).
+- A written list of your questions and any current medications.
+
+**Questions you can ask your specialist:**
+1. What does this guideline referral mean for me or my pregnancy?
+2. What further tests are available, and what are their benefits and limitations?
+3. What steps can we take to protect our family's health?
+
+**What to expect during the visit:**
+The genetics specialist will review your personal and family medical history in a friendly, confidential setting. They will explain available options clearly so that you can make informed decisions in your own time.`
+
+  const summary_hi = `### रोगी सूचना एवं मार्गदर्शन पत्र (चिकित्सक समीक्षा आवश्यक)
+**विशेषज्ञ परामर्श का कारण:**
+आपके चिकित्सक ने क्लिनिकल दिशा-निर्देशों के आधार पर ${referralTarget} से परामर्श की अनुशंसा की है (${reasonTextEn})। यह किसी बीमारी का अंतिम निदान नहीं है, बल्कि आपके और आपके परिवार के स्वास्थ्य के लिए सर्वोत्तम जांच व देखभाल विकल्पों पर चर्चा हेतु एक मार्गदर्शक परामर्श है।
+
+**परामर्श में क्या साथ लाएं:**
+- पूर्व के सभी अल्ट्रासाउंड स्कैन, रक्त जांच और प्रयोगशाला रिपोर्ट।
+- परिवार के स्वास्थ्य का विवरण (रक्त संबंधियों में हुई बीमारियां और उनकी आयु)।
+- अपने प्रश्नों की सूची और वर्तमान में ली जा रही दवाओं के विवरण।
+
+**परामर्शदाता से पूछे जाने वाले मुख्य प्रश्न:**
+1. इस परामर्श का मेरे या मेरे गर्भस्थ शिशु के स्वास्थ्य के लिए क्या महत्व है?
+2. आगे कौन-सी जांचें उपलब्ध हैं और उनके क्या लाभ हैं?
+3. परिवार के भविष्य के स्वास्थ्य हेतु हम क्या कदम उठा सकते हैं?
+
+**परामर्श सत्र में क्या होगा:**
+आनुवंशिक विशेषज्ञ (जेनेटिक काउंसलर) पूरी गोपनीयता और संवेदनशीलता के साथ आपकी स्वास्थ्य पृष्ठभूमि को समझेंगे। वे सभी उपलब्ध विकल्पों को सरल भाषा में स्पष्ट करेंगे ताकि आप सोच-समझकर निर्णय ले सकें।`
+
+  return { summary_en, summary_hi }
+}
+
+function _pickHighest(
+  matches: MatchedCriterion[],
+  pathwayId: string,
+  input: Record<string, unknown> = {},
+): DecisionResult {
+  const timeCtx = computeTimeCriticalContext(pathwayId, input)
+  const gaps = computeMissingGaps(pathwayId, input)
+
   if (!matches || matches.length === 0) {
+    const isBlank = Object.keys(input).length === 0 || Object.values(input).every((v) => v === '' || v === null || v === undefined || v === false)
+    const tier: StandardTier = isBlank ? 'INSUFFICIENT_DATA' : 'COUNSEL_AND_REASSESS'
+    const target = 'Routine Obstetric & Primary Healthcare'
+    const { summary_en, summary_hi } = generateBilingualPatientSummary(pathwayId, tier, target, [])
+
     return {
       outcome: 'no_referral',
       clinical_decision: 'no_referral_needed',
-      referral_target: 'None',
+      tier,
+      referral_target: target,
       matched_criteria: [],
-      explanation: 'No referral criteria met under current FOGSI, ACOG, ACMG, ASRM, or NCCN clinical standards. Routine prenatal / obstetric care recommended.',
-      guideline_citations: [],
+      fired_rules: [],
+      not_fired_rules_with_missing_inputs: gaps,
+      counterfactuals: [],
+      time_critical_context: timeCtx,
+      explanation:
+        'No referral criteria met under current FOGSI, ACOG, ACMG, ASRM, or NCCN clinical standards. Routine prenatal / obstetric care recommended.',
+      guideline_citations: [
+        'ACOG / NCCN / ACMG / ASRM / FOGSI Clinical Practice Guidelines (2024–2025)',
+      ],
       pathway_id: pathwayId,
       confidence_score: 0.99,
       matched_rule_id: 'STD-CARE-00',
       cpt_codes: ['99213'],
       icd10_codes: ['Z34.90'],
       counseling_points: ['Patient is eligible for standard routine monitoring.'],
+      patient_summary_en: summary_en,
+      patient_summary_hi: summary_hi,
     }
   }
 
-  const sorted = [...matches].sort((a, b) => (URGENCY_RANK[b.outcome] || 0) - (URGENCY_RANK[a.outcome] || 0))
+  const sorted = [...matches].sort(
+    (a, b) => (URGENCY_RANK[b.outcome] || 0) - (URGENCY_RANK[a.outcome] || 0),
+  )
   const top = sorted[0]
   const citations = [...new Set(sorted.map((m) => `${m.guideline_source}: ${m.citation}`))]
 
-  const explanation = `Recommendation: ${top.outcome.toUpperCase()} REFERRAL to ${top.referral_target}. Met criteria: ${sorted.map((m) => m.label).join('; ')}. Evaluated deterministically against published clinical practice guidelines.`
+  const topTier: StandardTier =
+    top.outcome === 'urgent'
+      ? 'URGENT'
+      : top.outcome === 'borderline'
+        ? 'PRIORITY'
+        : top.outcome === 'routine'
+          ? 'ROUTINE'
+          : 'COUNSEL_AND_REASSESS'
+
+  const firedRules: FiredRule[] = sorted.map((m) => ({
+    id: m.rule_key,
+    rule_key: m.rule_key,
+    label: m.label,
+    description: m.description || '',
+    tier:
+      m.outcome === 'urgent'
+        ? 'URGENT'
+        : m.outcome === 'borderline'
+          ? 'PRIORITY'
+          : m.outcome === 'routine'
+            ? 'ROUTINE'
+            : 'COUNSEL_AND_REASSESS',
+    triggering_parameters: { ...input },
+    guideline_source: m.guideline_source,
+    citation: m.citation,
+    next_steps_non_treatment: `Refer to ${m.referral_target} for comprehensive evaluation under ${m.guideline_source} recommendations.`,
+  }))
+
+  const counterfactuals = computeCounterfactuals(pathwayId, input, topTier)
+  const { summary_en, summary_hi } = generateBilingualPatientSummary(
+    pathwayId,
+    topTier,
+    top.referral_target,
+    firedRules,
+  )
+
+  const explanation = `Recommendation: ${topTier} REFERRAL to ${top.referral_target}. Met criteria: ${sorted.map((m) => m.label).join('; ')}. Evaluated deterministically against published clinical practice guidelines.`
 
   return {
     outcome: top.outcome,
     clinical_decision: OUTCOME_MAP_TO_CLINICAL[top.outcome],
+    tier: topTier,
     referral_target: top.referral_target,
     matched_criteria: sorted,
+    fired_rules: firedRules,
+    not_fired_rules_with_missing_inputs: gaps,
+    counterfactuals,
+    time_critical_context: timeCtx,
     explanation,
     guideline_citations: citations,
     pathway_id: pathwayId,
@@ -920,6 +1327,8 @@ function _pickHighest(matches: MatchedCriterion[], pathwayId: string): DecisionR
     cpt_codes: RULE_CPT_MAP[pathwayId] || ['96040'],
     icd10_codes: RULE_ICD10_MAP[pathwayId] || ['Z15.01'],
     counseling_points: COUNSELING_POINTS_MAP[pathwayId] || [],
+    patient_summary_en: summary_en,
+    patient_summary_hi: summary_hi,
   }
 }
 
@@ -1000,7 +1409,7 @@ export function evaluateHereditaryCancer(input: Record<string, unknown>, criteri
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'hereditary_cancer')
+  return _pickHighest(matches, 'hereditary_cancer', d)
 }
 
 export function evaluateCarrierScreening(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
@@ -1059,7 +1468,7 @@ export function evaluateCarrierScreening(input: Record<string, unknown>, criteri
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'carrier_screening')
+  return _pickHighest(matches, 'carrier_screening', d)
 }
 
 export function evaluateNipt(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
@@ -1097,7 +1506,7 @@ export function evaluateNipt(input: Record<string, unknown>, criteria: Criterion
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'nipt_results')
+  return _pickHighest(matches, 'nipt_results', d)
 }
 
 export function evaluateUltrasound(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
@@ -1147,7 +1556,7 @@ export function evaluateUltrasound(input: Record<string, unknown>, criteria: Cri
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'abnormal_ultrasound')
+  return _pickHighest(matches, 'abnormal_ultrasound', d)
 }
 
 export function evaluateInfertilityRpl(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
@@ -1191,7 +1600,7 @@ export function evaluateInfertilityRpl(input: Record<string, unknown>, criteria:
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'infertility_rpl')
+  return _pickHighest(matches, 'infertility_rpl', d)
 }
 
 export function evaluateFamilyHistory(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
@@ -1231,7 +1640,7 @@ export function evaluateFamilyHistory(input: Record<string, unknown>, criteria: 
     if (c) matches.push(_match(c))
   }
 
-  return _pickHighest(matches, 'family_history')
+  return _pickHighest(matches, 'family_history', d)
 }
 
 export const PATHWAY_EVALUATORS: Record<
@@ -1258,8 +1667,12 @@ export function evaluatePathway(
     return {
       outcome: 'no_referral',
       clinical_decision: 'no_referral_needed',
+      tier: 'INSUFFICIENT_DATA',
       referral_target: 'None',
       matched_criteria: [],
+      fired_rules: [],
+      not_fired_rules_with_missing_inputs: [],
+      counterfactuals: [],
       explanation: `Unknown clinical pathway: ${pathwaySlug}`,
       guideline_citations: [],
       pathway_id: pathwayId,

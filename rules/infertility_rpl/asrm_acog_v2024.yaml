@@ -1,0 +1,93 @@
+module: infertility_rpl
+source_guideline: "ASRM Practice Committee Opinion on Recurrent Pregnancy Loss / ACOG Practice Bulletin 200"
+version: "v.2024"
+ruleset_id: infertility_rpl_2024
+rules:
+  - id: rpl_two_or_more_losses
+    module: infertility_rpl
+    source_guideline: "ASRM / ACOG"
+    version: "v.2024"
+    section: "ASRM RPL Definition: Two or More Failed Clinical Pregnancies"
+    citation_url: "https://www.asrm.org"
+    conditions:
+      any:
+        - field: recurrent_losses_count
+          operator: ">="
+          value: 2
+    outputs:
+      tier: PRIORITY
+      reason_text: "Two or more recurrent pregnancy losses meet the clinical definition of RPL warranting formal genetic and reproductive evaluation."
+      next_steps_non_treatment: "Refer couple for peripheral blood parental karyotyping to evaluate for balanced reciprocal or Robertsonian translocations, plus antiphospholipid antibody panel and anatomical assessment."
+
+  - id: rpl_balanced_translocation_carrier
+    module: infertility_rpl
+    source_guideline: "ASRM / ACMG"
+    version: "v.2024"
+    section: "ASRM / ACMG: Parental Structural Chromosomal Rearrangement"
+    citation_url: "https://www.asrm.org"
+    conditions:
+      any:
+        - field: parental_karyotype_abnormal
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Parental carrier of balanced translocation or chromosomal inversion creates high risk of unbalanced gametes, recurrent miscarriage, and offspring with unbalanced karyotype."
+      next_steps_non_treatment: "Refer to Clinical Geneticist and Reproductive Endocrinology (REI) for Pre-implantation Genetic Testing for Structural Rearrangements (PGT-SR) and prenatal diagnostic planning."
+
+  - id: inf_azoospermia_severe_oligo
+    module: infertility_rpl
+    source_guideline: "ASRM / EAU"
+    version: "v.2024"
+    section: "ASRM: Severe Male Factor Infertility Genetic Evaluation"
+    citation_url: "https://www.asrm.org"
+    conditions:
+      any:
+        - field: azoospermia_or_severe_oligo
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Severe male factor infertility (non-obstructive azoospermia or severe oligospermia <5 million/mL) warrants mandatory genetic evaluation."
+      next_steps_non_treatment: "Order constitutional karyotype (to rule out Klinefelter syndrome 47,XXY) and Y-chromosome microdeletion testing (AZFa, AZFb, AZFc). If congenital bilateral absence of vas deferens (CBAVD), order CFTR mutation analysis."
+
+  - id: inf_premature_ovarian_insufficiency
+    module: infertility_rpl
+    source_guideline: "ASRM / ESHRE"
+    version: "v.2024"
+    section: "ASRM / ESHRE: Premature Ovarian Insufficiency (POI) Genetic Workup"
+    citation_url: "https://www.asrm.org"
+    conditions:
+      any:
+        - field: primary_ovarian_insufficiency
+          operator: "=="
+          value: true
+        - field: family_history_poi_intellectual_disability
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Primary ovarian insufficiency before age 40 or POI with family history of intellectual disability."
+      next_steps_non_treatment: "Refer to Clinical Genetics for FMR1 CGG repeat analysis (Fragile X premutation testing) and peripheral blood karyotype to rule out Turner mosaicism / X-autosome translocations."
+
+  - id: inf_standard_unexplained
+    module: infertility_rpl
+    source_guideline: "ASRM"
+    version: "v.2024"
+    section: "ASRM: Unexplained Infertility with Normal Baseline Testing"
+    citation_url: "https://www.asrm.org"
+    conditions:
+      all:
+        - field: recurrent_losses_count
+          operator: "<"
+          value: 2
+        - field: parental_karyotype_abnormal
+          operator: "=="
+          value: false
+        - field: azoospermia_or_severe_oligo
+          operator: "=="
+          value: false
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "Baseline presentation does not meet genetic indications for RPL or monogenic infertility testing."
+      next_steps_non_treatment: "Proceed with standard reproductive endocrinology evaluation (ovulatory tracking, hysterosalpingography, standard semen analysis). Re-evaluate if pregnancy loss occurs."

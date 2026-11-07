@@ -1,0 +1,82 @@
+module: nipt_results
+source_guideline: "ACOG Practice Bulletin 226 / SMFM Consensus on Screening for Fetal Chromosomal Abnormalities"
+version: "v.2024"
+ruleset_id: nipt_screening_2024
+rules:
+  - id: nipt_high_risk_aneuploidy_time_critical
+    module: nipt_results
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "ACOG PB 226: High-Risk cfDNA Aneuploidy Finding"
+    citation_url: "https://www.acog.org/clinical/clinical-guidance/practice-bulletin/articles/2020/10/screening-for-fetal-chromosomal-abnormalities"
+    conditions:
+      any:
+        - field: high_risk_cfdna
+          operator: "=="
+          value: true
+        - field: nipt_result_type
+          operator: "in"
+          value: ["high_risk_t21", "high_risk_t18", "high_risk_t13", "high_risk_monosomy_x", "high_risk_microdeletion"]
+    outputs:
+      tier: URGENT
+      reason_text: "High-risk cell-free DNA (cfDNA) screening result for major chromosomal aneuploidy (Trisomy 21, 18, 13, or sex chromosome). cfDNA is a screening test with variable PPV, not a diagnostic test."
+      next_steps_non_treatment: "Urgent Fetal Medicine / Genetic Counselor consultation. Offer comprehensive targeted anatomical ultrasound and definitive diagnostic testing (CVS from 10w to 13w6d, or Amniocentesis from 15w). Strict adherence to PC&PNDT Act, 1994 (no fetal sex disclosure) and MTP Act (2021) legal timelines."
+    time_critical_window: "Within 48-72 hours to allow timely pre-test counseling and diagnostic testing"
+
+  - id: nipt_discordant_ultrasound
+    module: nipt_results
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "SMFM Consult Series: Low-Risk cfDNA with Ultrasound Anomaly"
+    citation_url: "https://www.smfm.org"
+    conditions:
+      all:
+        - field: ultrasound_discordance
+          operator: "=="
+          value: true
+    outputs:
+      tier: URGENT
+      reason_text: "Discordant findings: ultrasound structural anomaly or increased NT detected in presence of low-risk cfDNA screening result."
+      next_steps_non_treatment: "cfDNA does not screen for structural defects, microdeletions, or single gene disorders. Urgent referral for diagnostic amniocentesis with Chromosomal Microarray (CMA) and/or exome sequencing."
+    time_critical_window: "Within 48-72 hours"
+
+  - id: nipt_no_call_low_fetal_fraction
+    module: nipt_results
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "ACOG PB 226: Uninformative / No-Call cfDNA Result"
+    citation_url: "https://www.acog.org"
+    conditions:
+      any:
+        - field: no_call_flag
+          operator: "=="
+          value: true
+        - field: fetal_fraction
+          operator: "<"
+          value: 4.0
+    outputs:
+      tier: PRIORITY
+      reason_text: "No-call or low fetal fraction (<4.0%) cfDNA result carries an elevated risk of fetal triploidy, trisomy 13/18, or maternal factors (high BMI, autoimmune disease)."
+      next_steps_non_treatment: "Refer for detailed structural ultrasound evaluation. Re-drawing cfDNA has a high redraw failure rate. Offer diagnostic testing (CVS/amniocentesis) vs redraw based on gestational age and ultrasound."
+
+  - id: nipt_low_risk_reassurance
+    module: nipt_results
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "ACOG PB 226: Negative / Low-Risk cfDNA Screening"
+    citation_url: "https://www.acog.org"
+    conditions:
+      all:
+        - field: high_risk_cfdna
+          operator: "=="
+          value: false
+        - field: no_call_flag
+          operator: "=="
+          value: false
+        - field: ultrasound_discordance
+          operator: "=="
+          value: false
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "Low-risk cfDNA screening result for common trisomies with normal fetal fraction and concordance."
+      next_steps_non_treatment: "Reassure patient that cfDNA significantly reduces risk of common aneuploidies. Emphasize that cfDNA does not rule out all genetic or structural defects; continue routine second-trimester anatomy scan at 18-20 weeks."

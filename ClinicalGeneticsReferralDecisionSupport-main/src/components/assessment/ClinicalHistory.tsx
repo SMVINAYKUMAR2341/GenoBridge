@@ -4,8 +4,8 @@ import React from 'react'
 import {
   type InputField,
   visibleIntakeFields,
-  type WorkflowIntake,
 } from '@/lib/form-fields'
+import type { WorkflowIntake } from '@/lib/workflow-store'
 
 export function ClinicalHistory({
   slug,

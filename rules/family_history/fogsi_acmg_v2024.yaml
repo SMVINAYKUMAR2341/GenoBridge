@@ -1,0 +1,99 @@
+module: family_history
+source_guideline: "FOGSI GCPR Medical Genetics / ACMG Practice Guidelines for Family History Risk Stratification"
+version: "v.2024"
+ruleset_id: family_history_2024
+rules:
+  - id: fh_known_familial_pathogenic_variant
+    module: family_history
+    source_guideline: "ACMG / FOGSI"
+    version: "v.2024"
+    section: "ACMG: Documented Familial Pathogenic Variant (Non-Cancer)"
+    citation_url: "https://www.acmg.net"
+    conditions:
+      any:
+        - field: known_familial_variant
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Documented pathogenic or likely pathogenic variant in a monogenic disease gene in a biological relative."
+      next_steps_non_treatment: "Obtain relative's laboratory report and schedule pre-test genetic counseling for single-site familial variant testing and reproductive risk counseling."
+
+  - id: fh_sudden_unexplained_cardiac_death
+    module: family_history
+    source_guideline: "HRS / EHRA / ACMG"
+    version: "v.2024"
+    section: "Expert Consensus on Genetic Testing for Inherited Cardiac Diseases"
+    citation_url: "https://www.hrsonline.org"
+    conditions:
+      any:
+        - field: sudden_cardiac_death_under_40
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Sudden unexplained cardiac death or sudden infant death syndrome (SIDS) under age 40 in a first-degree relative strongly suggests inherited cardiomyopathy or channelopathy (Long QT, Brugada, HCM, ARVC)."
+      next_steps_non_treatment: "Refer patient to Cardiogenetics clinic for clinical phenotyping (12-lead ECG, 24h Holter, echocardiogram) and comprehensive inherited arrhythmia/cardiomyopathy panel."
+
+  - id: fh_consanguinity_with_affected
+    module: family_history
+    source_guideline: "FOGSI GCPR / ACMG"
+    version: "v.2024"
+    section: "FOGSI Medical Genetics: Consanguinity with Affected Family Members"
+    citation_url: "https://www.fogsi.org"
+    conditions:
+      all:
+        - field: consanguinity
+          operator: "=="
+          value: true
+        - field: affected_relatives_count
+          operator: ">="
+          value: 1
+    outputs:
+      tier: PRIORITY
+      reason_text: "Consanguineous partnership combined with family history of unexplained congenital anomalies, intellectual disability, or neurometabolic disease."
+      next_steps_non_treatment: "Refer to Clinical Geneticist for extended pedigree analysis, enzymatic/metabolic screening, or whole exome sequencing (trio WES) to assess recurrence risk."
+
+  - id: fh_multiple_affected_relatives
+    module: family_history
+    source_guideline: "ACMG"
+    version: "v.2024"
+    section: "ACMG: Familial Clustering of Non-Cancer Conditions"
+    citation_url: "https://www.acmg.net"
+    conditions:
+      any:
+        - field: multiple_affected_relatives
+          operator: "=="
+          value: true
+        - field: affected_relatives_count
+          operator: ">="
+          value: 2
+    outputs:
+      tier: PRIORITY
+      reason_text: "Two or more close relatives affected by the same congenital, neurological, neuromuscular, or sensory condition."
+      next_steps_non_treatment: "Refer to Clinical Geneticist for comprehensive phenotyping, medical records review, and tailored multi-gene NGS panel."
+
+  - id: fh_distant_or_isolated_mild
+    module: family_history
+    source_guideline: "ACMG / FOGSI"
+    version: "v.2024"
+    section: "ACMG Standard Pedigree Evaluation: Negative Risk"
+    citation_url: "https://www.acmg.net"
+    conditions:
+      all:
+        - field: known_familial_variant
+          operator: "=="
+          value: false
+        - field: sudden_cardiac_death_under_40
+          operator: "=="
+          value: false
+        - field: consanguinity
+          operator: "=="
+          value: false
+        - field: affected_relatives_count
+          operator: "<="
+          value: 0
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "No personal or first/second-degree family history suggestive of inherited Mendelian disorders."
+      next_steps_non_treatment: "Reassure patient regarding general population risks. Encourage routine healthcare maintenance and re-evaluation if new family medical events emerge."

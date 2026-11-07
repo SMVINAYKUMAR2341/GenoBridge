@@ -7,7 +7,7 @@ import type { EmptyWorkflowSection } from './workflow-store'
 /** Structural contract also accepts the parent's upcoming extended field catalog. */
 export type WorkflowFormField = {
   key: string
-  type: 'select' | 'text' | 'checkbox' | 'number' | 'date' | 'textarea'
+  type: 'select' | 'text' | 'checkbox' | 'number' | 'date' | 'textarea' | 'bool' | 'multi'
   options?: readonly (readonly [string, string])[]
   required?: boolean
   section?: string
@@ -53,7 +53,9 @@ function validateAnswer(field: WorkflowFormField, value: unknown) {
   if (value === '') return
   let valid = false
   switch (field.type) {
-    case 'checkbox': valid = typeof value === 'boolean'; break
+    case 'checkbox':
+    case 'bool': valid = typeof value === 'boolean'; break
+    case 'multi': valid = Array.isArray(value) || typeof value === 'string'; break
     case 'number':
       valid = (typeof value === 'number' && Number.isFinite(value)) ||
         (typeof value === 'string' && value.length <= 100 && /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(value) && Number.isFinite(Number(value)))

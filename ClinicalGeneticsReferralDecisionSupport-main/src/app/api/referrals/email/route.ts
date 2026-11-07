@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const payload = await getPayloadClient()
     try {
       await payload.create({
-        collection: 'audit_logs',
+        collection: 'audit-logs' as any,
         data: {
           action: 'referral_email_dispatched',
           performedBy: user.email,

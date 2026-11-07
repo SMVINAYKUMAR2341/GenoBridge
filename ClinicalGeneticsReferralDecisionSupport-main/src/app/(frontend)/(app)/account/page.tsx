@@ -207,7 +207,7 @@ export default async function AccountPage() {
               </li>
               <li className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-[#22C9EE] shrink-0 mt-0.5" />
-                <span><strong className="text-white">Ultrasound &amp; Lab Triage:</strong> Flags abnormal structural ultrasound findings (thickened NT $\ge 3.5\text{ mm}$, cystic hygroma) and cfDNA/NIPT reports.</span>
+                <span><strong className="text-white">Ultrasound &amp; Lab Triage:</strong> Flags abnormal structural ultrasound findings (thickened NT &ge; 3.5 mm, cystic hygroma) and cfDNA/NIPT reports.</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-[#22C9EE] shrink-0 mt-0.5" />

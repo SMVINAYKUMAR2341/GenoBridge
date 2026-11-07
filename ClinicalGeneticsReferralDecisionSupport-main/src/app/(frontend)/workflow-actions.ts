@@ -23,10 +23,13 @@ async function currentActor() {
     const guestUser: WorkflowUser = {
       id: 'guest-clinician-provider',
       name: 'Dr. SM Vinay Kumar (Provider)',
+      email: 'clinician@genobridge.in',
       role: 'provider',
       enabled: true,
       reviewerAuthorized: true,
       collection: 'users',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
     }
     return { user: guestUser, payload, store }
   }
@@ -40,10 +43,13 @@ async function currentActor() {
   const fallbackUser: WorkflowUser = {
     id: String(session.id || 'provider-session'),
     name: session.name || 'Dr. SM Vinay Kumar',
+    email: (session as any).email || 'clinician@genobridge.in',
     role: 'provider',
     enabled: true,
     reviewerAuthorized: true,
     collection: 'users',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   }
   return { user: fallbackUser, payload, store }
 }

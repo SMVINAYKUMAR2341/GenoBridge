@@ -1,0 +1,105 @@
+module: abnormal_ultrasound
+source_guideline: "ISUOG Practice Guidelines / ACOG Practice Bulletin 175: Ultrasound in Pregnancy"
+version: "v.2024"
+ruleset_id: abnormal_ultrasound_2024
+rules:
+  - id: us_cystic_hygroma_hydrops
+    module: abnormal_ultrasound
+    source_guideline: "ISUOG / ACOG"
+    version: "v.2024"
+    section: "ISUOG Consensus: Fetal Hydrops and Septated Cystic Hygroma"
+    citation_url: "https://www.isuog.org"
+    conditions:
+      any:
+        - field: cystic_hygroma
+          operator: "=="
+          value: true
+        - field: fetal_hydrops
+          operator: "=="
+          value: true
+    outputs:
+      tier: URGENT
+      reason_text: "Presence of fetal cystic hygroma or non-immune hydrops fetalis carries >50% probability of aneuploidy (Turner syndrome, Trisomy 21/18/13) or Noonan syndrome/RASopathies."
+      next_steps_non_treatment: "Urgent Fetal Medicine Unit referral within 24-48 hours. Offer diagnostic testing (CVS/amniocentesis) for rapid QF-PCR, chromosomal microarray (CMA), and Noonan multi-gene sequencing panel. Counsel within MTP Act (2021) statutory framework."
+    time_critical_window: "Immediate (within 24-48 hours)"
+
+  - id: us_major_structural_anomaly
+    module: abnormal_ultrasound
+    source_guideline: "ISUOG / ACOG"
+    version: "v.2024"
+    section: "ACOG PB 175: Major Fetal Structural Anomalies"
+    citation_url: "https://www.acog.org"
+    conditions:
+      any:
+        - field: major_structural_anomaly
+          operator: "=="
+          value: true
+        - field: holoprosencephaly
+          operator: "=="
+          value: true
+        - field: omphalocele
+          operator: "=="
+          value: true
+        - field: congenital_heart_defect
+          operator: "=="
+          value: true
+    outputs:
+      tier: URGENT
+      reason_text: "Major structural organ malformation (cardiac defect, CNS abnormality, diaphragmatic hernia, omphalocele) strongly associated with underlying chromosomal aneuploidy or monogenic syndromes."
+      next_steps_non_treatment: "Urgent referral to Fetal Medicine Specialist and Pediatric Geneticist. Perform detailed neurosonography/fetal echocardiography and offer diagnostic amniocentesis with chromosomal microarray (CMA)."
+    time_critical_window: "Within 48-72 hours"
+
+  - id: us_increased_nuchal_translucency
+    module: abnormal_ultrasound
+    source_guideline: "ISUOG / Fetal Medicine Foundation"
+    version: "v.2024"
+    section: "FMF UK / ISUOG: Increased Nuchal Translucency >= 3.0 mm (or >95th percentile)"
+    citation_url: "https://fetalmedicine.org"
+    conditions:
+      any:
+        - field: nuchal_translucency_mm
+          operator: ">="
+          value: 3.0
+    outputs:
+      tier: PRIORITY
+      reason_text: "Nuchal translucency (NT) >= 3.0 mm (or >95th percentile for CRL) indicates significantly increased risk for aneuploidy, structural cardiac defects, and genetic syndromes."
+      next_steps_non_treatment: "Refer to Fetal Medicine. Offer diagnostic invasive testing (CVS if GA <=13w6d, or Amniocentesis from 15w) with CMA, plus early fetal echocardiography at 16-18 weeks."
+    time_critical_window: "Urgent if GA is between 11w0d and 13w6d (CVS window)"
+
+  - id: us_multiple_soft_markers
+    module: abnormal_ultrasound
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "ACOG PB 175: Multiple Second-Trimester Soft Markers"
+    citation_url: "https://www.acog.org"
+    conditions:
+      any:
+        - field: soft_marker_count
+          operator: ">="
+          value: 2
+    outputs:
+      tier: PRIORITY
+      reason_text: "Two or more ultrasound soft markers (e.g. thickened nuchal fold, echogenic bowel, short femur, intracardiac echogenic focus, pyelectasis) compound the risk of fetal aneuploidy."
+      next_steps_non_treatment: "Refer to Genetic Counselor / Fetal Medicine. Calculate combined age-adjusted likelihood ratio, correlate with first-trimester screening/cfDNA results, and offer diagnostic amniocentesis."
+
+  - id: us_single_isolated_soft_marker
+    module: abnormal_ultrasound
+    source_guideline: "ACOG / SMFM"
+    version: "v.2024"
+    section: "ACOG PB 175: Isolated Soft Marker in Low-Risk Patient"
+    citation_url: "https://www.acog.org"
+    conditions:
+      all:
+        - field: soft_marker_count
+          operator: "=="
+          value: 1
+        - field: major_structural_anomaly
+          operator: "=="
+          value: false
+        - field: nuchal_translucency_mm
+          operator: "<"
+          value: 3.0
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "Single isolated second-trimester ultrasound soft marker (such as isolated choroid plexus cyst or isolated echogenic intracardiac focus) in a patient with low-risk prior screening."
+      next_steps_non_treatment: "Reassure patient regarding benign nature of isolated findings. Review maternal serum/cfDNA screening status. No invasive diagnostic testing indicated if prior screening was negative."

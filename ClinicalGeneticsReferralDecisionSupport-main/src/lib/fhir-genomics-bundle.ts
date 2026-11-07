@@ -366,15 +366,16 @@ export function buildFhirGenomicsBundle(
   if (pedigreeModel && pedigreeModel.people && pedigreeModel.people.length > 0) {
     pedigreeModel.people.forEach((person, idx) => {
       const fmhId = `fmh-${person.id || idx}`
-      const isProband = person.isProband
+      const isProband = person.proband
+      const personSex = person.sex
 
       let relCode = TERMINOLOGY.SNOMED.SIBLING
       if (person.generation === 1) {
-        relCode = person.gender === 'female' ? TERMINOLOGY.SNOMED.MATERNAL_GRANDMOTHER : TERMINOLOGY.SNOMED.MATERNAL_GRANDFATHER
+        relCode = personSex === 'female' ? TERMINOLOGY.SNOMED.MATERNAL_GRANDMOTHER : TERMINOLOGY.SNOMED.MATERNAL_GRANDFATHER
       } else if (person.generation === 2) {
-        relCode = person.gender === 'female' ? TERMINOLOGY.SNOMED.MOTHER : TERMINOLOGY.SNOMED.FATHER
+        relCode = personSex === 'female' ? TERMINOLOGY.SNOMED.MOTHER : TERMINOLOGY.SNOMED.FATHER
       } else if (person.generation === 3) {
-        relCode = person.gender === 'female' ? TERMINOLOGY.SNOMED.DAUGHTER : TERMINOLOGY.SNOMED.SON
+        relCode = personSex === 'female' ? TERMINOLOGY.SNOMED.DAUGHTER : TERMINOLOGY.SNOMED.SON
       }
 
       entries.push({
@@ -398,26 +399,16 @@ export function buildFhirGenomicsBundle(
             coding: [
               {
                 system: 'http://hl7.org/fhir/administrative-gender',
-                code: person.gender === 'female' ? 'female' : person.gender === 'male' ? 'male' : 'other',
+                code: personSex === 'female' ? 'female' : personSex === 'male' ? 'male' : 'other',
               },
             ],
           },
-          condition: (person.conditions || []).map((cond: string) => ({
+          condition: (person.conditions || []).map((cond: any) => ({
             code: {
-              text: cond,
+              text: typeof cond === 'string' ? cond : cond?.condition || 'Clinical Finding',
             },
             contributedToDeath: person.deceased || false,
           })),
-          extension: [
-            {
-              url: 'http://hl7.org/fhir/StructureDefinition/family-member-carrier-status',
-              valueBoolean: person.carrier || false,
-            },
-            {
-              url: 'http://hl7.org/fhir/StructureDefinition/family-member-affected-status',
-              valueBoolean: person.affected || false,
-            },
-          ],
         },
       })
     })

@@ -1,0 +1,116 @@
+module: carrier_screening
+source_guideline: "ACOG Committee Opinion 691 / ACMG Tier 3 Practice Guideline / FOGSI GCPR Carrier Screening"
+version: "v.2024"
+ruleset_id: carrier_screening_2024
+rules:
+  - id: cs_both_carriers_same_gene_pregnant
+    module: carrier_screening
+    source_guideline: "ACOG / FOGSI"
+    version: "v.2024"
+    section: "ACOG CO 691: Couple at 25% Recessive Risk During Pregnancy"
+    citation_url: "https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2017/03/carrier-screening-for-genetic-conditions"
+    conditions:
+      all:
+        - field: both_partners_same_carrier
+          operator: "=="
+          value: true
+        - field: pregnant
+          operator: "=="
+          value: true
+    outputs:
+      tier: URGENT
+      reason_text: "Both reproductive partners are confirmed carriers of the same autosomal recessive disorder in an ongoing pregnancy (25% fetal recurrence risk per pregnancy)."
+      next_steps_non_treatment: "Urgent referral to Prenatal Geneticist / Fetal Medicine specialist to counsel on prenatal diagnostic options (CVS before 14w, Amniocentesis from 15w) within MTP Act (2021) statutory timelines."
+    time_critical_window: "Immediate evaluation (within 48-72h) due to gestational limits for prenatal diagnosis"
+
+  - id: cs_both_carriers_preconception
+    module: carrier_screening
+    source_guideline: "ACOG / ACMG"
+    version: "v.2024"
+    section: "ACOG CO 691 / ACMG Tier 3: Preconception Dual Carrier Status"
+    citation_url: "https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2017/03/carrier-screening-for-genetic-conditions"
+    conditions:
+      all:
+        - field: both_partners_same_carrier
+          operator: "=="
+          value: true
+        - field: pregnant
+          operator: "=="
+          value: false
+    outputs:
+      tier: PRIORITY
+      reason_text: "Both partners identified as carriers of the same autosomal recessive condition prior to conception."
+      next_steps_non_treatment: "Refer to Reproductive Geneticist / IVF specialist to review pre-implantation genetic testing (PGT-M), donor gamete options, or prenatal testing planning."
+
+  - id: cs_prior_affected_child
+    module: carrier_screening
+    source_guideline: "FOGSI / ACOG"
+    version: "v.2024"
+    section: "FOGSI GCPR: Recurrence Risk with Previous Affected Offspring"
+    citation_url: "https://www.fogsi.org"
+    conditions:
+      any:
+        - field: prior_affected_child
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Prior child or neonatal death affected by unexplained genetic, metabolic, or congenital condition."
+      next_steps_non_treatment: "Refer to Medical Genetics to review previous records, confirm molecular diagnosis, and formulate reproductive risk management plan."
+
+  - id: cs_consanguinity
+    module: carrier_screening
+    source_guideline: "FOGSI / ACOG"
+    version: "v.2024"
+    section: "ACOG CO 690 & FOGSI GCPR: Consanguineous Unions"
+    citation_url: "https://www.fogsi.org"
+    conditions:
+      any:
+        - field: consanguinity
+          operator: "=="
+          value: true
+    outputs:
+      tier: PRIORITY
+      reason_text: "Consanguineous partnership (second-degree cousin or closer union) substantially increases homozygous expression of shared rare autosomal recessive alleles."
+      next_steps_non_treatment: "Refer to Prenatal/Preconception Genetic Counselor for extended carrier screening (ACMG Tier 3 / comprehensive NGS panel) and detailed family pedigree review."
+
+  - id: cs_thalassemia_high_risk_community
+    module: carrier_screening
+    source_guideline: "FOGSI GCPR / National Health Mission"
+    version: "v.2024"
+    section: "NHM / FOGSI: Hemoglobinopathy Screening in High-Prevalence Populations"
+    citation_url: "https://nhm.gov.in"
+    conditions:
+      any:
+        - field: high_risk_ancestry_hemoglobinopathy
+          operator: "=="
+          value: true
+        - field: low_mcv_mch
+          operator: "=="
+          value: true
+    outputs:
+      tier: ROUTINE
+      reason_text: "High-prevalence Indian ethno-geographic community (Sindhi, Lohana, Punjabi, Gujarati, tribal populations) or microcytic hypochromic indices (MCV <80, MCH <27)."
+      next_steps_non_treatment: "Order maternal HPLC / Hb electrophoresis and serum ferritin. If HbA2 > 3.5% or variant detected, test partner immediately."
+
+  - id: cs_standard_preconception_offer
+    module: carrier_screening
+    source_guideline: "ACOG / ACMG"
+    version: "v.2024"
+    section: "ACMG Tier 3 Universal Offering"
+    citation_url: "https://www.acmg.net"
+    conditions:
+      all:
+        - field: both_partners_same_carrier
+          operator: "=="
+          value: false
+        - field: consanguinity
+          operator: "=="
+          value: false
+        - field: prior_affected_child
+          operator: "=="
+          value: false
+    outputs:
+      tier: COUNSEL_AND_REASSESS
+      reason_text: "No high-risk carrier criteria identified. Routine pre-pregnancy planning indicated."
+      next_steps_non_treatment: "Provide general pre-conception counseling (folic acid 400-500 mcg/day, routine CBC). Offer optional expanded carrier screening (ACMG Tier 3)."
