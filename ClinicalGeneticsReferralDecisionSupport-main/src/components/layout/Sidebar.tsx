@@ -71,8 +71,15 @@ function Item({
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const path = usePathname()
-  const isActive = (h: string) =>
-    h === '/' ? path === '/' || path.startsWith('/assessment') : path.startsWith(h)
+  const isActive = (h: string) => {
+    if (h === '/assessment') {
+      return path.startsWith('/assessment') || path.startsWith('/doctor/dashboard') || path.startsWith('/nurse/dashboard')
+    }
+    if (h === '/') {
+      return path === '/' || path.startsWith('/assessment')
+    }
+    return path.startsWith(h)
+  }
   return (
     <>
       {open && (
