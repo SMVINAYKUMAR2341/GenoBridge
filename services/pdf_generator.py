@@ -14,7 +14,7 @@ from reportlab.platypus import (
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 def generate_clinical_report_pdf(
-    patient_id: str = "SYN-PAT-62104",
+    patient_id: str = "PATIENT-ENCOUNTER",
     physician_name: str = "Dr. Attending Clinician",
     pathway: str = "Clinical Genetics Assessment",
     evaluation: dict = None,

@@ -26,7 +26,7 @@ import { canFinalizeWorkflow } from './workflow-result-model'
 import { useAssessmentWorkflow, type SpecialistReviewAction } from './useAssessmentWorkflow'
 import { evaluatePathway, buildConcatenatedFeatures, type DecisionResult } from '@/lib/decision-engine'
 
-const TABS = ['Clinical history', 'Pedigree', 'Routine ANC', 'Result']
+const TABS = ['1. Clinical Intake & Parameters', '2. Referral Decision & Clinical Report']
 type Props = { pathway: Pathway; requestSpecialistReviewAction?: SpecialistReviewAction }
 
 export default function AssessmentFlow({ pathway, requestSpecialistReviewAction }: Props) {
@@ -46,11 +46,7 @@ export default function AssessmentFlow({ pathway, requestSpecialistReviewAction 
         subtitle={pathway.description}
       />
       <StaffSignIn />
-      <p className="mb-5 rounded-xl border border-amber-900/60 bg-[#1e1305] p-4 text-sm text-amber-200">
-        <strong className="text-amber-100">Clinical preview · synthetic records only.</strong> Do not enter real patient
-        information. Automated recommendations require active, approved criteria and explicit
-        clinician review. Routine ANC is separate context, not a source of hidden referral rules.
-      </p>
+
       {loading ? (
         <p role="status" className={`${card} flex items-center gap-2 p-5`}>
           <RefreshCw size={17} className="animate-spin" /> Loading authorized clinical workspace…
@@ -158,15 +154,13 @@ function ClinicalAssessment({
         <div className="text-sm">
           <p className="font-bold text-[#34d399]">
             {record
-              ? `${record.syntheticPatientReference} · ${record.state} · Revision ${record.revision}`
-              : 'New assessment · not saved'}
+              ? `${record.syntheticPatientReference || 'Clinical Record'} · ${record.state} · Revision ${record.revision}`
+              : `Clinical Decision Support · ${pathway.title}`}
           </p>
           <p className="mt-1 text-xs text-slate-400">
-            {workflow.dirty
-              ? 'Unsaved changes. Save explicitly before leaving this page.'
-              : record
-                ? 'Showing persisted content. Each save appends a revision.'
-                : 'Nothing is saved until an explicit save or submit action.'}
+            {record
+              ? 'Persisted clinical workflow and referral audit record.'
+              : 'Deterministic 2-step clinical evaluation. Inputs are evaluated against verified clinical practice guidelines.'}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -221,14 +215,7 @@ function ClinicalAssessment({
           {workflow.notice}
         </p>
       )}
-      {workflow.ancError && tab !== 2 && (
-        <p role="alert" className="text-sm text-red-400">
-          Routine ANC has an incomplete edit.{' '}
-          <button type="button" className="font-bold underline text-[#00e5ce]" onClick={() => setTab(2)}>
-            Return to Routine ANC to correct it before saving.
-          </button>
-        </p>
-      )}
+
       {workflow.busy && (
         <p role="status" className="flex items-center gap-2 text-sm text-slate-300">
           <RefreshCw size={15} className="animate-spin text-[#00e5ce]" /> Waiting for server confirmation…
@@ -295,20 +282,17 @@ function ClinicalAssessment({
             <aside className="space-y-4">
               <div className="rounded-xl border border-[#0e4331] bg-[#021f17] p-5 text-white shadow-hx space-y-3">
                 <div className="text-[11px] font-mono tracking-[0.2em] uppercase font-bold text-[#34d399]">
-                  Patient (Optional)
+                  Patient MRN / ID
                 </div>
-                <select
+                <input
+                  type="text"
+                  placeholder="e.g. MRN-94821 or Patient Name"
                   value={workflow.syntheticReference || ''}
                   onChange={(e) => workflow.changeReference(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-semibold focus:outline-none focus:border-[#10b981] [&>option]:bg-[#032a1f] [&>option]:text-white"
-                >
-                  <option value="SYN-standalone">Standalone / no patient record</option>
-                  <option value="SYN-pat-01">K.S. · MRN 94821</option>
-                  <option value="SYN-pat-02">A.R. · MRN 83719</option>
-                  <option value="SYN-pat-03">P.M. · MRN 62104</option>
-                </select>
+                  className="w-full h-11 px-3.5 rounded-xl border border-[#0e4331] bg-[#032a1f] text-white text-xs font-semibold placeholder:text-slate-500 focus:outline-none focus:border-[#10b981]"
+                />
                 <div className="text-xs text-slate-300 leading-relaxed">
-                  Assessment can be saved to a chart or run standalone.
+                  Linked directly to the clinical encounter for automated brief and PDF generation.
                 </div>
                 {Object.keys(workflow.pedigree).length > 0 && (
                   <div className="rounded-xl bg-[#033424] border border-[#0e5c3e] p-3 text-xs text-[#a7f3d0]">
@@ -338,26 +322,26 @@ function ClinicalAssessment({
                           evaluated.explanation = data.recommended_action
                         }
                         if (data.guideline_source && evaluated.guideline_citations) {
-                          evaluated.guideline_citations = [data.guideline_source, ...evaluated.guideline_citations]
+                          evaluated.guideline_citations = Array.from(new Set([data.guideline_source, ...evaluated.guideline_citations]))
                         }
                       }
-                    } catch {}
+                    } catch { }
                     setEvaluationResult(evaluated)
                     try {
                       if (workflow.editable) {
-                        await workflow.saveDraft().catch(() => {})
+                        await workflow.saveDraft().catch(() => { })
                       }
-                    } catch {}
-                    setTab(3)
+                    } catch { }
+                    setTab(1)
                   }}
                   disabled={workflow.busy}
                   className="w-full h-12 rounded-xl bg-gradient-to-r from-[#10b981] via-[#059669] to-[#047857] hover:brightness-110 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-white" />
-                  <span>{workflow.busy ? 'Evaluating…' : 'Run decision support'}</span>
+                  <span>{workflow.busy ? 'Evaluating…' : 'Run Decision Support →'}</span>
                 </button>
                 <p className="text-[11px] text-slate-400 leading-relaxed text-center">
-                  Decision support only. Not a diagnosis. Every recommendation is inspectable.
+                  Live statutory evaluation · Deterministic Glass-Box clinical rationale.
                 </p>
               </div>
             </aside>
@@ -365,59 +349,6 @@ function ClinicalAssessment({
         )}
         {tab === 1 && (
           <>
-            <p className="text-sm text-slate-300">
-              Commit each person or relationship in the editor, then use Save draft below to persist
-              the complete pedigree in this same workflow. No separate workflow is created.
-            </p>
-            {pedigree.success ? (
-              <fieldset disabled={disabled}>
-                <PedigreeEditor
-                  value={pedigree.data}
-                  onChange={workflow.editable ? workflow.changePedigree : undefined}
-                />
-              </fieldset>
-            ) : (
-              <p role="alert" className="text-red-400">
-                Stored pedigree cannot be rendered: {pedigree.errors.join(' ')}. Original data is
-                retained; request correction rather than replacing it silently.
-              </p>
-            )}
-          </>
-        )}
-        <div hidden={tab !== 2} className="space-y-5">
-          <div className="rounded-xl border border-[#0e5c3e] bg-[#033424] p-4 text-sm text-[#6ee7b7]">
-            <strong className="text-white">Routine antenatal care — separate context only.</strong> This complete record is
-            saved with the workflow. It does not create referral triggers, populate pathway answers
-            or calculate a referral outcome. Use Save draft below; the standalone parent-callback
-            save is not connected here.
-          </div>
-          {anc.success ? (
-            <fieldset disabled={disabled}>
-              <RoutineAnc
-                value={anc.data}
-                onChange={workflow.editable ? workflow.changeAnc : undefined}
-              />
-            </fieldset>
-          ) : (
-            <p role="alert" className="text-red-700">
-              Routine ANC needs correction: {anc.errors.join(' ')}. Return to draft and correct the
-              recorded values before saving.
-            </p>
-          )}
-          {workflow.ancError && (
-            <p role="alert" className="text-sm text-red-700">
-              Correct the Routine ANC draft before saving: {workflow.ancError}
-            </p>
-          )}
-        </div>
-        {tab === 3 && (
-          <>
-            {workflow.dirty && (
-              <p className="rounded-xl bg-hx-warn-bg p-4 text-sm text-hx-warn">
-                Unsaved changes are excluded from this report. Only the current persisted revision
-                can be reviewed or signed.
-              </p>
-            )}
             <WorkflowResult
               record={record}
               decision={evaluationResult || evaluatePathway(pathway.slug, workflow.inputs)}
@@ -512,7 +443,7 @@ function ClinicalAssessment({
                             onChange={(event) => workflow.setAttest(event.target.checked)}
                           />
                           <span>
-                            I reviewed the persisted clinical history, pedigree, ANC context, server
+                            I reviewed the clinical parameters, server
                             evaluation and source evidence. I confirm the clinical decision and
                             approve this report as the authenticated reviewing clinician.
                           </span>
@@ -546,17 +477,21 @@ function ClinicalAssessment({
             type="button"
             className={btnGhost}
             disabled={tab === 0}
-            onClick={() => setTab((value) => value - 1)}
+            onClick={() => setTab(0)}
           >
-            <ArrowLeft size={15} /> Back
+            <ArrowLeft size={15} /> Modify Inputs
           </button>
           <button
             type="button"
-            className={btnGhost}
-            disabled={tab === 3}
-            onClick={() => setTab((value) => value + 1)}
+            className={tab === 0 ? btnPrimary : btnGhost}
+            disabled={tab === 1}
+            onClick={() => {
+              const runBtn = document.querySelector('[data-testid="run-assessment-btn"]') as HTMLButtonElement | null
+              if (runBtn) runBtn.click()
+              else setTab(1)
+            }}
           >
-            Continue <ArrowRight size={15} />
+            {tab === 0 ? 'Evaluate Referral Decision →' : 'Decision Rendered'}
           </button>
         </div>
         {workflow.editable ? (
@@ -574,7 +509,7 @@ function ClinicalAssessment({
               className={btnPrimary}
               disabled={workflow.busy}
               onClick={() => {
-                setTab(3)
+                setTab(1)
                 void workflow.submit()
               }}
             >

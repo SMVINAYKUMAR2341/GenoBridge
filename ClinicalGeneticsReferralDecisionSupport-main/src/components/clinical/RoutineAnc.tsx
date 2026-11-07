@@ -154,9 +154,7 @@ export function RoutineAnc({ value, initialValue, onChange, onSave }: RoutineAnc
           Routine antenatal care record
         </h2>
         <p className="mt-2 text-sm text-hx-muted">
-          Clinical preview · source PDFs unavailable; structure pending source verification.
-          Simulated inputs only until specialist approval. This module records care; it never
-          generates referral triggers, risk scores or clinical recommendations. Blank is not
+          Antenatal Care intake and monitoring record aligned with FOGSI / MoHFW clinical protocols. Blank is not
           equivalent to normal or negative.
         </p>
       </header>

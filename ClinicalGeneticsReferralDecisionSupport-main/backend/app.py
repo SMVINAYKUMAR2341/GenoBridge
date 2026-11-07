@@ -113,7 +113,7 @@ async def generate_pdf_endpoint(request: Request):
     except Exception:
         return JSONResponse({"detail": "Expected JSON"}, status_code=400)
 
-    patient_id = data.get("patient_id", "SYN-STANDALONE")
+    patient_id = data.get("patient_id", "PATIENT-ENCOUNTER")
     physician_name = data.get("physician_name", "Attending Clinician")
     pathway = data.get("pathway", "Clinical Genetics Assessment")
     evaluation = data.get("evaluation", {})
@@ -131,7 +131,7 @@ async def send_email_endpoint(request: Request):
         return JSONResponse({"detail": "Expected JSON"}, status_code=400)
 
     recipient_email = data.get("recipient_email")
-    patient_mrn = data.get("patient_mrn", "SYN-STANDALONE")
+    patient_mrn = data.get("patient_mrn", "PATIENT-ENCOUNTER")
     pathway_title = data.get("pathway_title", "Clinical Genetics")
     urgency_level = data.get("urgency_level", "ROUTINE")
     evaluation = data.get("evaluation", {})

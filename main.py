@@ -184,7 +184,7 @@ async def generate_pdf_route(request: Request):
     from services.pdf_generator import generate_clinical_report_pdf
     data = await request.json()
     pdf_bytes = generate_clinical_report_pdf(
-        patient_id=data.get("patient_id", "SYN-62104"),
+        patient_id=data.get("patient_id", "PT-84291"),
         physician_name=data.get("physician_name", "Dr. Attending"),
         pathway=data.get("pathway", "Clinical Genetics"),
         evaluation=data.get("evaluation", {}),
@@ -199,7 +199,7 @@ async def send_email_route(request: Request):
     data = await request.json()
     
     recipient = data.get("recipient_email")
-    patient_id = data.get("patient_id", "SYN-62104")
+    patient_id = data.get("patient_id", "PT-84291")
     pathway = data.get("pathway", "Clinical Genetics")
     evaluation = data.get("evaluation", {})
     

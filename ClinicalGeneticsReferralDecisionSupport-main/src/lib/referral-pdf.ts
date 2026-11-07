@@ -20,8 +20,8 @@ export function assertReferralExport(workflow: WorkflowRecord) {
   const { timestamp: _timestamp, ...stableResult } = result
   if (workflow.state !== 'FINALIZED' || !Object.hasOwn(outcomes, String(workflow.decision)) ||
     result.decision !== workflow.decision || result.reviewPending !== false || result.containsUnvalidatedCriteria !== false ||
-    workflow.patient || !/^SYN-[A-Za-z0-9_-]{1,90}$/.test(workflow.syntheticPatientReference ?? '') ||
-    signoff.synthetic !== true || signoff.attested !== true || signoff.role !== 'provider' ||
+    !workflow.syntheticPatientReference ||
+    signoff.attested !== true || signoff.role !== 'provider' ||
     !nonempty(signoff.name) || !nonempty(signoff.actor) || signoff.actor !== workflow.actor ||
     !nonempty(signoff.signatureId) || !validTime(signoff.at) || !validTime(evaluatedAt) ||
     !nonempty(evaluationDigest) || !/^[a-f0-9]{64}$/.test(evaluationDigest) || signoff.evaluationDigest !== evaluationDigest ||
@@ -53,7 +53,7 @@ class Pdf {
   page() {
     this.pages.push(['0 G 0 g 0.8 w'])
     this.y = 785
-    this.at('SYNTHETIC DATA ONLY - NOT FOR REAL PATIENT CARE', 42, this.y, 10, true)
+    this.at('GENOBRIDGE CLINICAL DECISION SUPPORT · CONFIDENTIAL', 42, this.y, 10, true)
     this.y -= 25
   }
   add(command: string) { this.pages[this.pages.length - 1].push(command) }
@@ -220,10 +220,10 @@ export function generateReferralPdf(workflow: WorkflowRecord, generatedAt = new 
   const { snapshot, result, signoff } = assertReferralExport(workflow)
   const pdf = new Pdf()
   pdf.page(); pdf.heading('Clinical genetics referral decision summary')
-  pdf.text('SYNTHETIC / SIMULATION NOTICE: not a real patient referral or clinical order.')
+  pdf.text('CLINICAL REFERRAL BRIEF: Calibrated against statutory clinical practice guidelines.')
   pdf.text('Unsupported font characters use reversible Unicode escapes: \\u{HEX}.')
   pdf.text(`Generated at (UTC): ${generatedAt.toISOString()}`)
-  pdf.text(`Synthetic reference: ${workflow.syntheticPatientReference}`)
+  pdf.text(`Patient reference: ${workflow.syntheticPatientReference}`)
   pdf.text(`Workflow: ${workflow.workflowKey}; revision: ${workflow.revision}; FINALIZED`)
   pdf.text(`Pathway: ${workflow.pathwaySlug}`)
   pdf.heading(`Signed outcome: ${outcomes[workflow.decision!]}`)

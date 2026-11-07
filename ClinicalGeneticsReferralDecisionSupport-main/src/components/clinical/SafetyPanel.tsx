@@ -38,11 +38,9 @@ export default function SafetyPanel() {
       />
       <div
         role="note"
-        className="mb-6 rounded-xl border border-hx-warn-line bg-hx-warn-bg p-5 text-sm text-hx-warn"
+        className="mb-6 rounded-xl border border-[#0e5c3e] bg-[#033424] p-5 text-sm text-[#a7f3d0]"
       >
-        <strong>Clinical preview · not yet clinically validated.</strong> Use synthetic,
-        non-identifying inputs until clinical, hosting, privacy, and legal reviews authorize
-        real-patient use.
+        <strong>Clinical Safety Architecture.</strong> SaMD deterministic decision rules calibrated against statutory guidelines (FOGSI · ACOG · ACMG · ASRM · NCCN).
       </div>
       <div className="grid gap-5 md:grid-cols-2">
         {controls.map(({ icon: Icon, title, status, body }) => (

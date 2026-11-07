@@ -101,3 +101,4 @@ If you received this in error, notify the sender immediately and delete this mes
     except Exception as exc:
         logger.error(f"SMTP delivery failed: {str(exc)}", exc_info=True)
         return False
+

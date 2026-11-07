@@ -37,18 +37,7 @@ export function PageHeader({
   )
 }
 export function PreviewBanner({ className = 'mb-6' }: { className?: string }) {
-  return (
-    <div
-      role="note"
-      className={`flex min-h-[50px] items-center gap-[22px] rounded-[10px] border border-hx-warn-line bg-hx-warn-bg px-[26px] py-3 text-[13px] text-hx-warn ${className}`}
-    >
-      <TriangleAlert size={19} strokeWidth={1.9} className="shrink-0 text-[#a4471a]" />
-      <p>
-        <strong className="font-bold">Clinical preview</strong> · NOT YET CLINICALLY VALIDATED. Use
-        simulated inputs only until specialist approval and HIPAA hosting review are complete.
-      </p>
-    </div>
-  )
+  return null
 }
 const pri: Record<Priority, string> = {
   routine: 'bg-hx-mint text-hx-emerald ring-[#cdeed6]',

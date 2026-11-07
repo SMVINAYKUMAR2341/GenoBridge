@@ -122,21 +122,24 @@ export function WorkflowResult({
   ]
 
   // Guideline citations
-  const guidelineCitations =
-    decision?.guideline_citations && decision.guideline_citations.length > 0
-      ? decision.guideline_citations
-      : [
-          'ACOG Practice Bulletin No. 691 / ACMG Tier 3 — Preconception Carrier Screening',
-          'ACOG Practice Bulletin No. 226 / SMFM — Screening for Fetal Chromosomal Abnormalities',
-          'ACOG Practice Bulletin No. 175 — Ultrasound Examination in Pregnancy',
-          'ASRM Practice Committee 2024 — Evaluation of Recurrent Pregnancy Loss',
-          'ACMG Technical Standards for Clinical Genetics Practice',
-          'NCCN Clinical Practice Guidelines in Oncology — Genetic/Familial High-Risk Assessment',
-        ]
+  const guidelineCitations = Array.from(
+    new Set(
+      decision?.guideline_citations && decision.guideline_citations.length > 0
+        ? decision.guideline_citations
+        : [
+            'ACOG Practice Bulletin No. 691 / ACMG Tier 3 — Preconception Carrier Screening',
+            'ACOG Practice Bulletin No. 226 / SMFM — Screening for Fetal Chromosomal Abnormalities',
+            'ACOG Practice Bulletin No. 175 — Ultrasound Examination in Pregnancy',
+            'ASRM Practice Committee 2024 — Evaluation of Recurrent Pregnancy Loss',
+            'ACMG Technical Standards for Clinical Genetics Practice',
+            'NCCN Clinical Practice Guidelines in Oncology — Genetic/Familial High-Risk Assessment',
+          ]
+    )
+  )
 
   const handleExportFhir = () => {
     try {
-      const syntheticRef = record?.syntheticPatientReference || 'SYN-STANDALONE'
+      const syntheticRef = record?.syntheticPatientReference || 'PATIENT-ENCOUNTER'
       const bundle = buildFhirGenomicsBundle({
         workflowKey: record?.workflowKey || `genobridge-${Date.now()}`,
         syntheticPatientReference: syntheticRef,
@@ -209,14 +212,14 @@ export function WorkflowResult({
     try {
       setEmailSending(true)
       setEmailStatus(null)
-      const syntheticRef = record?.syntheticPatientReference || 'SYN-STANDALONE'
+      const patientRef = record?.syntheticPatientReference || 'PATIENT-ENCOUNTER'
       const res = await fetch('/api/referrals/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: recipientEmail,
           referralId: record?.workflowKey || `case-${Date.now()}`,
-          patientName: syntheticRef,
+          patientName: patientRef,
           pathwayTitle: pathwaySlug || 'Clinical Genetics Assessment',
           decisionLabel: isUrgent ? 'URGENT REFERRAL' : isRoutine ? 'ROUTINE REFERRAL' : 'STANDARD CARE',
         }),

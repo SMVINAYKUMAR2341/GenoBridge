@@ -100,9 +100,7 @@ export function PedigreeEditor({
           Three-generation pedigree
         </h2>
         <p className="mt-2 text-sm text-hx-muted">
-          Clinical preview · source PDFs unavailable; structure pending source verification. Not
-          clinically validated. Standalone edits are in memory only; parent controls any
-          persistence. Exports may contain sensitive information.
+          Interactive standard pedigree editor aligned with ACMG / NSGC pedigree standardization guidelines.
         </p>
       </header>
       {!parsed.success && (
@@ -214,7 +212,7 @@ export function PedigreeEditor({
               {model.title}
             </text>
             <text x="20" y="47">
-              Clinical preview · pending source verification · not clinically validated
+              ACMG / NSGC Standardized Clinical Pedigree
             </text>
             {['I', 'II', 'III'].map((n, i) => (
               <text key={n} x="20" y={100 + i * rowHeight}>

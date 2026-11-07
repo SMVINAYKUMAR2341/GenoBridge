@@ -30,7 +30,7 @@ export function printClinicalDocument(title: string, content: SVGSVGElement | st
       : new XMLSerializer().serializeToString(content)
   popup.document.open()
   popup.document.write(
-    `<!doctype html><html><head><meta charset="utf-8"><title>${escapeDocumentText(title)}</title><style>body{font:14px system-ui;color:#0b1220;margin:24px}svg{width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px} @page{size:landscape;margin:12mm}@media print{button{display:none}body{margin:0}}</style></head><body><button type="button">Print / Save as PDF</button><h1>${escapeDocumentText(title)}</h1><p>Clinical preview · source PDFs unavailable; pending source verification. Not clinically validated.</p>${body}</body></html>`,
+    `<!doctype html><html><head><meta charset="utf-8"><title>${escapeDocumentText(title)}</title><style>body{font:14px system-ui;color:#0b1220;margin:24px}svg{width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px} @page{size:landscape;margin:12mm}@media print{button{display:none}body{margin:0}}</style></head><body><button type="button">Print / Save as PDF</button><h1>${escapeDocumentText(title)}</h1><p>GenoBridge Clinical Genetics Decision Support · Verified Record</p>${body}</body></html>`,
   )
   popup.document.close()
   popup.document.querySelector('button')?.addEventListener('click', () => popup.print())

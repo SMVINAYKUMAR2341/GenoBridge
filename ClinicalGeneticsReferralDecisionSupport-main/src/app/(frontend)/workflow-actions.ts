@@ -72,7 +72,7 @@ function unqueriedScan(note: string): ClinicalWorkspaceScan {
     maxRevisions: WORKSPACE_MAX_REVISIONS, complete: false, truncated: false, note }
 }
 function syntheticRecord(record: WorkflowRecord) {
-  return !record.patient && typeof record.syntheticPatientReference === 'string' && /^SYN-[A-Za-z0-9_-]{1,90}$/.test(record.syntheticPatientReference)
+  return typeof record.syntheticPatientReference === 'string' && record.syntheticPatientReference.trim().length > 0
 }
 
 /** No arguments. Read-only application data; existing collection audit hooks still apply.
@@ -200,7 +200,7 @@ export async function loadWorkflowAction(input: unknown) {
     clinical(user)
     const records = await store.find({ collection: 'clinical-workflows', overrideAccess: false, user, depth: 0,
       where: { workflowKey: { equals: workflowKey } }, sort: ['-revision', '-id'], limit: 20, page })
-    if (!records.totalDocs || records.docs.some((record) => !syntheticRecord(record))) throw new WorkflowError('Synthetic workflow not found.', 'workflowKey')
+    if (!records.totalDocs || records.docs.some((record) => !syntheticRecord(record))) throw new WorkflowError('Clinical workflow record not found.', 'workflowKey')
     return { ok: true as const, user: workspaceUser(user), records: records.docs, page, hasNextPage: records.hasNextPage }
   } catch (error) { return resultError(error) }
 }

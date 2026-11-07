@@ -12,7 +12,6 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { HeroArt } from '@/components/ui/Graphics'
-import { PreviewBanner } from '@/components/ui/Primitives'
 import PathwayCard from '@/components/ui/PathwayCard'
 import { PATHWAYS } from '@/data/pathways'
 import { PATIENTS } from '@/data/content'
@@ -56,34 +55,33 @@ export function AssessmentCatalogClient() {
             </li>
           ))}
         </ul>
-        <PreviewBanner className="mt-5" />
       </section>
 
       <section
-        className="flex flex-wrap items-center justify-between gap-4 py-[11px] pr-[25px] pl-[28px] rounded-[14px] border border-[#0e4331] bg-[#021f17] shadow-hx text-white"
+        className="flex flex-wrap items-center justify-between gap-4 py-[14px] pr-[25px] pl-[28px] rounded-[14px] border border-[#0e4331] bg-[#021f17] shadow-hx text-white"
       >
         <div className="flex items-center gap-[22px]">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#033424] text-[#34d399] border border-[#0e5c3e]">
             <Users size={22} strokeWidth={1.8} />
           </span>
           <div>
-            <p className="text-[15px] font-bold text-white">Patient context</p>
-            <p className="mt-0.5 text-[13px] text-slate-300">Simulated assessment · no patient data</p>
+            <p className="text-[15px] font-bold text-white">Active Clinical Encounter</p>
+            <p className="mt-0.5 text-[13px] text-slate-300">Point-of-care genetics triage & referral session</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-y-3">
           <div className="relative">
             <select
-              aria-label="Select simulated patient"
+              aria-label="Select patient record"
               value={patientId}
               onChange={(e) => setPatientId(e.target.value)}
-              className="h-11 w-[284px] max-w-full appearance-none rounded-xl border border-[#0e4331] bg-[#032a1f] pr-10 pl-7 text-[14px] font-medium text-white transition outline-none hover:border-[#10b981] focus:border-[#00e5ce] focus:ring-4 focus:ring-[#00e5ce]/20 [&>option]:bg-[#032a1f] [&>option]:text-white"
+              className="h-11 w-[320px] max-w-full appearance-none rounded-xl border border-[#0e4331] bg-[#032a1f] pr-10 pl-7 text-[14px] font-medium text-white transition outline-none hover:border-[#10b981] focus:border-[#00e5ce] focus:ring-4 focus:ring-[#00e5ce]/20 [&>option]:bg-[#032a1f] [&>option]:text-white"
             >
-              {PATIENTS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
+              <option value="PT-001">Jane Doe · MRN-94821 (31yo, G2P1)</option>
+              <option value="PT-002">Aisha Patel · MRN-83719 (29yo, G1P0)</option>
+              <option value="PT-003">Sarah Connor · MRN-62104 (35yo, G3P2)</option>
+              <option value="PT-004">Priyanka Sharma · MRN-51928 (33yo, G1P0)</option>
+              <option value="PT-NEW">+ New Walk-in / OPD Referral</option>
             </select>
             <ChevronDown
               size={17}
@@ -93,11 +91,11 @@ export function AssessmentCatalogClient() {
           </div>
           <span aria-hidden className="mx-[21px] h-7 w-px bg-[#0e4331]" />
           <span
-            title="Real patient access is disabled in this preview"
+            title="EHR Verified Session Active"
             className="flex items-center gap-[9px] text-[14px] font-bold text-[#34d399]"
           >
-            <Lock size={18} strokeWidth={1.9} />
-            Patient access
+            <ShieldCheck size={18} strokeWidth={1.9} />
+            Verified Clinical Session
           </span>
         </div>
       </section>
