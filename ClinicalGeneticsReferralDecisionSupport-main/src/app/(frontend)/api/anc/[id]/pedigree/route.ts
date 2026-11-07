@@ -86,3 +86,4 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: error?.message || 'Failed to sync pedigree' }, { status: 500 })
   }
 }
+

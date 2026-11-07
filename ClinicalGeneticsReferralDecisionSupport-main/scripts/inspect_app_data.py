@@ -32,3 +32,4 @@ cur.execute("SELECT count(*) FROM audit_logs;")
 print(f"\nAudit logs in DB: {cur.fetchone()[0]}")
 
 conn.close()
+

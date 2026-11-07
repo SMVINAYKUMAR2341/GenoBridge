@@ -50,3 +50,4 @@ cur.execute("SELECT count(*) FROM patients;")
 print(f"Total patients in PostgreSQL: {cur.fetchone()[0]}")
 
 conn.close()
+

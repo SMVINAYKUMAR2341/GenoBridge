@@ -8,8 +8,14 @@ import { getUnifiedPatients } from '@/lib/patient-history-service'
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await appAuth.currentSessionUser()
-    if (!user || user.verificationStatus !== 'APPROVED' || !user.enabled) {
+    let user = null
+    try {
+      user = await appAuth.currentSessionUser()
+    } catch (authErr) {
+      console.warn('Analytics route: auth session lookup error:', authErr)
+    }
+
+    if (!user || (user.verificationStatus && user.verificationStatus !== 'APPROVED') || user.enabled === false) {
       return NextResponse.json({ error: 'Unauthorized clinical session' }, { status: 401 })
     }
 
@@ -36,19 +42,37 @@ export async function GET(req: NextRequest) {
     }
 
     // 1. Patient Analytics (Unique count across DB and ANC)
-    const allPatients = await getUnifiedPatients()
+    let allPatients: any[] = []
+    try {
+      allPatients = await getUnifiedPatients()
+    } catch (patErr) {
+      console.warn('Analytics route: unified patients load error:', patErr)
+      allPatients = []
+    }
+
     const filteredPatients = allPatients.filter((p) => {
-      if (startDate && new Date(p.registeredAt || Date.now()) < startDate) return false
-      if (portalFilter !== 'all' && !p.sourcePortals.includes(portalFilter)) return false
-      return true
+      try {
+        if (startDate) {
+          const regDate = p.registeredAt instanceof Date ? p.registeredAt : new Date(p.registeredAt || Date.now())
+          if (regDate < startDate) return false
+        }
+        if (portalFilter !== 'all' && !(p.sourcePortals || []).includes(portalFilter)) return false
+        return true
+      } catch {
+        return true
+      }
     })
 
     const totalUniquePatients = filteredPatients.length
-    const activePatients = filteredPatients.filter((p) => p.pregnancyStatus.toLowerCase().includes('active') || p.pregnancyStatus.toLowerCase().includes('pregnant')).length
-    const patientsWithAnc = filteredPatients.filter((p) => p.hasAnc).length
-    const patientsWithPedigree = filteredPatients.filter((p) => p.hasPedigree).length
-    const patientsWithAssessments = filteredPatients.filter((p) => p.assessmentCount > 0).length
-    const patientsWithReports = filteredPatients.filter((p) => p.documentCount > 0).length
+    const activePatients = filteredPatients.filter((p) => {
+      const status = String(p.pregnancyStatus || '').toLowerCase()
+      return status.includes('active') || status.includes('pregnant')
+    }).length
+
+    const patientsWithAnc = filteredPatients.filter((p) => Boolean(p.hasAnc)).length
+    const patientsWithPedigree = filteredPatients.filter((p) => Boolean(p.hasPedigree)).length
+    const patientsWithAssessments = filteredPatients.filter((p) => (p.assessmentCount || 0) > 0).length
+    const patientsWithReports = filteredPatients.filter((p) => (p.documentCount || 0) > 0).length
 
     // 2. Cross-Portal Activity Metrics (Actual database queries)
     let totalWorkflows = 0
@@ -62,22 +86,45 @@ export async function GET(req: NextRequest) {
          FROM clinical_workflows 
          GROUP BY pathway_slug, state;`,
       )
-      for (const row of wfRes.rows) {
-        const count = parseInt(row.count, 10) || 0
-        totalWorkflows += count
-        if (row.state === 'FINALIZED') finalizedAssessments += count
-        else draftAssessments += count
-        const pSlug = row.pathway_slug || 'General Assessment'
-        pathwayCounts[pSlug] = (pathwayCounts[pSlug] || 0) + count
+      if (wfRes && Array.isArray(wfRes.rows)) {
+        for (const row of wfRes.rows) {
+          const count = parseInt(String(row.count || '0'), 10) || 0
+          totalWorkflows += count
+          if (row.state === 'FINALIZED') finalizedAssessments += count
+          else draftAssessments += count
+          const pSlug = row.pathway_slug || 'General Assessment'
+          pathwayCounts[pSlug] = (pathwayCounts[pSlug] || 0) + count
+        }
       }
-    } catch {}
+    } catch (wfErr) {
+      console.warn('Analytics route: clinical_workflows query error:', wfErr)
+    }
+
+    // Include assessments from assessments table
+    try {
+      const asmRes = await dbQuery<{ action_taken: string; count: string }>(
+        `SELECT action_taken, count(*) as count FROM assessments GROUP BY action_taken;`,
+      )
+      if (asmRes && Array.isArray(asmRes.rows)) {
+        for (const row of asmRes.rows) {
+          const count = parseInt(String(row.count || '0'), 10) || 0
+          finalizedAssessments += count
+        }
+      }
+    } catch (asmErr) {
+      console.warn('Analytics route: assessments table query error:', asmErr)
+    }
 
     // Total Pedigrees in PostgreSQL
     let totalPedigrees = 0
     try {
       const pedCountRes = await dbQuery<{ count: string }>('SELECT count(*) as count FROM pedigrees;')
-      totalPedigrees = parseInt(pedCountRes.rows[0]?.count || '0', 10)
-    } catch {}
+      if (pedCountRes && Array.isArray(pedCountRes.rows) && pedCountRes.rows.length > 0) {
+        totalPedigrees = parseInt(String(pedCountRes.rows[0]?.count || '0'), 10) || 0
+      }
+    } catch (pedErr) {
+      console.warn('Analytics route: pedigrees table query error:', pedErr)
+    }
 
     // 3. ANC Module Real Aggregates
     let ancVisitsTotal = 0
@@ -91,15 +138,22 @@ export async function GET(req: NextRequest) {
         const content = await fs.promises.readFile(ANC_FILE, 'utf-8')
         const ancRecords: RoutineAncData[] = JSON.parse(content || '[]')
         for (const anc of ancRecords) {
-          if (startDate && new Date(anc.booking?.bookingDate || (anc as any).lastUpdated || Date.now()) < startDate) continue
+          if (startDate) {
+            const dateVal = anc.booking?.bookingDate || (anc as any).lastUpdated || Date.now()
+            if (new Date(dateVal) < startDate) continue
+          }
           ancVisitsTotal += Array.isArray(anc.visits) ? anc.visits.length : 0
           ancUltrasoundsTotal += Array.isArray(anc.ultrasounds) ? anc.ultrasounds.length : 0
-          ancLabsTotal += Array.isArray(anc.investigations) ? anc.investigations.length : 0
-          ancVaccinationsTotal += Array.isArray(anc.vaccinations) ? anc.vaccinations.length : 0
-          if (anc.riskClassification?.riskLevel === 'HIGH') ancHighRiskTotal++
+          ancLabsTotal += anc.investigations ? 1 : 0
+          ancVaccinationsTotal += anc.vaccinations ? 1 : 0
+          if (anc.riskClassification?.riskLevel === 'HIGH' || anc.status === 'HIGH_RISK') {
+            ancHighRiskTotal++
+          }
         }
       }
-    } catch {}
+    } catch (ancErr) {
+      console.warn('Analytics route: ANC data read error:', ancErr)
+    }
 
     // 4. Documents & Reports Total
     let totalDocumentsGenerated = 0
@@ -107,9 +161,11 @@ export async function GET(req: NextRequest) {
       if (fs.existsSync(REPORTS_META_FILE)) {
         const metaContent = await fs.promises.readFile(REPORTS_META_FILE, 'utf-8')
         const allMeta: any[] = JSON.parse(metaContent || '[]')
-        totalDocumentsGenerated = allMeta.length
+        totalDocumentsGenerated = Array.isArray(allMeta) ? allMeta.length : 0
       }
-    } catch {}
+    } catch (metaErr) {
+      console.warn('Analytics route: reports metadata read error:', metaErr)
+    }
 
     // 5. Demographics (Age Buckets from actual records)
     const ageBuckets = {
@@ -122,12 +178,12 @@ export async function GET(req: NextRequest) {
     }
 
     filteredPatients.forEach((p) => {
-      const age = p.age
-      if (!age || age < 20) ageBuckets['< 20']++
-      else if (age <= 24) ageBuckets['20–24']++
-      else if (age <= 29) ageBuckets['25–29']++
-      else if (age <= 34) ageBuckets['30–34']++
-      else if (age <= 39) ageBuckets['35–39']++
+      const ageNum = typeof p.age === 'number' ? p.age : parseInt(String(p.age || '0'), 10)
+      if (!ageNum || isNaN(ageNum) || ageNum < 20) ageBuckets['< 20']++
+      else if (ageNum <= 24) ageBuckets['20–24']++
+      else if (ageNum <= 29) ageBuckets['25–29']++
+      else if (ageNum <= 34) ageBuckets['30–34']++
+      else if (ageNum <= 39) ageBuckets['35–39']++
       else ageBuckets['40+']++
     })
 
@@ -149,7 +205,14 @@ export async function GET(req: NextRequest) {
     const trendMap = new Map<string, { date: string; registrations: number; clinicalVisits: number }>()
 
     filteredPatients.forEach((p) => {
-      const d = (p.registeredAt || '').slice(0, 10) || 'Recent'
+      let d = 'Recent'
+      try {
+        if (p.registeredAt instanceof Date) {
+          d = p.registeredAt.toISOString().slice(0, 10)
+        } else if (typeof p.registeredAt === 'string' && p.registeredAt.length >= 10) {
+          d = p.registeredAt.slice(0, 10)
+        }
+      } catch {}
       const cur = trendMap.get(d) || { date: d, registrations: 0, clinicalVisits: 0 }
       cur.registrations++
       trendMap.set(d, cur)

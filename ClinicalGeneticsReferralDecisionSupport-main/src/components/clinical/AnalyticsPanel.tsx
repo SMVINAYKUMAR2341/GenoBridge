@@ -67,12 +67,19 @@ export default function AnalyticsPanel() {
     setError('')
     try {
       const res = await fetch(`/api/analytics/overview?range=${range}&portal=${portal}`)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/login?redirect=/analytics'
+          return
+        }
+        const errJson = await res.json().catch(() => ({}))
+        throw new Error(errJson.error || `HTTP ${res.status}`)
+      }
       const json = await res.json()
       setData(json)
     } catch (err: any) {
       console.error('Analytics load error:', err)
-      setError('Unable to load database analytics. Please retry.')
+      setError(err?.message || 'Unable to load database analytics. Please retry.')
     } finally {
       setLoading(false)
     }

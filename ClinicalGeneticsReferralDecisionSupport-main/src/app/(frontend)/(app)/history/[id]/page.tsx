@@ -25,3 +25,4 @@ export default async function HistoryDetailPage({ params }: HistoryDetailPagePro
 
   return <PatientHistoryClient initialPatientId={id} />
 }
+

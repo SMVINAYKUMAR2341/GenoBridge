@@ -128,8 +128,14 @@ export async function getUnifiedPatients(searchQuery = ''): Promise<UnifiedPatie
         assessmentCount: 0,
         documentCount: 0,
         sourcePortals: ['Hospital Portal'],
-        registeredAt: r.created_at || new Date().toISOString(),
-        lastActivityAt: r.updated_at || r.created_at || new Date().toISOString(),
+        registeredAt: r.created_at
+          ? new Date(r.created_at).toISOString()
+          : new Date().toISOString(),
+        lastActivityAt: r.updated_at
+          ? new Date(r.updated_at).toISOString()
+          : r.created_at
+          ? new Date(r.created_at).toISOString()
+          : new Date().toISOString(),
       })
     }
   } catch (err) {
@@ -149,7 +155,7 @@ export async function getUnifiedPatients(searchQuery = ''): Promise<UnifiedPatie
 
         const ancPortal = 'ANC Portal'
         const gpla = `G${anc.booking.gravida ?? 1} P${anc.booking.para ?? 0} L${anc.booking.living ?? 0} A${anc.booking.abortions ?? 0}`
-        const portals = existing ? Array.from(new Set([...existing.sourcePortals, ancPortal])) : [ancPortal]
+        const portals = existing ? Array.from(new Set([...(existing.sourcePortals || []), ancPortal])) : [ancPortal]
 
         patientMap.set(mrnKey, {
           id: existing?.id || anc.booking.patientId || anc.booking.identifier,
@@ -185,7 +191,9 @@ export async function getUnifiedPatients(searchQuery = ''): Promise<UnifiedPatie
     )
     for (const ped of pedRes.rows) {
       for (const [key, p] of patientMap.entries()) {
-        if (p.id === ped.patient_id || ped.title.toLowerCase().includes(p.name.toLowerCase())) {
+        const pedTitle = String(ped.title || '').toLowerCase()
+        const pName = String(p.name || '').toLowerCase()
+        if (p.id === ped.patient_id || (pedTitle && pName && pedTitle.includes(pName))) {
           p.hasPedigree = true
           if (!p.sourcePortals.includes('Pedigree Studio')) {
             p.sourcePortals.push('Pedigree Studio')
@@ -227,7 +235,11 @@ export async function getUnifiedPatients(searchQuery = ''): Promise<UnifiedPatie
   }
 
   // Sort by last activity descending
-  return results.sort((a, b) => new Date(b.lastActivityAt).getTime() - new Date(a.lastActivityAt).getTime())
+  return results.sort((a, b) => {
+    const timeB = new Date(b.lastActivityAt || Date.now()).getTime() || 0
+    const timeA = new Date(a.lastActivityAt || Date.now()).getTime() || 0
+    return timeB - timeA
+  })
 }
 
 /**
