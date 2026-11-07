@@ -164,14 +164,14 @@ export function WorkflowResult({
   const handleDownloadPdf = async () => {
     try {
       setDownloadingPdf(true)
-      const syntheticRef = record?.syntheticPatientReference || 'SYN-STANDALONE'
+      const patientRef = record?.syntheticPatientReference || 'PATIENT-ENCOUNTER'
       const res = await fetch('/api/referrals/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          patientId: syntheticRef,
+          patientId: patientRef,
           physicianName: 'Attending Clinician',
-          pathway: pathwaySlug || 'Clinical Genetics',
+          pathway: pathwaySlug || 'Preconception Carrier Screening',
           evaluation: {
             risk_level: isUrgent ? 'URGENT' : isRoutine ? 'ROUTINE' : isBorderline ? 'BORDERLINE' : 'NO_REFERRAL_NEEDED',
             confidence_score: confidenceScore,
@@ -190,7 +190,7 @@ export function WorkflowResult({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `Clinical_Brief_${syntheticRef}.pdf`
+      a.download = `Clinical_Brief_${patientRef.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`
       document.body.appendChild(a)
       a.click()
       a.remove()
