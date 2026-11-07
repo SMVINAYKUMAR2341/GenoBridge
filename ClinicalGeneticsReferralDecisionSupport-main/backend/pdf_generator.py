@@ -1,7 +1,7 @@
 """
 services/pdf_generator.py
-FDA SaMD-Compliant Clean Clinical Decision Support PDF Report Generator
-Eliminates encoding/mojibake errors and translates raw codes to clinician-friendly English.
+FDA SaMD-Compliant Clean Black & White Clinical Decision Support PDF Report Generator
+Pure black-and-white, zero color fills, high-contrast typography, and zero encoding glitches.
 """
 
 import io
@@ -84,7 +84,8 @@ def generate_clinical_pdf(
     evaluation: dict = None,
 ) -> bytes:
     """
-    Generates a clean, professional, and properly encoded clinical PDF report.
+    Generates a clean, crisp, black-and-white clinical PDF report.
+    Zero colors, white background, solid black borders, and pitch-black text.
     """
     if evaluation is None:
         evaluation = {}
@@ -99,56 +100,56 @@ def generate_clinical_pdf(
 
     styles = getSampleStyleSheet()
 
-    # Custom Clean Styles (Avoiding encoding crashes)
+    # Pure Black & White Styles
     title_style = ParagraphStyle(
-        'DocTitle',
+        'DocTitleBW',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
         fontSize=16,
         leading=20,
-        textColor=colors.HexColor('#0F291E'),
+        textColor=colors.black,
         alignment=TA_LEFT
     )
 
     subtitle_style = ParagraphStyle(
-        'DocSubtitle',
+        'DocSubtitleBW',
         parent=styles['Normal'],
         fontName='Helvetica',
         fontSize=8.5,
         leading=11,
-        textColor=colors.HexColor('#555555'),
+        textColor=colors.black,
         alignment=TA_LEFT
     )
 
     section_heading = ParagraphStyle(
-        'SectionHeading',
+        'SectionHeadingBW',
         parent=styles['Heading2'],
         fontName='Helvetica-Bold',
         fontSize=12,
         leading=16,
-        textColor=colors.HexColor('#0F291E'),
+        textColor=colors.black,
         spaceBefore=10,
         spaceAfter=5
     )
 
     body_style = ParagraphStyle(
-        'BodyTextCustom',
+        'BodyTextBW',
         parent=styles['Normal'],
         fontName='Helvetica',
         fontSize=9.5,
         leading=14,
-        textColor=colors.HexColor('#222222')
+        textColor=colors.black
     )
 
     story = []
 
-    # 1. Header Block
+    # 1. Header Block (Black & White)
     story.append(Paragraph("GENOBRIDGE CLINICAL GENETICS DSS", title_style))
     story.append(Paragraph("FDA SaMD Compliant Decision Support Brief | ACOG / NCCN / ACMG / ASRM Guidelines", subtitle_style))
     story.append(Spacer(1, 8))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor('#0F291E'), spaceAfter=14))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.black, spaceAfter=14))
 
-    # 2. Patient & Encounter Metadata Table
+    # 2. Patient & Encounter Metadata Table (White background, black border)
     date_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     meta_data = [
         [Paragraph(f"<b>Case Reference:</b> {clean_ascii_text(patient_id)}", body_style), Paragraph(f"<b>Date:</b> {date_str}", body_style)],
@@ -156,10 +157,10 @@ def generate_clinical_pdf(
     ]
     meta_table = Table(meta_data, colWidths=[260, 260])
     meta_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F4F6F5')),
+        ('BOX', (0,0), (-1,-1), 0.75, colors.black),
+        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
         ('PADDING', (0,0), (-1,-1), 7),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 7),
     ]))
     story.append(meta_table)
     story.append(Spacer(1, 14))
@@ -181,15 +182,14 @@ def generate_clinical_pdf(
     icds = evaluation.get("icd10_codes") or ["Z31.430", "Z84.81"]
     icd_desc = ", ".join([ICD_TRANSLATIONS.get(i, i) for i in icds])
 
-    # 3. Triage & Recommendation Summary Box
+    # 3. Triage & Recommendation Summary Box (White background, solid black border)
     triage_data = [
-        [Paragraph(f"<b>TRIAGE LEVEL: {risk_label} (CONFIDENCE: {confidence}%)</b>", ParagraphStyle('Alert', fontName='Helvetica-Bold', fontSize=10.5, textColor=colors.HexColor('#1B4D3E')))],
+        [Paragraph(f"<b>TRIAGE LEVEL: {risk_label} (CONFIDENCE: {confidence}%)</b>", ParagraphStyle('AlertBW', fontName='Helvetica-Bold', fontSize=10.5, textColor=colors.black))],
         [Paragraph(f"<b>Recommended Clinical Action:</b><br/>{action_text}", body_style)]
     ]
     triage_table = Table(triage_data, colWidths=[520])
     triage_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#EBF3F0')),
-        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#2E6F5E')),
+        ('BOX', (0,0), (-1,-1), 1.0, colors.black),
         ('PADDING', (0,0), (-1,-1), 9),
         ('BOTTOMPADDING', (0,0), (-1,-1), 9),
     ]))
@@ -198,7 +198,7 @@ def generate_clinical_pdf(
 
     # 4. Glass-Box Clinical Rationale (Clean, formatted layout)
     story.append(Paragraph("Glass-Box Clinical Rationale & Ground Truth", section_heading))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#CCCCCC'), spaceAfter=8))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.black, spaceAfter=8))
 
     rationale_text = f"""
     <b>Matched Clinical Rule:</b> {rule_title}<br/>
@@ -210,7 +210,7 @@ def generate_clinical_pdf(
     story.append(Paragraph(rationale_text, body_style))
     story.append(Spacer(1, 18))
 
-    # 5. Statutory Clinical Safety Notice
+    # 5. Statutory Clinical Safety Notice (White background, black border)
     notice_text = """
     <b>STATUTORY CLINICAL SAFETY NOTICE:</b><br/>
     This evaluation is generated by a deterministic rule-based decision support algorithm mapped to verified medical guidelines. 
@@ -219,8 +219,7 @@ def generate_clinical_pdf(
     """
     notice_table = Table([[Paragraph(notice_text, subtitle_style)]], colWidths=[520])
     notice_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FAFAFA')),
-        ('BOX', (0,0), (-1,-1), 0.5, colors.HexColor('#DDDDDD')),
+        ('BOX', (0,0), (-1,-1), 0.5, colors.black),
         ('PADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(notice_table)
