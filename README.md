@@ -45,83 +45,77 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 
 ## 📸 System Walkthrough & Screenshot Gallery
 
-### 1. Authentication & Institutional Onboarding
+Explore the operational portals of GenoBridge across the clinical genetic triage, maternal care, pedigree modeling, and analytics lifecycle:
 
-#### Doctor / Gynecologist Registration (`/signup`)
-*Registration interface for attending OB-GYNs capturing National Medical Commission (NMC) registration numbers, state medical councils across all 30 Indian states/UTs, hospital affiliation, and clinical designation.*
-![Doctor Registration](Readme/01-signup-doctor.jpeg)
-
----
-
-#### Nurse / Medical Assistant Registration (`/signup`)
-*Institutional onboarding portal for maternal health nurses capturing Indian Nursing Council (INC) registration details, healthcare facility name, and intake authority credentials.*
-![Nurse Registration](Readme/02-signup-nurse.jpeg)
+### 1. Public Clinical Portal & Landing Gateway (`/`)
+*The entry portal introduces GenoBridge's clinical mission: "Bringing Clarity to Every Genetic Referral Decision." It highlights the four core clinical pillars—OB-GYN Triage (ACOG Protocols), Fetal & ANC Care (Routine Surveillance), Genomic Analysis (ACMG Variant Triage), and Biochemical Lab (NIPT & Quad Screen)—with direct one-click routing to the Clinician and Nurse Intake workspaces.*
+![Public Clinical Landing Page](Screenshots/01-public-landing-page.jpeg)
 
 ---
 
-#### Role-Based Workspace Sign-In (`/login`)
-*Split-screen authentication portal with mathematical 3D B-DNA visual architecture, allowing verified staff to select their professional role (Doctor vs. Nurse) and securely access authorized clinical workspaces.*
-![Workspace Login](Readme/03-login-role-selection.jpeg)
+### 2. Role-Based Workspace Authentication (`/login`)
+*Split-screen authentication portal with mathematical 3D B-DNA visual architecture enforcing strict Role-Based Access Control (RBAC). Clinicians and staff select their registered clinical role (`Gynecologist / OB-GYN` or `Nurse / Medical Assistant`), authenticating via institutional email, password, or Google Single Sign-On (SSO) with direct links to professional self-registration.*
+![Clinical Workspace Login](Screenshots/02-login-workspace.jpeg)
 
 ---
 
-### 2. Clinical Dashboards & Pathway Catalogs
-
-#### Maternal & Child Health (MCH) Antenatal Care Registry (`/anc` or `/nurse/dashboard`)
-*Centralized obstetric surveillance dashboard displaying real-time high-risk case metrics, active pregnancy registries, referral counters, instant search filters, and new patient intake coordination.*
-![MCH ANC Registry](Readme/04-mch-anc-registry.jpeg)
-
----
-
-#### Clinical Pathways & Assessment Catalog (`/assessment`)
-*Standardized clinical catalog supporting 6 specialized genetic assessment pathways (Hereditary Cancer Risk, Preconception Carrier Screening, NIPT, Abnormal Ultrasound, Infertility & RPL, Positive Family History) with authenticated provider session context.*
-![Clinical Pathways Catalog](Readme/05-clinical-pathways-catalog.jpeg)
+### 3. Point-of-Care Clinical Pathway Triage (`/assessment`)
+*The central clinical triage launchpad displaying the active clinical encounter session (e.g., Priyanka Sharma, MRN-51928, 33yo) with verified session tokens. Clinicians select from 6 evidence-informed reproductive pathways designed for completion under two minutes:*
+* **Hereditary Cancer Risk:** BRCA1/2, Lynch Syndrome, and HBOC personal/family history (ACOG No. 793, NCCN v2.2024).
+* **Preconception Carrier Screening:** Consanguinity, ethnicity-based carrier screening, and recessive traits (ACOG No. 691, ACMG Tier 3, FOGSI).
+* **NIPT Results Interpretation:** High-risk, discordant, or no-call/low fetal fraction cfDNA triage (ACOG PB 226, SMFM Consensus).
+* **Abnormal Ultrasound Findings:** Structural anomalies and soft marker evaluation (ACOG PB 175, ISUOG Standards).
+* **Infertility / Recurrent Pregnancy Loss (RPL):** Parental balanced translocations and karyotyping (ASRM 2024, ACOG PB 200).
+* **Positive Family History of Genetic Disorder:** Non-cancer Mendelian conditions surfaced on history-taking (FOGSI GCPR, ACMG Guidelines).
+![Point-of-Care Clinical Pathways](Screenshots/03-clinical-pathways-triage.jpeg)
 
 ---
 
-### 3. Progressive Patient Intake & Clinical Risk Stratification
-
-#### Patient Overview & Active Clinical Risk Triggers
-*Dynamic obstetric summary displaying real-time risk indicators, gestational age (44w 1d), EDD, G/P formula, 7 automated risk triggers (Rh negative, prior C-section, chronic hypertension, renal, etc.), and ACOG low-dose aspirin prophylaxis recommendations.*
-![Patient Overview & Risk Triggers](Readme/06-patient-overview-risk-triggers.jpeg)
+### 4. Interactive Multi-Generational Pedigree Studio (`/pedigree`)
+*The dynamic clinical pedigree drawing canvas adheres strictly to standardized ACMG and National Society of Genetic Counselors (NSGC) digital nomenclature. Real-time metric cards summarize total family members (6), generations tracked (4), carriers (2), affected individuals (0), and deceased members. Clinicians can drag and reposition nodes with automatic layout adjustments, zoom controls, and instant serialization.*
+![Interactive Pedigree Studio Overview](Screenshots/04-pedigree-studio-overview.jpeg)
 
 ---
 
-#### Baseline Physical Examination & Vitals
-*Standardized clinical record tracking baseline physical examination metrics: height, weight, calculated BMI, blood pressure, pulse, temperature, pallor, pedal edema, and baseline hemoglobin (Hb).*
-![Patient Profile & Vitals](Readme/07-patient-profile-vitals.jpeg)
+### 5. Multi-Generational Pedigree Chart Canvas (Lineage Detail)
+*High-resolution canvas view illustrating maternal and paternal lineage connections across four generations: Generation I (Maternal Grandfather), Generation II (Father, Mother diagnosed with Breast Cancer), Generation III (Proband Consultand at age 28 marked with `P ↗`, and Partner/Spouse), and Generation IV (Offspring). Half-fill states represent confirmed heterozygote carriers, and double horizontal marriage bars indicate consanguineous partnerships.*
+![Pedigree Chart Canvas](Screenshots/05-pedigree-chart-canvas.jpeg)
 
 ---
 
-#### Socio-Demographic & Patient Registration Details
-*Longitudinal patient demographic record tracking Hospital Reg Number (MRN), national identifiers, primary/alternate contact numbers, residential address, and emergency contact details.*
-![Patient Demographics](Readme/08-patient-demographics.jpeg)
+### 6. Pedigree Factors, Ancestry & Family Members Roster
+*Comprehensive family history metadata manager tracking biological consanguinity, clinician free-text notes, and self-reported ancestral backgrounds (e.g., South Asian / Indian, Ashkenazi Jewish, Mediterranean) to detect regional founder mutations. An organized family member roster details generation levels, biological relationships, age, and individual genetic status (`UNAFFECTED`, `CARRIER`, `SUSPECTED CARRIER`, `UNKNOWN`).*
+![Pedigree Factors and Family Roster](Screenshots/06-pedigree-factors-roster.jpeg)
 
 ---
 
-#### Current Pregnancy Timeline & Obstetric Index
-*Obstetric calendar tracking LMP, EDD, menstrual cycle length, multiple gestation markers (e.g. 3 fetuses), gravida/para indices, living children, prior spontaneous abortions, and stillbirths.*
-![Pregnancy Timeline & Obstetric Index](Readme/09-pregnancy-timeline-obstetric.jpeg)
+### 7. Maternal & Child Health (MCH) Antenatal Patient Registration (`/anc/new`)
+*Progressive 11-step clinical intake wizard designed for nursing staff and frontline healthcare workers (Patient $\to$ Pregnancy $\to$ Obstetric $\to$ Medical $\to$ Risk $\to$ Exam $\to$ Labs $\to$ Ultrasound $\to$ Vaccines $\to$ Birth Plan $\to$ Review). Captures auto-assigned Patient IDs, Hospital MRNs, demographics, primary and emergency contacts, educational level, occupation, and complete residential details.*
+![Antenatal Patient Registration](Screenshots/07-anc-patient-registration.jpeg)
 
 ---
 
-#### Maternal Medical & Surgical History
-*Multi-system maternal medical condition screening covering pre-gestational diabetes, chronic hypertension, thyroid disorders, cardiac disease, renal disease, epilepsy, tuberculosis history, and drug allergies.*
-![Maternal Medical History](Readme/10-maternal-medical-history.jpeg)
+### 8. Universal Patient History & Cross-Portal Registry (`/history`)
+*Centralized longitudinal clinical registry aggregating patient identities and historical encounters across ANC, Clinical Genetics, Doctor Workspace, and Hospital EMR registries. The searchable registry displays unified dossiers, gestational age, parity indices (G/P), originating portals, and one-click access to complete chronological patient timelines.*
+![Universal Patient History](Screenshots/08-universal-patient-history.jpeg)
 
 ---
 
-#### Clinical Risk Stratification & Pre-Eclampsia Matrix
-*Dual-layer clinical risk engine separating deterministic algorithmic risk (HIGH) from attending physician sign-off ("Pending Clinician Sign-Off") to ensure clinical safety and human-in-the-loop governance.*
-![Clinical Risk Stratification](Readme/11-risk-stratification-matrix.jpeg)
+### 9. Genetics Referral & Cross-Portal Analytics Dashboard (`/analytics`)
+*Database-driven operational intelligence panel querying live records directly from Neon Serverless PostgreSQL. Features high-level KPI cards (Unique Patients, Active In-Care, Pedigrees Mapped, Clinical Workflows, ANC Encounters, and Attested Documents Issued) alongside interactive Recharts visualizations of portal activity distribution, patient age demographics, and historical encounter timelines.*
+![Cross-Portal Analytics Dashboard](Screenshots/09-genetics-analytics-dashboard.jpeg)
 
 ---
 
-### 4. Comprehensive Clinical Record Report (PDF Export)
+### 10. Clinician Account, Statutory Credentials & Security Management (`/account`)
+*Institutional profile and credential governance console displaying verified physician details (e.g., Dr. Priya Sharma, Senior Consultant OB/GYN, AIIMS New Delhi). It securely manages State Medical Council registration numbers (`DMC/2026/55412`, Delhi Medical Council) that are stamped onto legal referral briefs, while offering password resets and active workstation session auditing.*
+![Clinician Account and Statutory Credentials](Screenshots/10-account-credentials-security.jpeg)
 
-#### Automated Antenatal Care (ANC) Record Report
-*Standardized clinical documentation export unifying patient identification, obstetric timeline, clinical risk stratification, baseline examination, maternal medical conditions, visit logs, and laboratory investigations for tertiary referral and EMR integration.*
-![Comprehensive ANC Record Report](Readme/12-anc-comprehensive-report.jpg)
+---
+
+### 11. Point-of-Care Clinical Genetics Knowledge Base (`/knowledge-base`)
+*Standardized educational and clinical reference catalog for attending healthcare professionals, defining critical genetic concepts at point-of-care: First-degree vs. Second-degree relatives, Screening vs. Diagnostic testing, Carrier traits, Variants of Uncertain Significance (VUS), Penetrance, Consanguinity, and standard Pedigree notation conventions.*
+![Clinical Genetics Knowledge Base](Screenshots/11-clinical-knowledge-base.jpeg)
 
 ---
 
