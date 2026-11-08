@@ -21,9 +21,7 @@ The system enforces strict role-based access control (RBAC). Use the pre-configu
 | :--- | :--- | :--- | :--- | :--- |
 | **Doctor / Clinician Portal** | **Gynecologist / OB-GYN** | `doctor@hospital.org` | `password123` | Full clinical review authority, clinician confirmation/sign-off on high-risk assessments, genetic referral attestation, pathway triage. |
 | **Nurse Intake Portal** | **Staff Nurse / Medical Assistant** | `nurse@hospital.org` | `password123` | Maternal health registration, ANC visit logging, baseline vitals intake, multiple gestation documentation, progressive draft saving. |
-| **Alternative Provider** | **Consultant OB-GYN** | `jane.smith@genobridge-test.local` | `password123` | Secondary clinician account for multi-specialist sign-off and retrospective audit review. |
-| **Alternative Nurse** | **ANC Coordinator** | `mary.johnson@genobridge-test.local` | `password123` | Secondary triage nurse account for high-volume intake testing. |
-| **System Administrator** | **Platform Admin** | `admin@genobridge-test.local` | `password123` | Master governance dashboard, institutional user verification approval, ruleset versioning lifecycle. |
+
 
 ### 🌐 Direct Portal Navigation & Page Redirect Matrix
 
