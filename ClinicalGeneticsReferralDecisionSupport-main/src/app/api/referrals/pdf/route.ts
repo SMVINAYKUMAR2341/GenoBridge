@@ -10,8 +10,18 @@ const RULE_TITLES: Record<string, string> = {
   single_carrier: 'Single Carrier Status (Partner Testing Indicated)',
   nipt_positive: 'Cell-Free DNA Positive Aneuploidy Screening',
   'SRC-NIPT-004': 'Cell-Free DNA Positive Aneuploidy Screening',
-  nipt_no_call: 'Uninformative cfDNA / Low Fetal Fraction Failure',
+  nipt_common_aneuploidy_positive: 'Common Aneuploidy cfDNA Positive Screening',
+  nipt_common_aneuploidy_positive_v2: 'Common Aneuploidy cfDNA Positive (Isolated, Expedited 1-2w)',
+  nipt_common_aneuploidy_sameday: 'Common Aneuploidy with Major Structural Anomaly (Same-Day Emergency)',
+  nipt_common_aneuploidy_time_critical: 'Common Aneuploidy with Structural Anomaly / Discordant Markers (Time-Critical 48-72h)',
+  nipt_common_aneuploidy_advanced_ga: 'Common Aneuploidy with Advanced Gestational Age (Urgent 3-5d)',
+  nipt_common_aneuploidy_soft_markers: 'Common Aneuploidy with Ultrasound Soft Markers (Urgent 3-5d)',
+  nipt_low_risk_no_discordance: 'Low-Risk cfDNA Screening (Routine Monitoring)',
+  nipt_nocall_low_ff: 'Uninformative cfDNA / Low Fetal Fraction Failure',
   'SRC-NIPT-007': 'Uninformative cfDNA / Low Fetal Fraction Failure',
+  nipt_discordant: 'Discordant cfDNA and Ultrasound Findings',
+  nipt_sex_chromosome_positive: 'Sex Chromosome Aneuploidy cfDNA Screening',
+  nipt_microdeletion_positive: 'Microdeletion cfDNA Screening',
   ultrasound_structural: 'Fetal Major Structural Anomaly / Microarray Evaluation',
   'SRC-US-001': 'Fetal Major Structural Anomaly / Microarray Evaluation',
   ultrasound_nt_elevated: 'Increased Nuchal Translucency (NT >= 3.5mm)',
@@ -113,16 +123,22 @@ export async function POST(request: Request) {
 
     const rawRuleId = String(evaluation.matched_rule_id || 'STD-CARE-00')
     const ruleTitle = RULE_TITLES[rawRuleId] || cleanAscii(rawRuleId.replace(/_/g, ' ').toUpperCase())
-    const rawRisk = String(evaluation.risk_level || evaluation.outcome || 'ROUTINE').toUpperCase()
-    const riskLabel = rawRisk.includes('URGENT')
-      ? 'URGENT REFERRAL'
-      : rawRisk.includes('PRIORITY')
-        ? 'PRIORITY REFERRAL'
-        : rawRisk.includes('ROUTINE')
-          ? 'ROUTINE REFERRAL'
-          : rawRisk.includes('INSUFFICIENT')
-            ? 'INSUFFICIENT DATA'
-            : 'COUNSEL & REASSESS'
+    const rawRisk = String(evaluation.risk_level || evaluation.tier || evaluation.outcome || 'ROUTINE').toUpperCase()
+    const riskLabel = rawRisk.includes('SAME_DAY')
+      ? 'SAME-DAY EMERGENCY REFERRAL'
+      : rawRisk.includes('TIME_CRITICAL')
+        ? 'TIME-CRITICAL CLINICAL REFERRAL'
+        : rawRisk.includes('URGENT')
+          ? 'URGENT REFERRAL'
+          : rawRisk.includes('EXPEDITED')
+            ? 'EXPEDITED REFERRAL'
+            : rawRisk.includes('PRIORITY')
+              ? 'PRIORITY REFERRAL'
+              : rawRisk.includes('ROUTINE')
+                ? 'ROUTINE REFERRAL'
+                : rawRisk.includes('INSUFFICIENT')
+                  ? 'INSUFFICIENT DATA'
+                  : 'COUNSEL & REASSESS'
 
     const confidence = Math.round(Number(evaluation.confidence_score || 0.98) * 100)
     const action = cleanAscii(

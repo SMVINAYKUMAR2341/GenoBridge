@@ -20,8 +20,18 @@ RULE_TRANSLATIONS = {
     "single_carrier": "Single Carrier Status (Partner Testing Indicated)",
     "nipt_positive": "Cell-Free DNA Positive Aneuploidy Screening",
     "SRC-NIPT-004": "Cell-Free DNA Positive Aneuploidy Screening",
-    "nipt_no_call": "Uninformative cfDNA / Low Fetal Fraction Failure",
+    "nipt_common_aneuploidy_positive": "Common Aneuploidy cfDNA Positive Screening",
+    "nipt_common_aneuploidy_positive_v2": "Common Aneuploidy cfDNA Positive (Isolated, Expedited 1-2w)",
+    "nipt_common_aneuploidy_sameday": "Common Aneuploidy with Major Structural Anomaly (Same-Day Emergency)",
+    "nipt_common_aneuploidy_time_critical": "Common Aneuploidy with Structural Anomaly / Discordant Markers (Time-Critical 48-72h)",
+    "nipt_common_aneuploidy_advanced_ga": "Common Aneuploidy with Advanced Gestational Age (Urgent 3-5d)",
+    "nipt_common_aneuploidy_soft_markers": "Common Aneuploidy with Ultrasound Soft Markers (Urgent 3-5d)",
+    "nipt_low_risk_no_discordance": "Low-Risk cfDNA Screening (Routine Monitoring)",
+    "nipt_nocall_low_ff": "Uninformative cfDNA / Low Fetal Fraction Failure",
     "SRC-NIPT-007": "Uninformative cfDNA / Low Fetal Fraction Failure",
+    "nipt_discordant": "Discordant cfDNA and Ultrasound Findings",
+    "nipt_sex_chromosome_positive": "Sex Chromosome Aneuploidy cfDNA Screening",
+    "nipt_microdeletion_positive": "Microdeletion cfDNA Screening",
     "ultrasound_structural": "Fetal Major Structural Anomaly / Microarray Evaluation",
     "SRC-US-001": "Fetal Major Structural Anomaly / Microarray Evaluation",
     "ultrasound_nt_elevated": "Increased Nuchal Translucency (NT >= 3.5mm)",
@@ -201,8 +211,23 @@ def generate_clinical_pdf(
     raw_rule = str(evaluation.get("matched_rule_id", "STD-CARE-00"))
     rule_title = RULE_TRANSLATIONS.get(raw_rule, raw_rule.replace("_", " ").title())
 
-    risk_raw = str(evaluation.get("risk_level") or evaluation.get("outcome") or "ROUTINE").upper()
-    risk_label = "URGENT REFERRAL" if "URGENT" in risk_raw else "PRIORITY REFERRAL" if "PRIORITY" in risk_raw else "ROUTINE REFERRAL" if "ROUTINE" in risk_raw else "COUNSEL & REASSESS"
+    risk_raw = str(evaluation.get("risk_level") or evaluation.get("tier") or evaluation.get("outcome") or "ROUTINE").upper()
+    if "SAME_DAY" in risk_raw:
+        risk_label = "SAME-DAY EMERGENCY REFERRAL"
+    elif "TIME_CRITICAL" in risk_raw:
+        risk_label = "TIME-CRITICAL CLINICAL REFERRAL"
+    elif "URGENT" in risk_raw:
+        risk_label = "URGENT REFERRAL"
+    elif "EXPEDITED" in risk_raw:
+        risk_label = "EXPEDITED REFERRAL"
+    elif "PRIORITY" in risk_raw:
+        risk_label = "PRIORITY REFERRAL"
+    elif "ROUTINE" in risk_raw:
+        risk_label = "ROUTINE REFERRAL"
+    elif "INSUFFICIENT" in risk_raw:
+        risk_label = "INSUFFICIENT DATA"
+    else:
+        risk_label = "COUNSEL & REASSESS"
     confidence = round(float(evaluation.get("confidence_score", 0.98)) * 100)
 
     action_text = clean_ascii_text(evaluation.get("action") or evaluation.get("explanation") or "Referral navigation decision generated deterministically against published clinical practice guidelines.")

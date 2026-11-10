@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           pathway,
           features: typeof features === 'string' ? features : JSON.stringify(features || inputs || {}),
+          inputs: rawInputs,
         }),
         signal: AbortSignal.timeout(1500), // 1.5s timeout for fast fallback
       })

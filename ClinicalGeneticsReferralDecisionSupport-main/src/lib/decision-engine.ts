@@ -1438,7 +1438,20 @@ function _pickHighest(
     firedRules,
   )
 
-  const explanation = `Recommendation: ${topTier} REFERRAL to ${top.referral_target}. Met criteria: ${sorted.map((m) => m.label).join('; ')}. Evaluated deterministically against published clinical practice guidelines.`
+  const tierDescriptor =
+    topTier === 'SAME_DAY'
+      ? 'SAME-DAY EMERGENCY REFERRAL (< 24 hours)'
+      : topTier === 'TIME_CRITICAL'
+        ? 'TIME-CRITICAL REFERRAL (< 48–72 hours)'
+        : topTier === 'URGENT'
+          ? 'URGENT REFERRAL (Within 3–5 days)'
+          : topTier === 'EXPEDITED'
+            ? 'EXPEDITED REFERRAL (Within 1–2 weeks)'
+            : topTier === 'ROUTINE'
+              ? 'ROUTINE REFERRAL (Within 2–4 weeks)'
+              : `${topTier} REFERRAL`
+
+  const explanation = `Recommendation: ${tierDescriptor} to ${top.referral_target}. Met criteria: ${sorted.map((m) => m.label).join('; ')}. Evaluated deterministically against published clinical practice guidelines.`
 
   return {
     outcome: top.outcome,

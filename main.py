@@ -178,6 +178,10 @@ class EvaluationResponse(BaseModel):
     fired_rules: List[Dict[str, Any]] = Field(default_factory=list)
     counterfactuals: List[Dict[str, Any]] = Field(default_factory=list)
     urgency_deadline: Optional[str] = None
+    outcome: Optional[str] = None
+    clinical_decision: Optional[str] = None
+    referral_target: Optional[str] = None
+    matched_rule_id: Optional[str] = None
 
 PATHWAY_SYNONYMS = {
     "hereditary-cancer-risk": "Hereditary Cancer Risk",
@@ -270,6 +274,10 @@ def evaluate_patient(payload: EvaluationRequest, module: Optional[str] = None):
                 match_confidence=float(nipt_res.guideline_match),
                 clinical_risk=nipt_res.tier.value,
                 tier=nipt_res.tier.value,
+                outcome="borderline" if nipt_res.tier.value == "EXPEDITED" else "urgent" if nipt_res.tier.value in ["URGENT", "TIME_CRITICAL", "SAME_DAY"] else "routine",
+                clinical_decision="borderline_consideration" if nipt_res.tier.value == "EXPEDITED" else "urgent_referral_recommended" if nipt_res.tier.value in ["URGENT", "TIME_CRITICAL", "SAME_DAY"] else "routine_referral_recommended" if nipt_res.tier.value == "ROUTINE" else "no_referral_needed",
+                referral_target=", ".join(nipt_res.referral_target),
+                matched_rule_id=nipt_res.rule_id,
                 recommended_action=nipt_res.rationale_summary,
                 triggering_parameters=str(payload.features),
                 evidence_level="Level A / Standard of Care (ACOG PB 226)",
@@ -499,10 +507,14 @@ async def send_email_route(request: Request):
     return {"success": success, "recipient": recipient}
 
 try:
-    from routers.nipt import router as nipt_router
+    from backend.routers.nipt import router as nipt_router
     app.include_router(nipt_router)
-except Exception as e:
-    logger.warning(f"Could not load nipt router: {e}")
+except Exception:
+    try:
+        from routers.nipt import router as nipt_router
+        app.include_router(nipt_router)
+    except Exception as e:
+        logger.warning(f"Could not load nipt router: {e}")
 
 if __name__ == "__main__":
     import uvicorn

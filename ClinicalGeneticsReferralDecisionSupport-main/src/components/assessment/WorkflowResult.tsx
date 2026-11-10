@@ -543,12 +543,19 @@ export function WorkflowResult({
                     <span>{r.label}</span>
                   </span>
                   <span
-                    className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${r.tier === 'URGENT'
-                      ? 'bg-rose-100 text-rose-800 border border-rose-200'
-                      : r.tier === 'PRIORITY'
-                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                        : 'bg-slate-200 text-slate-800 border border-slate-300'
-                      }`}
+                    className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md ${
+                      r.tier === 'SAME_DAY'
+                        ? 'bg-red-100 text-red-800 border border-red-200'
+                        : r.tier === 'TIME_CRITICAL'
+                          ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                          : r.tier === 'URGENT'
+                            ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                            : r.tier === 'EXPEDITED' || r.tier === 'PRIORITY'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              : r.tier === 'ROUTINE'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : 'bg-slate-200 text-slate-800 border border-slate-300'
+                    }`}
                   >
                     {r.tier}
                   </span>
@@ -861,9 +868,11 @@ export function WorkflowResult({
                     onChange={(e) => setOverrideTier(e.target.value as StandardTier)}
                     className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-xs font-bold focus:outline-none focus:border-slate-900 shadow-xs"
                   >
-                    <option value="URGENT">URGENT (Time-Critical, same day to 72h)</option>
-                    <option value="PRIORITY">PRIORITY (Within 1–2 weeks)</option>
-                    <option value="ROUTINE">ROUTINE (Standard consultation)</option>
+                    <option value="SAME_DAY">SAME-DAY EMERGENCY (&lt; 24h, major anomaly + GA &gt; 22w)</option>
+                    <option value="TIME_CRITICAL">TIME-CRITICAL (&lt; 48–72h, structural anomaly or GA &gt; 22w)</option>
+                    <option value="URGENT">URGENT (3–5 days, soft markers present)</option>
+                    <option value="EXPEDITED">EXPEDITED (Within 1–2 weeks, isolated aneuploidy positive)</option>
+                    <option value="ROUTINE">ROUTINE (Within 2–4 weeks, standard monitoring)</option>
                     <option value="COUNSEL_AND_REASSESS">COUNSEL &amp; REASSESS (Criteria not met)</option>
                   </select>
                 </div>
