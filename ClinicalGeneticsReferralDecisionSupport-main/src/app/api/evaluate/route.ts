@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { evaluatePathway } from '@/lib/decision-engine'
+import { validateClinicalGuardrails } from '@/lib/clinical-guardrails'
 
 export async function POST(request: Request) {
   try {
@@ -8,6 +9,21 @@ export async function POST(request: Request) {
 
     if (!pathway) {
       return NextResponse.json({ message: 'Pathway is required' }, { status: 400 })
+    }
+
+    const rawInputs = typeof inputs === 'object' && inputs !== null ? inputs : {}
+
+    // CLINICAL & STATUTORY GUARDRAIL ENFORCEMENT
+    const guardrail = validateClinicalGuardrails(rawInputs, typeof features === 'string' ? features : '')
+    if (guardrail.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Clinical and statutory guardrail block.',
+          violations: guardrail.violations,
+          statutory_notice: guardrail.statutoryNotice,
+        },
+        { status: 403 }
+      )
     }
 
     // Attempt to connect to Python FastAPI semantic retrieval engine if running
@@ -32,7 +48,6 @@ export async function POST(request: Request) {
     }
 
     // Deterministic SaMD evaluation bridge
-    const rawInputs = typeof inputs === 'object' && inputs !== null ? inputs : {}
     const evaluated = evaluatePathway(pathway, rawInputs)
 
     return NextResponse.json({
@@ -57,6 +72,8 @@ export async function POST(request: Request) {
       time_critical_context: evaluated.time_critical_context,
       patient_summary_en: evaluated.patient_summary_en,
       patient_summary_hi: evaluated.patient_summary_hi,
+      guardrail_warnings: guardrail.warnings,
+      mtp_statutory_context: guardrail.mtpContext,
       cpt_codes: evaluated.cpt_codes || [],
       icd10_codes: evaluated.icd10_codes || [],
       counseling_points: evaluated.counseling_points || [],

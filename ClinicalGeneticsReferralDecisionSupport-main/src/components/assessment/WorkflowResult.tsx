@@ -237,8 +237,11 @@ export function WorkflowResult({
 
   const activeTier: StandardTier = isOverridden ? overrideTier : recommendedTier
 
+  const isEmergency = activeTier === 'SAME_DAY'
+  const isTimeCritical = activeTier === 'TIME_CRITICAL'
   const isUrgent = activeTier === 'URGENT'
-  const isPriority = activeTier === 'PRIORITY'
+  const isExpedited = activeTier === 'EXPEDITED' || activeTier === 'PRIORITY'
+  const isPriority = isExpedited
   const isRoutine = activeTier === 'ROUTINE'
   const isCounsel = activeTier === 'COUNSEL_AND_REASSESS'
   const isInsufficient = activeTier === 'INSUFFICIENT_DATA'
@@ -248,15 +251,20 @@ export function WorkflowResult({
   const referralTarget =
     (serverResult.referralTarget as string) ||
     decision?.referral_target ||
-    (isNoReferral ? 'Routine Obstetric & Primary Care' : 'Clinical Genetics / Genetic Counselor')
+    (isNoReferral ? 'Routine Obstetric & Primary Care' : 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor')
 
-  const timeframe = isUrgent
-    ? '< 48–72 hours (Time-Critical)'
-    : isPriority
-      ? '< 1–2 weeks (Priority Review)'
-      : isRoutine
-        ? '< 2–4 weeks (Routine Consultation)'
-        : 'Routine prenatal / clinical follow-up'
+  const timeframe =
+    isEmergency
+      ? 'Same day (<24 hours)'
+      : isTimeCritical
+        ? '< 48–72 hours (Time-Critical)'
+        : isUrgent
+          ? 'Within 3–5 days'
+          : isExpedited
+            ? 'Within 1–2 weeks (Expedited Review)'
+            : isRoutine
+              ? '< 2–4 weeks (Routine Consultation)'
+              : 'Routine prenatal / clinical follow-up'
 
   // Rationale & Explanations
   const explanation =
@@ -434,14 +442,19 @@ export function WorkflowResult({
 
       {/* 3. Authoritative Clinical Referral Decision Hero Banner */}
       <div
-        className={`rounded-2xl p-6 sm:p-8 text-white shadow-xl border ${isUrgent
-          ? 'bg-gradient-to-r from-[#881337] via-[#9f1239] to-[#be123c] border-rose-500/50'
-          : isPriority
-            ? 'bg-gradient-to-r from-[#7c2d12] via-[#9a3412] to-[#c2410c] border-orange-500/50'
-            : isRoutine
-              ? 'bg-gradient-to-r from-[#78350f] via-[#92400e] to-[#b45309] border-amber-500/50'
-              : 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700'
-          }`}
+        className={`rounded-2xl p-6 sm:p-8 text-white shadow-xl border ${
+          isEmergency
+            ? 'bg-gradient-to-r from-[#7f1d1d] via-[#991b1b] to-[#b91c1c] border-red-500/50'
+            : isTimeCritical
+              ? 'bg-gradient-to-r from-[#881337] via-[#9f1239] to-[#be123c] border-rose-500/50'
+              : isUrgent
+                ? 'bg-gradient-to-r from-[#9a3412] via-[#c2410c] to-[#ea580c] border-orange-500/50'
+                : isExpedited
+                  ? 'bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#f59e0b] border-amber-500/50'
+                  : isRoutine
+                    ? 'bg-gradient-to-r from-[#065f46] via-[#047857] to-[#059669] border-emerald-500/50'
+                    : 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-slate-700'
+        }`}
       >
         <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 mb-3">
           <span className="flex items-center gap-2">
@@ -454,20 +467,25 @@ export function WorkflowResult({
         </div>
 
         <div className="text-3xl sm:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-          {isUrgent && <AlertCircle className="w-9 h-9 text-rose-200 shrink-0" />}
-          {isPriority && <AlertTriangle className="w-9 h-9 text-orange-200 shrink-0" />}
-          {isRoutine && <AlertTriangle className="w-9 h-9 text-amber-200 shrink-0" />}
+          {(isEmergency || isTimeCritical) && <AlertCircle className="w-9 h-9 text-rose-200 shrink-0" />}
+          {isUrgent && <AlertTriangle className="w-9 h-9 text-orange-200 shrink-0" />}
+          {isExpedited && <AlertTriangle className="w-9 h-9 text-amber-200 shrink-0" />}
+          {isRoutine && <CheckCircle2 className="w-9 h-9 text-emerald-200 shrink-0" />}
           {isNoReferral && <CheckCircle2 className="w-9 h-9 text-slate-200 shrink-0" />}
           <span>
-            {isUrgent
-              ? 'Urgent Clinical Referral Recommended (Same day – 72h)'
-              : isPriority
-                ? 'Priority Clinical Referral Recommended (Within 1–2 weeks)'
-                : isRoutine
-                  ? 'Routine Clinical Referral Recommended (Within 2–4 weeks)'
-                  : isCounsel
-                    ? 'Counsel and Reassess — Guideline Criteria Not Met'
-                    : 'Insufficient Data — Essential Parameters Missing'}
+            {isEmergency
+              ? 'Same-Day Emergency Referral (< 24h)'
+              : isTimeCritical
+                ? 'Time-Critical Clinical Referral (< 48–72 hours)'
+                : isUrgent
+                  ? 'Urgent Referral Recommended (Within 3–5 days)'
+                  : isExpedited
+                    ? 'Expedited Referral Recommended (Within 1–2 weeks)'
+                    : isRoutine
+                      ? 'Routine Clinical Referral Recommended (Within 2–4 weeks)'
+                      : isCounsel
+                        ? 'Counsel and Reassess — Guideline Criteria Not Met'
+                        : 'Insufficient Data — Essential Parameters Missing'}
           </span>
         </div>
 

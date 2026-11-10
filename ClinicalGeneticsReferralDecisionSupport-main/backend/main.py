@@ -215,13 +215,85 @@ def evaluate_patient(payload: EvaluationRequest, module: Optional[str] = None):
     Evaluates patient features against the pathway rule base using TF-IDF cosine similarity.
     Returns highest-matching rule, 5-tier classification, and glass-box explainability.
     """
+    chosen_module = module or payload.pathway
+    norm_module = chosen_module.lower().replace("-", "_").strip()
+
+    if norm_module in ["nipt_results", "nipt"]:
+        try:
+            raw_inp = payload.inputs or {}
+            if not raw_inp and isinstance(payload.features, str):
+                try:
+                    import json
+                    raw_inp = json.loads(payload.features)
+                except Exception:
+                    raw_inp = {}
+            
+            from rules.nipt_rules import evaluate_nipt, NIPTRuleInput
+            
+            res_type = raw_inp.get("result_type") or raw_inp.get("niptFinding") or "low_risk"
+            if res_type in ["HIGH_RISK_T21", "t21_positive", "high_risk_common_trisomy"]:
+                res_type = "screen_positive_T21"
+            elif res_type in ["HIGH_RISK_T18", "t18_positive"]:
+                res_type = "screen_positive_T18"
+            elif res_type in ["HIGH_RISK_T13", "t13_positive"]:
+                res_type = "screen_positive_T13"
+            elif res_type in ["LOW_RISK", "negative"]:
+                res_type = "low_risk"
+
+            rule_input = NIPTRuleInput(
+                result_type=res_type,
+                fetal_fraction=float(raw_inp.get("fetal_fraction") or raw_inp.get("fetal_fraction_percentage") or raw_inp.get("niptFetalFraction") or 23.0),
+                is_nocall_low_ff=bool(raw_inp.get("no_call_flag") or raw_inp.get("no_call") or raw_inp.get("is_nocall_low_ff")),
+                is_discordant_with_ultrasound=bool(raw_inp.get("discordant_with_ultrasound") or raw_inp.get("niptDiscordantWithUltrasound")),
+                gestational_age_weeks=int(raw_inp.get("gestational_age_weeks") or raw_inp.get("niptGestationalWeeks") or 16),
+                maternal_age=int(raw_inp.get("maternal_age") or raw_inp.get("niptMaternalAge") or 30),
+                soft_markers=raw_inp.get("soft_markers") or raw_inp.get("niptSoftMarkers") or {"nonePresent": True},
+                major_structural_anomaly=bool(raw_inp.get("major_structural_anomaly") or raw_inp.get("niptMajorStructuralAnomaly")),
+                pedigree_linked=bool(raw_inp.get("pedigree_linked", False))
+            )
+            nipt_res = evaluate_nipt(rule_input)
+            
+            assessment_id = f"asm-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+            assessments_store[assessment_id] = {
+                "id": assessment_id,
+                "module": chosen_module,
+                "inputs": raw_inp,
+                "tier": nipt_res.tier.value,
+                "confidence": float(nipt_res.guideline_match),
+                "matched_rule": nipt_res.rule_id,
+                "recommendation": nipt_res.rationale_summary,
+                "guideline": "ACOG PB 226 / SMFM 2015",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+
+            return EvaluationResponse(
+                match_confidence=float(nipt_res.guideline_match),
+                clinical_risk=nipt_res.tier.value,
+                tier=nipt_res.tier.value,
+                recommended_action=nipt_res.rationale_summary,
+                triggering_parameters=str(payload.features),
+                evidence_level="Level A / Standard of Care (ACOG PB 226)",
+                guideline_source="ACOG PB 226 / SMFM 2015",
+                fired_rules=[{
+                    "id": nipt_res.rule_id,
+                    "rule_key": nipt_res.rule_id,
+                    "label": nipt_res.triggering_criteria[0]["criterion"] if nipt_res.triggering_criteria else "cfDNA Screen Evaluation",
+                    "tier": nipt_res.tier.value,
+                    "citation": "ACOG PB 226 / SMFM 2015",
+                    "guideline_source": "ACOG / SMFM",
+                }],
+                counterfactuals=nipt_res.counterfactuals,
+                urgency_deadline=nipt_res.timeframe_hours,
+            )
+        except Exception as e:
+            logger.warning(f"Deterministic NIPT rule evaluation fallback to TF-IDF: {e}")
+
     df = artifacts.get("df_clinical")
     vec = artifacts.get("tfidf_vectorizer")
 
     if df is None or vec is None:
         raise HTTPException(status_code=503, detail="Prediction artifacts not loaded on server.")
 
-    chosen_module = module or payload.pathway
     pathway_name = PATHWAY_SYNONYMS.get(chosen_module.lower().strip(), chosen_module)
     pathway_clean = pathway_name.lower().replace("-", " ").replace("_", " ")
 
@@ -425,6 +497,16 @@ async def send_email_route(request: Request):
         pdf_bytes=pdf_bytes,
     )
     return {"success": success, "recipient": recipient}
+
+try:
+    from backend.routers.nipt import router as nipt_router
+    app.include_router(nipt_router)
+except Exception:
+    try:
+        from routers.nipt import router as nipt_router
+        app.include_router(nipt_router)
+    except Exception as e:
+        logger.warning(f"Could not load nipt router: {e}")
 
 if __name__ == "__main__":
     import uvicorn

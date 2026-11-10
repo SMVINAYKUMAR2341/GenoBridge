@@ -22,7 +22,15 @@ export type PathwaySlug =
   | 'family_history'
 
 export type UrgencyTier = 'no_referral' | 'borderline' | 'routine' | 'urgent'
-export type StandardTier = 'URGENT' | 'PRIORITY' | 'ROUTINE' | 'COUNSEL_AND_REASSESS' | 'INSUFFICIENT_DATA'
+export type StandardTier =
+  | 'SAME_DAY'
+  | 'TIME_CRITICAL'
+  | 'URGENT'
+  | 'EXPEDITED'
+  | 'PRIORITY'
+  | 'ROUTINE'
+  | 'COUNSEL_AND_REASSESS'
+  | 'INSUFFICIENT_DATA'
 export type PrimaryDecision = 'urgent_referral' | 'routine_referral' | 'no_referral_needed'
 export type SafeguardDecision =
   | 'borderline_consideration'
@@ -35,6 +43,7 @@ export interface MatchedCriterion {
   label: string
   description?: string
   outcome: UrgencyTier
+  tier?: StandardTier
   referral_target: string
   guideline_source: string
   citation: string
@@ -139,6 +148,7 @@ export interface CriterionDefinition {
   description: string
   threshold: number | null
   outcome: UrgencyTier
+  tier?: StandardTier
   referral_target: string
   guideline_source: string
   citation: string
@@ -771,8 +781,40 @@ export function normalizeInputs(pathwayId: string, raw: Record<string, unknown>)
   }
 
   // NIPT
-  if (norm.fetal_fraction === undefined && raw.fetal_fraction_percentage !== undefined) {
-    norm.fetal_fraction = raw.fetal_fraction_percentage
+  if (norm.fetal_fraction === undefined) {
+    norm.fetal_fraction =
+      normalizeNumber(raw.fetal_fraction_percentage) ??
+      normalizeNumber(raw.fetal_fraction) ??
+      normalizeNumber(raw.niptFetalFraction) ??
+      normalizeNumber(raw.fetalFraction)
+  }
+  if (norm.gestational_age_weeks === undefined) {
+    norm.gestational_age_weeks =
+      normalizeNumber(raw.gestational_age_weeks) ??
+      normalizeNumber(raw.niptGestationalWeeks) ??
+      normalizeNumber(raw.gestationalAgeWeeks)
+  }
+  if (norm.maternal_age === undefined) {
+    norm.maternal_age =
+      normalizeNumber(raw.maternal_age) ??
+      normalizeNumber(raw.niptMaternalAge) ??
+      normalizeNumber(raw.maternalAge)
+  }
+  if (norm.soft_markers === undefined) {
+    norm.soft_markers = raw.soft_markers ?? raw.niptSoftMarkers ?? raw.softMarkers
+  }
+  if (norm.major_structural_anomaly === undefined) {
+    norm.major_structural_anomaly =
+      normalizeBoolean(raw.major_structural_anomaly) ||
+      normalizeBoolean(raw.niptMajorStructuralAnomaly) ||
+      normalizeBoolean(raw.structural_anomaly)
+  }
+  if (norm.discordant_with_ultrasound === undefined) {
+    norm.discordant_with_ultrasound =
+      normalizeBoolean(raw.discordant_with_ultrasound) ||
+      normalizeBoolean(raw.niptDiscordantWithUltrasound) ||
+      normalizeBoolean(raw.is_discordant_with_ultrasound) ||
+      normalizeBoolean(raw.isDiscordantWithUltrasound)
   }
   if (norm.no_call === undefined && raw.no_call_flag !== undefined) {
     norm.no_call = raw.no_call_flag
@@ -785,11 +827,11 @@ export function normalizeInputs(pathwayId: string, raw: Record<string, unknown>)
     else if (f === 'single_early_nocall') norm.no_call = true
   } else if (norm.result_type) {
     const r = String(norm.result_type).toUpperCase()
-    if (r === 'HIGH_RISK_T21') norm.result_type = 't21_positive'
-    else if (r === 'HIGH_RISK_T18') norm.result_type = 't18_positive'
-    else if (r === 'HIGH_RISK_T13') norm.result_type = 't13_positive'
-    else if (r === 'SEX_CHROMOSOME_ANEUPLOIDY') norm.result_type = 'sex_chromosome_positive'
-    else if (r === 'MICRODELETION_22Q11') norm.result_type = 'microdeletion_positive'
+    if (r === 'HIGH_RISK_T21' || r === 'SCREEN_POSITIVE_T21') norm.result_type = 't21_positive'
+    else if (r === 'HIGH_RISK_T18' || r === 'SCREEN_POSITIVE_T18') norm.result_type = 't18_positive'
+    else if (r === 'HIGH_RISK_T13' || r === 'SCREEN_POSITIVE_T13') norm.result_type = 't13_positive'
+    else if (r === 'SEX_CHROMOSOME_ANEUPLOIDY' || r === 'SCREEN_POSITIVE_MONOSOMY_X') norm.result_type = 'sex_chromosome_positive'
+    else if (r === 'MICRODELETION_22Q11' || r === 'SCREEN_POSITIVE_MICRODELETION') norm.result_type = 'microdeletion_positive'
     else if (r === 'LOW_RISK') norm.result_type = 'negative'
   }
 
@@ -845,6 +887,7 @@ function _match(c: CriterionDefinition): MatchedCriterion {
     label: c.label,
     description: c.description,
     outcome: c.outcome,
+    tier: c.tier,
     referral_target: c.referral_target,
     guideline_source: c.guideline_source,
     citation: c.citation,
@@ -991,6 +1034,32 @@ export function computeTimeCriticalContext(
   return ctx
 }
 
+export function hasSoftMarkers(soft: unknown): boolean {
+  if (!soft) return false
+  if (Array.isArray(soft)) {
+    return soft.some((k) => k !== 'nonePresent' && Boolean(k))
+  }
+  if (typeof soft === 'object') {
+    return Object.entries(soft as Record<string, unknown>).some(
+      ([k, v]) => k !== 'nonePresent' && Boolean(v)
+    )
+  }
+  return false
+}
+
+export function countSoftMarkers(soft: unknown): number {
+  if (!soft) return 0
+  if (Array.isArray(soft)) {
+    return soft.filter((k) => k !== 'nonePresent' && Boolean(k)).length
+  }
+  if (typeof soft === 'object') {
+    return Object.entries(soft as Record<string, unknown>).filter(
+      ([k, v]) => k !== 'nonePresent' && Boolean(v)
+    ).length
+  }
+  return 0
+}
+
 export function computeCounterfactuals(
   pathwayId: string,
   inputs: Record<string, unknown>,
@@ -1040,14 +1109,61 @@ export function computeCounterfactuals(
       })
     }
   } else if (pathwayId.includes('nipt')) {
-    if (tier === 'URGENT') {
+    const result = String(inputs.result_type || inputs.niptFinding || '').toLowerCase()
+    const ga =
+      normalizeNumber(inputs.gestational_age_weeks) ??
+      normalizeNumber(inputs.niptGestationalWeeks) ??
+      normalizeNumber(inputs.gestationalAgeWeeks) ??
+      16
+    const softData = inputs.soft_markers || inputs.niptSoftMarkers || inputs.softMarkers
+    const hasSoft = hasSoftMarkers(softData)
+    const hasStructuralAnomaly = normalizeBoolean(
+      inputs.major_structural_anomaly || inputs.niptMajorStructuralAnomaly || inputs.structural_anomaly
+    )
+
+    // Factor 1: cfDNA result
+    list.push({
+      factor: 'Cell-free DNA screening result',
+      current_value: result.includes('low_risk') || result === 'negative'
+        ? 'Low-risk cfDNA result'
+        : 'Screen positive for T21/T18/T13',
+      alternate_value: result.includes('low_risk') || result === 'negative'
+        ? 'Screen positive for T21/T18/T13'
+        : 'Low-risk cfDNA result',
+      resulting_tier: result.includes('low_risk') || result === 'negative' ? 'EXPEDITED' : 'ROUTINE',
+      explanation: 'If cfDNA were low-risk without ultrasound discordance, referral would not be indicated.',
+    })
+
+    // Factor 2: Ultrasound soft markers
+    if (!hasSoft) {
       list.push({
-        factor: 'Cell-free DNA screening risk finding',
-        current_value: 'High-risk cfDNA aneuploidy finding',
-        alternate_value: 'Low-risk cfDNA result',
-        resulting_tier: 'COUNSEL_AND_REASSESS',
-        explanation:
-          'If cfDNA were low-risk without ultrasound discordance, referral would not be indicated; patient would receive standard obstetric monitoring.',
+        factor: 'Ultrasound soft markers',
+        current_value: 'No soft markers present',
+        alternate_value: '≥1 soft marker present (e.g., echogenic bowel, nuchal fold)',
+        resulting_tier: 'URGENT',
+        explanation: 'Concordant soft markers with cfDNA positive increases PPV and escalates urgency to 3–5 days.',
+      })
+    }
+
+    // Factor 3: Gestational age
+    if (ga < 22) {
+      list.push({
+        factor: 'Gestational age',
+        current_value: `${ga} weeks — within standard diagnostic window`,
+        alternate_value: 'Gestational age ≥22 weeks',
+        resulting_tier: 'URGENT',
+        explanation: 'Advanced GA narrows the window for CVS/amnio and counseling — escalates to urgent 3–5 days.',
+      })
+    }
+
+    // Factor 4: Structural anomaly
+    if (!hasStructuralAnomaly) {
+      list.push({
+        factor: 'Ultrasound structural findings',
+        current_value: 'No major structural anomaly',
+        alternate_value: 'Major structural anomaly present',
+        resulting_tier: 'TIME_CRITICAL',
+        explanation: 'Structural anomaly concordant with NIPT positive requires 48–72h MFM consultation.',
       })
     }
   } else if (pathwayId.includes('ultrasound')) {
@@ -1265,20 +1381,34 @@ function _pickHighest(
     }
   }
 
-  const sorted = [...matches].sort(
-    (a, b) => (URGENCY_RANK[b.outcome] || 0) - (URGENCY_RANK[a.outcome] || 0),
-  )
+  const TIER_RANK: Record<string, number> = {
+    SAME_DAY: 6,
+    TIME_CRITICAL: 5,
+    URGENT: 4,
+    EXPEDITED: 3,
+    PRIORITY: 3,
+    ROUTINE: 2,
+    COUNSEL_AND_REASSESS: 1,
+    INSUFFICIENT_DATA: 0,
+  }
+
+  const sorted = [...matches].sort((a, b) => {
+    const rankA = (a.tier && TIER_RANK[a.tier]) ?? ((URGENCY_RANK[a.outcome] || 0) * 1.5)
+    const rankB = (b.tier && TIER_RANK[b.tier]) ?? ((URGENCY_RANK[b.outcome] || 0) * 1.5)
+    return rankB - rankA
+  })
   const top = sorted[0]
   const citations = [...new Set(sorted.map((m) => `${m.guideline_source}: ${m.citation}`))]
 
   const topTier: StandardTier =
-    top.outcome === 'urgent'
+    top.tier ||
+    (top.outcome === 'urgent'
       ? 'URGENT'
       : top.outcome === 'borderline'
-        ? 'PRIORITY'
+        ? 'EXPEDITED'
         : top.outcome === 'routine'
           ? 'ROUTINE'
-          : 'COUNSEL_AND_REASSESS'
+          : 'COUNSEL_AND_REASSESS')
 
   const firedRules: FiredRule[] = sorted.map((m) => ({
     id: m.rule_key,
@@ -1286,13 +1416,14 @@ function _pickHighest(
     label: m.label,
     description: m.description || '',
     tier:
-      m.outcome === 'urgent'
+      m.tier ||
+      (m.outcome === 'urgent'
         ? 'URGENT'
         : m.outcome === 'borderline'
-          ? 'PRIORITY'
+          ? 'EXPEDITED'
           : m.outcome === 'routine'
             ? 'ROUTINE'
-            : 'COUNSEL_AND_REASSESS',
+            : 'COUNSEL_AND_REASSESS'),
     triggering_parameters: { ...input },
     guideline_source: m.guideline_source,
     citation: m.citation,
@@ -1474,36 +1605,178 @@ export function evaluateCarrierScreening(input: Record<string, unknown>, criteri
 export function evaluateNipt(input: Record<string, unknown>, criteria: CriterionDefinition[]): DecisionResult {
   const matches: MatchedCriterion[] = []
   const d = input
-  const result = String(d.result_type || d.niptFinding || '').toLowerCase()
+  const result = String(d.result_type || d.resultType || d.niptFinding || '').toLowerCase()
 
-  if (['t21_positive', 't18_positive', 't13_positive', 'high_risk_common_trisomy'].some((k) => result.includes(k))) {
-    const c = _fires(criteria, 'nipt_common_aneuploidy_positive')
-    if (c) matches.push(_match(c))
+  const ga =
+    normalizeNumber(d.gestational_age_weeks) ??
+    normalizeNumber(d.niptGestationalWeeks) ??
+    normalizeNumber(d.gestationalAgeWeeks) ??
+    16
+
+  const ff =
+    normalizeNumber(d.fetal_fraction_percentage) ??
+    normalizeNumber(d.fetal_fraction) ??
+    normalizeNumber(d.niptFetalFraction) ??
+    normalizeNumber(d.fetalFraction)
+
+  const hasStructuralAnomaly =
+    normalizeBoolean(d.major_structural_anomaly) ||
+    normalizeBoolean(d.niptMajorStructuralAnomaly) ||
+    normalizeBoolean(d.structural_anomaly)
+
+  const hasDiscordance =
+    normalizeBoolean(d.discordant_with_ultrasound) ||
+    normalizeBoolean(d.niptDiscordantWithUltrasound) ||
+    normalizeBoolean(d.is_discordant_with_ultrasound) ||
+    normalizeBoolean(d.isDiscordantWithUltrasound)
+
+  const softData = d.soft_markers || d.niptSoftMarkers || d.softMarkers
+  const hasSoft = hasSoftMarkers(softData)
+  const softCount = countSoftMarkers(softData)
+
+  const isNoCall =
+    normalizeBoolean(d.no_call_flag) ||
+    normalizeBoolean(d.no_call) ||
+    normalizeBoolean(d.is_nocall_low_ff) ||
+    result.includes('no_call') ||
+    result.includes('single_early_nocall') ||
+    (ff !== null && ff < 4.0)
+
+  const isLowRisk =
+    result.includes('low_risk') ||
+    result === 'negative' ||
+    result.includes('screen_negative')
+
+  const isCommonTrisomy =
+    result.includes('t21') ||
+    result.includes('t18') ||
+    result.includes('t13') ||
+    result.includes('high_risk_common_trisomy') ||
+    result.includes('screen_positive_t21') ||
+    result.includes('screen_positive_t18') ||
+    result.includes('screen_positive_t13')
+
+  // BRANCH 1: Low risk result
+  if (isLowRisk && !hasDiscordance) {
+    matches.push({
+      rule_key: 'nipt_low_risk_no_discordance',
+      label: 'Low-risk cfDNA result without ultrasound discordance',
+      description: 'Standard obstetric care per ACOG PB 226.',
+      outcome: 'routine',
+      tier: 'ROUTINE',
+      referral_target: 'Obstetrician — standard monitoring',
+      guideline_source: 'ACOG',
+      citation: 'ACOG PB 226 — Low-Risk cfDNA Management',
+    })
+    return _pickHighest(matches, 'nipt_results', d)
   }
+
+  // BRANCH 2: No-call / Low fetal fraction
+  if (isNoCall) {
+    matches.push({
+      rule_key: 'nipt_nocall_low_ff',
+      label: 'No-call result or insufficient fetal fraction',
+      description: 'Repeat cfDNA or proceed to diagnostic testing (CVS/amniocentesis).',
+      outcome: 'borderline',
+      tier: 'EXPEDITED',
+      referral_target: 'MFM + Prenatal Genetic Counselor',
+      guideline_source: 'ACOG',
+      citation: 'ACOG PB 226 — No-Call cfDNA Management',
+    })
+  }
+
+  // BRANCH 3: Common aneuploidy positive (T21 / T18 / T13)
+  if (isCommonTrisomy) {
+    if (hasStructuralAnomaly && ga >= 22) {
+      // Sub-branch 3a: Major structural anomaly + GA >= 22w -> SAME_DAY (<24h)
+      matches.push({
+        rule_key: 'nipt_common_aneuploidy_sameday',
+        label: 'Major structural anomaly on ultrasound + GA ≥ 22w',
+        description: `Screen positive for cfDNA with major structural anomaly at ${ga}w. Time-critical — same-day MFM consultation required.`,
+        outcome: 'urgent',
+        tier: 'SAME_DAY',
+        referral_target: 'Maternal-Fetal Medicine (MFM)',
+        guideline_source: 'SMFM',
+        citation: 'SMFM 2015 — Ultrasound anomaly + cfDNA positive',
+      })
+    } else if (hasStructuralAnomaly || (hasDiscordance && hasSoft)) {
+      // Sub-branch 3a2: Structural anomaly OR discordant + soft markers -> TIME_CRITICAL (48-72h)
+      matches.push({
+        rule_key: 'nipt_common_aneuploidy_time_critical',
+        label: 'Structural anomaly OR discordant ultrasound + soft markers',
+        description: `Screen positive with structural anomaly or discordant ultrasound + soft markers at ${ga}w. Urgent MFM + genetics referral.`,
+        outcome: 'urgent',
+        tier: 'TIME_CRITICAL',
+        referral_target: 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor',
+        guideline_source: 'ACOG / SMFM',
+        citation: 'ACOG PB 226 + SMFM 2015',
+      })
+    } else if (ga >= 22 && !hasSoft) {
+      // Sub-branch 3b: Advanced GA >= 22w without soft markers -> URGENT (3-5 days)
+      matches.push({
+        rule_key: 'nipt_common_aneuploidy_advanced_ga',
+        label: `Gestational age ${ga}w — advanced GA narrows diagnostic window`,
+        description: `Screen positive at ${ga} weeks. Advanced GA creates time-sensitive decision window for diagnostic testing and counseling.`,
+        outcome: 'urgent',
+        tier: 'URGENT',
+        referral_target: 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor',
+        guideline_source: 'ACOG',
+        citation: 'ACOG PB 226 — Gestational age and decision timing',
+      })
+    } else if (hasSoft) {
+      // Sub-branch 3c: Soft markers present, GA < 22w -> URGENT (3-5 days)
+      matches.push({
+        rule_key: 'nipt_common_aneuploidy_soft_markers',
+        label: `${softCount} ultrasound soft marker(s) present`,
+        description: `Screen positive with ${softCount} soft marker(s) at ${ga}w. Concordant ultrasound findings increase PPV — expedited genetics referral within 3–5 days.`,
+        outcome: 'urgent',
+        tier: 'URGENT',
+        referral_target: 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor',
+        guideline_source: 'ISUOG / ACOG',
+        citation: 'ISUOG + ACOG — Soft markers concordance with cfDNA',
+      })
+    } else {
+      // Sub-branch 3d: Default — positive, no soft markers, no anomaly, GA < 22w -> EXPEDITED (1-2 weeks)
+      // THIS IS THE USER'S SCREENSHOT CASE!
+      matches.push({
+        rule_key: 'nipt_common_aneuploidy_positive_v2',
+        label: 'Screen positive for common aneuploidy (isolated without escalating factors)',
+        description: `Screen positive at ${ga} weeks. No soft markers, no structural anomaly. Pre-diagnostic genetic counseling and offer of CVS/amniocentesis within 1–2 weeks per ACOG PB 226. Not a clinical emergency.`,
+        outcome: 'borderline',
+        tier: 'EXPEDITED',
+        referral_target: 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor',
+        guideline_source: 'ACMG / ACOG',
+        citation: 'ACOG PB 226 — Expedited genetic counseling pathway',
+      })
+    }
+  }
+
+  // BRANCH 4: Sex chromosome / Microdeletion findings
   if (['sex_chromosome_positive', 'high_risk_sca_or_rat'].some((k) => result.includes(k))) {
     const c = _fires(criteria, 'nipt_sex_chromosome_positive')
     if (c) matches.push(_match(c))
   }
-  if (['microdeletion_positive', 'repeat_low_ff_or_microdeletion'].some((k) => result.includes(k))) {
+  if (
+    ['microdeletion_positive', 'repeat_low_ff_or_microdeletion', 'microdeletion_22q11'].some((k) =>
+      result.includes(k)
+    )
+  ) {
     const c = _fires(criteria, 'nipt_microdeletion_positive')
     if (c) matches.push(_match(c))
   }
 
-  const ff = normalizeNumber(d.fetal_fraction) ?? normalizeNumber(d.niptFetalFraction)
-  const lowFfRule = _fires(criteria, 'nipt_low_fetal_fraction')
-  const ffThreshold = lowFfRule?.threshold ?? 4.0
-  if (
-    normalizeBoolean(d.no_call) ||
-    result.includes('no_call') ||
-    result.includes('single_early_nocall') ||
-    (ff !== null && ff < ffThreshold)
-  ) {
-    if (lowFfRule) matches.push(_match(lowFfRule))
-  }
-
-  if (normalizeBoolean(d.discordant_with_ultrasound)) {
-    const c = _fires(criteria, 'nipt_discordant')
-    if (c) matches.push(_match(c))
+  // BRANCH 5: Discordant only (no aneuploidy positive)
+  if (hasDiscordance && !isCommonTrisomy) {
+    matches.push({
+      rule_key: 'nipt_discordant',
+      label: 'Discordant cfDNA and ultrasound findings',
+      description: 'cfDNA result discordant with ultrasound. MFM review required to reconcile findings.',
+      outcome: 'urgent',
+      tier: 'URGENT',
+      referral_target: 'Maternal-Fetal Medicine (MFM) + Prenatal Genetic Counselor',
+      guideline_source: 'ACOG',
+      citation: 'ACOG PB 226 — Discordant Results Management',
+    })
   }
 
   return _pickHighest(matches, 'nipt_results', d)

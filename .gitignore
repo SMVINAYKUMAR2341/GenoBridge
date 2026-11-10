@@ -31,3 +31,7 @@ Thumbs.db
 !README.md
 
 .neon
+
+__pycache__/
+*.pyc
+.pytest_cache/
