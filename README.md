@@ -88,7 +88,7 @@ Explore the operational portals of GenoBridge across the clinical genetic triage
 ---
 
 ### 7. Maternal & Child Health (MCH) Antenatal Patient Registration (`/anc/new`)
-*Progressive 11-step clinical intake wizard designed for nursing staff and frontline healthcare workers (Patient $\to$ Pregnancy $\to$ Obstetric $\to$ Medical $\to$ Risk $\to$ Exam $\to$ Labs $\to$ Ultrasound $\to$ Vaccines $\to$ Birth Plan $\to$ Review). Captures auto-assigned Patient IDs, Hospital MRNs, demographics, primary and emergency contacts, educational level, occupation, and complete residential details.*
+*A step-by-step antenatal care (ANC) registration form for nursing staff and frontline healthcare workers to register pregnant mothers. Instead of an overwhelming single form, it guides intake across 11 clear sections: Patient Details → Pregnancy Dating → Obstetric History → Medical History → Risk Assessment → Physical Exam → Lab Tests → Ultrasound Scans → Vaccines → Birth Plan → Final Review. It captures patient IDs, hospital MRNs, demographics, emergency contacts, vital signs, and pregnancy history to ensure complete clinical continuity.*
 ![Antenatal Patient Registration](Screenshots/07-anc-patient-registration.jpeg)
 
 ---
@@ -178,8 +178,8 @@ To support **10 million users** without crashing the database and with **$0 clou
 * **Tag-Based Invalidation:** When a record or profile is updated, cache tags (e.g. `user-session-{id}`, `clinical-pathways`) are purged in real-time across both memory and database tiers.
 
 ### 3. Dual-Track Clinical Governance State Machines
-* **Patient Referral Lifecycle:** `DRAFT` $\rightarrow$ `SUBMITTED` $\rightarrow$ `IN_REVIEW` $\rightarrow$ `FINALIZED`. Preserves immutable snapshots with SHA-256 cryptographic digests over clinical inputs to detect tampering.
-* **Clinical Ruleset Lifecycle:** `DRAFT` $\rightarrow$ `UNDER_REVIEW` $\rightarrow$ `APPROVED` $\rightarrow$ `ACTIVE` $\rightarrow$ `RETIRED`. All clinical algorithms are version-controlled and tied to published medical bulletins with multi-specialist sign-off.
+* **Patient Referral Lifecycle:** `DRAFT` → `SUBMITTED` → `IN_REVIEW` → `FINALIZED`. Preserves immutable snapshots with SHA-256 cryptographic digests over clinical inputs to detect tampering.
+* **Clinical Ruleset Lifecycle:** `DRAFT` → `UNDER_REVIEW` → `APPROVED` → `ACTIVE` → `RETIRED`. All clinical algorithms are version-controlled and tied to published medical bulletins with multi-specialist sign-off.
 
 ---
 
